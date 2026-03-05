@@ -6,7 +6,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:blocz/_internal/findNodes.dart';
 // import 'package:blocz/_internal/getImportUri.dart';
 import 'package:blocz/_internal/getInnerType.dart';
-import 'package:blocz/_internal/typedef.dart';
 import 'package:blocz/getProjectRootPath.dart';
 import 'package:blocz/importClauseToPath.dart';
 import 'package:path/path.dart' as p;
@@ -159,17 +158,15 @@ Future<Map<String, dynamic>> extractMethodResponseTypeWithField(
 
   // printInfo("↓↓↓ result ↓↓↓");
   return {
-      "searchFields": searchFields,
-      "hitClass": innerType,
-      "hitField": foundBy_findClassDeclarationWithHttpResponse
-          ? "body"
-          : "data",
-      "responseDataType": responseDataType,
-      "importUri": foundBy_findClassDeclarationWithHttpResponse
-          ? "import 'package:http/src/response.dart';"
-          : importUri,
-      "classDeclarationPath": classDeclarationPath,
-    };
+    "searchFields": searchFields,
+    "hitClass": innerType,
+    "hitField": foundBy_findClassDeclarationWithHttpResponse ? "body" : "data",
+    "responseDataType": responseDataType,
+    "importUri": foundBy_findClassDeclarationWithHttpResponse
+        ? "import 'package:http/src/response.dart';"
+        : importUri,
+    "classDeclarationPath": classDeclarationPath,
+  };
 }
 
 class _MethodVisitor extends RecursiveAstVisitor<void> {
