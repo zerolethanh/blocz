@@ -1,0 +1,28 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+
+
+tasks:
+  compile:
+    desc: Compile binary
+    aliases:
+      - c
+    cmds:
+      - dart compile exe bin/floc_helper.dart -o bin/floc_helper
+      - ls -lh bin/floc_helper #check file size
+  compile:hasher:
+    cmds:
+      - dcli compile -o last_build_hash_gen.dart
+      - ls -lh last_build_hash_gen #check file size
+  test:built:
+    cmds:
+      - ./floc_helper {{.CLI_ARGS}}
+  test:
+    cmds:
+      - dart run /Users/lethanh/WebstormProjects/floc/src/floc_helper/bin/floc_helper.dart {{.CLI_ARGS}}
+  release:local:
+    cmds:
+      - dart pub global activate --source path bin
