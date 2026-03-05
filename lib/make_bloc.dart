@@ -10,7 +10,9 @@ Future<void> makeBloc(String domain, String? name) async {
 
   final String nameSnake = name!.snakeCase;
   final String domainSnake = domain.snakeCase;
-  final String commonFileName = isEmptyName ? domainSnake : '${domainSnake}_${nameSnake}';
+  final String commonFileName = isEmptyName
+      ? domainSnake
+      : '${domainSnake}_${nameSnake}';
   final String commonClassName = commonFileName.pascalCase;
 
   final Map<String, String> data = {
@@ -24,9 +26,9 @@ Future<void> makeBloc(String domain, String? name) async {
     'CommonFileName': commonClassName,
   };
 
-  final bloc = _renderTemplate('bloc', data);
-  final event = _renderTemplate('event', data);
-  final state = _renderTemplate('state', data);
+  final bloc = _renderTemplate(_blocTemplate, data);
+  final event = _renderTemplate(_eventTemplate, data);
+  final state = _renderTemplate(_stateTemplate, data);
 
   final writeDir = p.join('lib', 'features', domain, 'presentation', 'bloc');
   Directory(writeDir).createSync(recursive: true);
@@ -44,13 +46,62 @@ Future<void> makeBloc(String domain, String? name) async {
   print('Generated: $statePath');
 }
 
-String _renderTemplate(String templateName, Map<String, String> data) {
-  final templatePath = p.join(
-    p.dirname(Platform.script.toFilePath()),
-    'templates',
-    '$templateName.dart.hbs',
-  );
-  final templateContent = File(templatePath).readAsStringSync();
+String _renderTemplate(String templateContent, Map<String, String> data) {
   final template = Template(templateContent, lenient: true);
   return template.renderString(data);
 }
+
+const _blocTemplate = r'''
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
+// import 'package:get_it/get_it.dart';
+
+import '{{common_file_name}}_event.dart';
+import '{{common_file_name}}_state.dart';
+
+@lazySingleton
+class {{CommonFileName}}Bloc extends Bloc<{{CommonFileName}}Event, {{CommonFileName}}State> {
+    // dependencies injections
+    // final OtherBloc _otherBloc = GetIt.I<OtherBloc>();
+    // final OtherUseCase _otherUseCase;
+
+    {{CommonFileName}}Bloc(
+        // this._otherUseCase
+    ) : super(const {{CommonFileName}}State.initial()) {
+        on<{{CommonFileName}}EventLoading>(_on{{CommonFileName}}EventLoading);
+    }
+
+    Future<void> _on{{CommonFileName}}EventLoading
+    (
+        {{CommonFileName}}EventLoading event,
+        Emitter<{{CommonFileName}}State> emit
+    ) async {
+        emit(const {{CommonFileName}}State.loading());
+    }
+}
+''';
+
+const _eventTemplate = r'''
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part '{{common_file_name}}_event.freezed.dart';
+
+@freezed
+sealed class {{CommonFileName}}Event with _${{CommonFileName}}Event {
+  const factory {{CommonFileName}}Event.loading() = {{CommonFileName}}EventLoading;
+}
+''';
+
+const _stateTemplate = r'''
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part '{{common_file_name}}_state.freezed.dart';
+
+@freezed
+sealed class {{CommonFileName}}State with _${{CommonFileName}}State {
+  const factory {{CommonFileName}}State.initial() = _{{CommonFileName}}StateInitialDone;
+  const factory {{CommonFileName}}State.loading() = _{{CommonFileName}}StateLoading;
+  // const factory {{CommonFileName}}State.loaded(dynamic result) = _{{CommonFileName}}StateLoaded;
+  const factory {{CommonFileName}}State.failure(String message) = _{{CommonFileName}}StateFailure;
+}
+''';
