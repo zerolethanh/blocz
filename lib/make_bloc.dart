@@ -8,7 +8,7 @@ Future<void> makeBloc(String domain, String? name) async {
   final bool isEmptyName = name == null || name.trim().isEmpty;
   name = isEmptyName ? domain : name;
 
-  final String nameSnake = name!.snakeCase;
+  final String nameSnake = name.snakeCase;
   final String domainSnake = domain.snakeCase;
   final String commonFileName = isEmptyName
       ? domainSnake
