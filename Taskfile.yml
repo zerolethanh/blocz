@@ -1,6 +1,6 @@
 # https://taskfile.dev
 
-version: '3'
+version: "3"
 
 #vars:
 #  PUB_BIN:
@@ -9,7 +9,6 @@ version: '3'
 #    windows: '%LOCALAPPDATA%\Pub\Cache\bin'
 
 tasks:
-
   compile:
     desc: Compile binary
     aliases:
@@ -39,13 +38,32 @@ tasks:
       - dart run bin/floc_helper.dart {{.CLI_ARGS}}
 
   release:local:
-    desc: Release local (activates globally and adds to PATH if missing)
+    desc: Release local (compiles and copies binary to pub-cache bin)
     aliases:
       - rl
     cmds:
-      - dart pub global activate --source path .
-      - task: setup:path
+      - task: compile
+      - task: _copy:bin:{{OS}}
+      # - task: setup:path
       - echo " ✅ Successfully activated floc_helper locally."
+
+  _copy:bin:darwin:
+    internal: true
+    cmds:
+      - mkdir -p "$HOME/.pub-cache/bin"
+      - cp bin/floc_helper "$HOME/.pub-cache/bin/floc_helper"
+
+  _copy:bin:linux:
+    internal: true
+    cmds:
+      - mkdir -p "$HOME/.pub-cache/bin"
+      - cp bin/floc_helper "$HOME/.pub-cache/bin/floc_helper"
+
+  _copy:bin:windows:
+    internal: true
+    cmds:
+      - powershell -Command "New-Item -ItemType Directory -Force -Path \"$env:LOCALAPPDATA\Pub\Cache\bin\""
+      - powershell -Command "Copy-Item -Path 'bin\floc_helper.exe' -Destination \"$env:LOCALAPPDATA\Pub\Cache\bin\floc_helper.exe\" -Force"
 
   setup:path:
     desc: Automatically add pub cache bin to PATH based on OS

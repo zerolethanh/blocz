@@ -27,24 +27,43 @@ Future<void> main(List<String> arguments) async {
   final parser = ArgParser();
 
   // Define command-line arguments
-  parser.addFlag('help', abbr: 'h', help: 'Show this help message', negatable: false);
+  parser.addFlag(
+    'help',
+    abbr: 'h',
+    help: 'Show this help message',
+    negatable: false,
+  );
   parser.addFlag('force', abbr: 'f', help: 'force write', defaultsTo: false);
 
   parser.addCommand('make:bloc')
+    ..addSeparator("Make bloc,state,event")
     ..addOption('domain', help: 'domain based name')
     ..addOption('name', abbr: 'n', help: 'name of bloc,state,event');
 
   parser.addCommand('add:event')
+    ..addSeparator("Add event to bloc")
     ..addOption('domain', help: 'domain name')
     ..addOption('name', abbr: 'n', help: 'name of bloc,state,event')
     ..addOption('event', abbr: 'e', help: 'event name')
-    ..addOption('apiPath', abbr: 'a', help: 'to be implemented api .dart fullpath')
+    ..addOption(
+      'apiPath',
+      abbr: 'a',
+      help: 'to be implemented api .dart fullpath',
+    )
     ..addOption('method', abbr: 'm', help: 'to be implemented api\'s method')
-    ..addOption('implementAllApiMethods', abbr: 'A', help: 'implement all methods from apiPath');
+    ..addOption(
+      'implementAllApiMethods',
+      abbr: 'A',
+      help: 'implement all methods from apiPath',
+    );
 
   parser.addCommand('pr', parser.addCommand("project:root"))
     ..addSeparator("Get project root")
-    ..addOption('path', abbr: 'p', help: 'Source file full path; defaults to current directory');
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path; defaults to current directory',
+    );
 
   parser.addCommand('sdk:path').addSeparator("Get dart sdk path");
 
@@ -64,7 +83,9 @@ Future<void> main(List<String> arguments) async {
 
   // ... other commands
   parser.addCommand('clause:import')
-    ..addSeparator("get import clause from filepath; eg: import 'package:abc/abc.dart'")
+    ..addSeparator(
+      "get import clause from filepath; eg: import 'package:abc/abc.dart'",
+    )
     ..addOption('path', abbr: 'p', help: 'source file full path');
 
   parser.addCommand('find:last:on:line:number')
@@ -98,7 +119,9 @@ Future<void> main(List<String> arguments) async {
     ..addOption('method', abbr: 'm', help: 'method name');
 
   parser.addCommand("method:response:inner:data:type")
-    ..addSeparator("extract response type `data` or `body` field type from method")
+    ..addSeparator(
+      "extract response type `data` or `body` field type from method",
+    )
     ..addOption('path', abbr: 'p', help: 'source file full path')
     ..addOption('method', abbr: 'm', help: 'method name');
 
@@ -106,7 +129,11 @@ Future<void> main(List<String> arguments) async {
     ..addSeparator("extract response type with custom field type from method")
     ..addOption('path', abbr: 'p', help: 'source file full path')
     ..addOption('method', abbr: 'm', help: 'method name')
-    ..addOption('fieldName', abbr: 'f', help: 'field name, canbe a string seperated by comma(,)');
+    ..addOption(
+      'fieldName',
+      abbr: 'f',
+      help: 'field name, canbe a string seperated by comma(,)',
+    );
 
   parser.addCommand("method:list")
     ..addSeparator("extract method list from class")
@@ -116,7 +143,11 @@ Future<void> main(List<String> arguments) async {
   parser.addCommand("method:list2")
     ..addSeparator("extract method list from class")
     ..addOption('path', abbr: 'p', help: 'source file full path')
-    ..addOption('identifier', abbr: 'i', help: 'identifier to find, eg: `OrderBloc`');
+    ..addOption(
+      'identifier',
+      abbr: 'i',
+      help: 'identifier to find, eg: `OrderBloc`',
+    );
 
   parser.addCommand('constructor:list')
     ..addSeparator("extract contructor list from class")
@@ -137,7 +168,7 @@ Future<void> main(List<String> arguments) async {
     if (parserResult['help'] as bool || parserResult.command == null) {
       print('Available commands:');
       parser.commands.forEach((name, command) {
-        print(' $name\n Usage: ${command.usage}\n');
+        print("$green$name$reset: ${command.usage}\n");
       });
       print('\n${parser.usage}');
       exit(0);
@@ -193,7 +224,10 @@ Future<void> main(List<String> arguments) async {
       case 'constructor:params:and:fields':
         _ensurePathParam(pathParam);
         final constructorName = command.option('name');
-        final result = extractConstructorParamsAndItsFields(pathParam!, constructorName);
+        final result = extractConstructorParamsAndItsFields(
+          pathParam!,
+          constructorName,
+        );
         print(result);
         break;
       // ... other cases
@@ -236,7 +270,10 @@ Future<void> main(List<String> arguments) async {
       case 'method:params2':
         _ensurePathParam(pathParam);
         final methodName = command.option('method');
-        final params = MethodManager(filePath: pathParam!, identifier: ".$methodName");
+        final params = MethodManager(
+          filePath: pathParam!,
+          identifier: ".$methodName",
+        );
         params.paramsList().expose();
         break;
       // case 'extractMethodResponseType':
@@ -252,7 +289,10 @@ Future<void> main(List<String> arguments) async {
         _ensurePathParam(pathParam);
         final methodName = command.option('method');
         _throwIfNotTrue(methodName != null, "--method or -m required");
-        final responseType = await extractMethodResponseInnerDataType(pathParam!, methodName!);
+        final responseType = await extractMethodResponseInnerDataType(
+          pathParam!,
+          methodName!,
+        );
         print(JsonEncoder.withIndent('  ').convert(responseType));
         break;
       // case 'extractMethodResponseTypeWithField':
@@ -261,7 +301,11 @@ Future<void> main(List<String> arguments) async {
         final methodName = command.option('method');
         dynamic fieldName = command.option('fieldName') ?? "data,body";
         _throwIfNotTrue(methodName != null, "--method or -m required");
-        final responseType = await extractMethodResponseTypeWithField(pathParam!, methodName!, fieldName);
+        final responseType = await extractMethodResponseTypeWithField(
+          pathParam!,
+          methodName!,
+          fieldName,
+        );
         print(JsonEncoder.withIndent('  ').convert(responseType));
         break;
       // case 'extractMethodListFromClass':
@@ -274,7 +318,10 @@ Future<void> main(List<String> arguments) async {
       case 'method:list2':
         _ensurePathParam(pathParam);
         final identifier = command.option('identifier');
-        final result = MethodManager(filePath: pathParam!, identifier: identifier ?? "").listAllMethods().toString();
+        final result = MethodManager(
+          filePath: pathParam!,
+          identifier: identifier ?? "",
+        ).listAllMethods().toString();
         print(result);
         break;
       // case 'extractConstructorListFromClass':
