@@ -37,12 +37,12 @@ Future<void> main(List<String> arguments) async {
 
   parser.addCommand('make:bloc')
     ..addSeparator("Make bloc,state,event")
-    ..addOption('domain', help: 'domain based name')
+    ..addOption('domain', abbr: 'd', help: 'domain based name')
     ..addOption('name', abbr: 'n', help: 'name of bloc,state,event');
 
   parser.addCommand('add:event')
     ..addSeparator("Add event to bloc")
-    ..addOption('domain', help: 'domain name')
+    ..addOption('domain', abbr: 'd', help: 'domain name')
     ..addOption('name', abbr: 'n', help: 'name of bloc,state,event')
     ..addOption('event', abbr: 'e', help: 'event name')
     ..addOption(
