@@ -1,4 +1,4 @@
-import 'package:floc_helper/_internal/typedef.dart';
+import 'package:blocz/_internal/typedef.dart';
 
 import '../../colors.dart';
 

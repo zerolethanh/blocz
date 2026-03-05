@@ -6,7 +6,7 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:floc_helper/_internal/colors.dart';
+import 'package:blocz/_internal/colors.dart';
 
 import '../getProjectRootPath.dart';
 import 'getSdkPath.dart';

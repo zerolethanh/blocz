@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:floc_helper/extractMethodResponseTypeWithField.dart';
+import 'package:blocz/extractMethodResponseTypeWithField.dart';
 
 /// Extracts the type of the 'data' field from a method's response type.
 Future<Map<String, dynamic>> extractMethodResponseInnerDataType(String filePath,

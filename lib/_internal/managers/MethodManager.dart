@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:floc_helper/_internal/colors.dart';
-import 'package:floc_helper/_internal/getInnerType.dart';
-import 'package:floc_helper/_internal/managers/mixins/ParseStringResultMixin.dart';
+import 'package:blocz/_internal/colors.dart';
+import 'package:blocz/_internal/getInnerType.dart';
+import 'package:blocz/_internal/managers/mixins/ParseStringResultMixin.dart';
 
 import '../../getClassName.dart';
 import '../projectContext.dart';

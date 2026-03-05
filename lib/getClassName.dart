@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:floc_helper/_internal/typedef.dart';
-import 'package:floc_helper/_internal/visitChildren.dart';
+import 'package:blocz/_internal/typedef.dart';
+import 'package:blocz/_internal/visitChildren.dart';
 
 JSONString getClassName(String codePath) {
   return getFirstClassNameInFile(codePath);

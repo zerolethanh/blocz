@@ -4,7 +4,7 @@ import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:floc_helper/extractMethodListFromClass.dart';
+import 'package:blocz/extractMethodListFromClass.dart';
 
 import '_internal/typedef.dart';
 

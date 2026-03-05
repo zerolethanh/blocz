@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:floc_helper/extractMethodParams.dart';
-import 'package:floc_helper/extractMethodResponseTypeWithDataField.dart';
-import 'package:floc_helper/findLastClassbodyLineNumber.dart';
-import 'package:floc_helper/findLastConstFactory.dart';
-import 'package:floc_helper/findLast_On_LineNumber.dart';
-import 'package:floc_helper/getClassName.dart';
+import 'package:blocz/extractMethodParams.dart';
+import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
+import 'package:blocz/findLastClassbodyLineNumber.dart';
+import 'package:blocz/findLastConstFactory.dart';
+import 'package:blocz/findLast_On_LineNumber.dart';
+import 'package:blocz/getClassName.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
 

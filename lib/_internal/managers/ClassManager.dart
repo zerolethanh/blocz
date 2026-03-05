@@ -1,6 +1,6 @@
-import 'package:floc_helper/_internal/managers/ConstructorManager.dart';
-import 'package:floc_helper/_internal/managers/MethodManager.dart';
-import 'package:floc_helper/_internal/managers/mixins/ParseStringResultMixin.dart';
+import 'package:blocz/_internal/managers/ConstructorManager.dart';
+import 'package:blocz/_internal/managers/MethodManager.dart';
+import 'package:blocz/_internal/managers/mixins/ParseStringResultMixin.dart';
 
 import '../../getClassName.dart';
 import '../visitors/ClassVisitors.dart';

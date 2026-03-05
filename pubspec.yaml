@@ -1,4 +1,5 @@
-name: floc_helper
+name: blocz
+
 description: Flutter bloc helpers
 version: 1.0.0
 # repository: https://github.com/my_org/my_repo
@@ -20,4 +21,4 @@ dev_dependencies:
   test: ^1.25.6
 
 executables:
-  floc_helper:
+  blocz:

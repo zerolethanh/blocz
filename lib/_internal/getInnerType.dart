@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:floc_helper/_internal/visitors/FieldVisitor.dart';
+import 'package:blocz/_internal/visitors/FieldVisitor.dart';
 import 'package:path/path.dart' as p;
 
 import '../getProjectRootPath.dart';

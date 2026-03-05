@@ -14,8 +14,8 @@ tasks:
     aliases:
       - c
     cmds:
-      - dart compile exe bin/floc_helper.dart -o bin/floc_helper
-      - ls -lh bin/floc_helper #check file size
+      - dart compile exe bin/blocz.dart -o bin/blocz
+      - ls -lh bin/blocz #check file size
 
   compile:hasher:
     aliases:
@@ -28,14 +28,14 @@ tasks:
     aliases:
       - tb
     cmds:
-      - bin/floc_helper {{.CLI_ARGS}}
+      - bin/blocz {{.CLI_ARGS}}
 
   test:
     desc: Run tests
     aliases:
       - t
     cmds:
-      - dart run bin/floc_helper.dart {{.CLI_ARGS}}
+      - dart run bin/blocz.dart {{.CLI_ARGS}}
 
   release:local:
     desc: Release local (compiles and copies binary to pub-cache bin)
@@ -45,25 +45,25 @@ tasks:
       - task: compile
       - task: _copy:bin:{{OS}}
       # - task: setup:path
-      - echo " ✅ Successfully activated floc_helper locally."
+      - echo " ✅ Successfully activated blocz locally."
 
   _copy:bin:darwin:
     internal: true
     cmds:
       - mkdir -p "$HOME/.pub-cache/bin"
-      - cp bin/floc_helper "$HOME/.pub-cache/bin/floc_helper"
+      - cp bin/blocz "$HOME/.pub-cache/bin/blocz"
 
   _copy:bin:linux:
     internal: true
     cmds:
       - mkdir -p "$HOME/.pub-cache/bin"
-      - cp bin/floc_helper "$HOME/.pub-cache/bin/floc_helper"
+      - cp bin/blocz "$HOME/.pub-cache/bin/blocz"
 
   _copy:bin:windows:
     internal: true
     cmds:
       - powershell -Command "New-Item -ItemType Directory -Force -Path \"$env:LOCALAPPDATA\Pub\Cache\bin\""
-      - powershell -Command "Copy-Item -Path 'bin\floc_helper.exe' -Destination \"$env:LOCALAPPDATA\Pub\Cache\bin\floc_helper.exe\" -Force"
+      - powershell -Command "Copy-Item -Path 'bin\blocz.exe' -Destination \"$env:LOCALAPPDATA\Pub\Cache\bin\blocz.exe\" -Force"
 
   setup:path:
     desc: Automatically add pub cache bin to PATH based on OS

@@ -5,8 +5,8 @@ import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
-import 'package:floc_helper/_internal/typedef.dart';
-import 'package:floc_helper/extractConstructorParams.dart';
+import 'package:blocz/_internal/typedef.dart';
+import 'package:blocz/extractConstructorParams.dart';
 
 /// Extracts a map of constructor parameter names to their corresponding field details.
 ///

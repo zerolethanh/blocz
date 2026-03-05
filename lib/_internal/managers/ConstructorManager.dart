@@ -1,6 +1,6 @@
-import 'package:floc_helper/_internal/colors.dart';
-import 'package:floc_helper/_internal/managers/mixins/ParseStringResultMixin.dart';
-import 'package:floc_helper/getClassName.dart';
+import 'package:blocz/_internal/colors.dart';
+import 'package:blocz/_internal/managers/mixins/ParseStringResultMixin.dart';
+import 'package:blocz/getClassName.dart';
 
 import '../visitors/ClassVisitors.dart';
 import 'data/ManagersResultData.dart';

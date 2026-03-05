@@ -4,7 +4,7 @@ import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:floc_helper/_internal/typedef.dart';
+import 'package:blocz/_internal/typedef.dart';
 
 /// Extracts the source code of the first class declaration found in the given Dart file.
 JSONString extractCls(String codePath) {

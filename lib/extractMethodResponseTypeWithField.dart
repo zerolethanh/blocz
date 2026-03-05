@@ -3,12 +3,12 @@ import 'dart:core';
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:floc_helper/_internal/findNodes.dart';
-// import 'package:floc_helper/_internal/getImportUri.dart';
-import 'package:floc_helper/_internal/getInnerType.dart';
-import 'package:floc_helper/_internal/typedef.dart';
-import 'package:floc_helper/getProjectRootPath.dart';
-import 'package:floc_helper/importClauseToPath.dart';
+import 'package:blocz/_internal/findNodes.dart';
+// import 'package:blocz/_internal/getImportUri.dart';
+import 'package:blocz/_internal/getInnerType.dart';
+import 'package:blocz/_internal/typedef.dart';
+import 'package:blocz/getProjectRootPath.dart';
+import 'package:blocz/importClauseToPath.dart';
 import 'package:path/path.dart' as p;
 
 import '_internal/colors.dart';
