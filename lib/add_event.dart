@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:blocz/extractMethodListFromClass.dart';
@@ -10,11 +11,19 @@ import 'package:blocz/getClassName.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
 
-Future<void> addEvent(String domain, String? name, String? event, String? apiPath, String? method) async {
+Future<void> addEvent(
+  String domain,
+  String? name,
+  String? event,
+  String? apiPath,
+  String? method,
+) async {
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
     final methods = extractMethodListFromClass(apiPath);
     if (methods != null && methods.isNotEmpty) {
-      print('Found ${methods.length} methods in $apiPath. Generating events...');
+      print(
+        'Found ${methods.length} methods in $apiPath. Generating events...',
+      );
       for (final methodName in methods) {
         await _addSingleEvent(domain, name, methodName, apiPath, methodName);
       }
@@ -33,14 +42,23 @@ Future<void> addEvent(String domain, String? name, String? event, String? apiPat
   await _addSingleEvent(domain, name, event, apiPath, method ?? event);
 }
 
-Future<void> _addSingleEvent(String domain, String? name, String event, String? apiPath, String? method) async {
+Future<void> _addSingleEvent(
+  String domain,
+  String? name,
+  String event,
+  String? apiPath,
+  String? method,
+) async {
   final bool isEmptyName = name == null || name.trim().isEmpty;
   name = isEmptyName ? domain : name;
 
   final String nameSnake = name.snakeCase;
   final String domainSnake = domain.snakeCase;
-  final String commonFileName = isEmptyName ? nameSnake : '${domainSnake}_${nameSnake}';
-  final String commonClassName = '${domain.pascalCase}${isEmptyName ? '' : name.pascalCase}';
+  final String commonFileName = isEmptyName
+      ? nameSnake
+      : '${domainSnake}_${nameSnake}';
+  final String commonClassName =
+      '${domain.pascalCase}${isEmptyName ? '' : name.pascalCase}';
 
   final writeDir = p.join('lib', 'features', domain, 'presentation', 'bloc');
   final blocPath = p.join(writeDir, '${commonFileName}_bloc.dart');
@@ -62,8 +80,14 @@ Future<void> _addSingleEvent(String domain, String? name, String event, String? 
   var eventContent = File(eventPath).readAsStringSync();
   final eventInsertionPoint = findLastConstFactory(eventPath);
   if (eventInsertionPoint != null) {
-    final params = (apiPath != null && method != null) ? extractMethodParams(apiPath, method) ?? '(dynamic params)' : '(dynamic params)';
-    final newEvent = '  const factory $eventClassName.${eventName}Requested$params = $eventClassName${EventName}Requested;';
+    String params = "(dynamic params)";
+    if (apiPath != null && method != null) {
+      params =
+          jsonDecode(extractMethodParams(apiPath, method) ?? "{}")?["data"] ??
+          "(dynamic params)";
+    }
+    final newEvent =
+        '  const factory $eventClassName.${eventName}Requested$params = $eventClassName${EventName}Requested;';
     if (!eventContent.contains(newEvent)) {
       final eventLines = eventContent.split('\n');
       eventLines.insert(eventInsertionPoint, newEvent);
@@ -77,9 +101,14 @@ Future<void> _addSingleEvent(String domain, String? name, String event, String? 
   var stateContent = File(statePath).readAsStringSync();
   final stateInsertionPoint = findLastConstFactory(statePath);
   if (stateInsertionPoint != null) {
-    final responseType = (apiPath != null && method != null) ? await extractMethodResponseInnerDataType(apiPath, method) : null;
-    final stateParams = responseType != null ? '(${responseType['responseDataType']} data)' : '(dynamic data)';
-    final newState = '  const factory $stateClassName.${eventName}Result$stateParams = $stateClassName${EventName}Result;';
+    final responseType = (apiPath != null && method != null)
+        ? await extractMethodResponseInnerDataType(apiPath, method)
+        : null;
+    final stateParams = responseType != null
+        ? '(${responseType['responseDataType']} data)'
+        : '(dynamic data)';
+    final newState =
+        '  const factory $stateClassName.${eventName}Result$stateParams = $stateClassName${EventName}Result;';
     if (!stateContent.contains(newState)) {
       final stateLines = stateContent.split('\n');
       stateLines.insert(stateInsertionPoint, newState);
@@ -92,7 +121,8 @@ Future<void> _addSingleEvent(String domain, String? name, String event, String? 
   var blocContent = File(blocPath).readAsStringSync();
   final onInsertionPoint = findLast_On_LineNumber(blocPath);
   if (onInsertionPoint != null) {
-    final newOn = '    on<${commonClassName}Event${EventName}Requested>(_on${commonClassName}Event${EventName}Requested);';
+    final newOn =
+        '    on<${commonClassName}Event${EventName}Requested>(_on${commonClassName}Event${EventName}Requested);';
     final newMethodName = '_on${commonClassName}Event${EventName}Requested';
 
     if (!blocContent.contains(newOn) && !blocContent.contains(newMethodName)) {
@@ -101,11 +131,16 @@ Future<void> _addSingleEvent(String domain, String? name, String event, String? 
 
       final lastLine = findLastClassbodyLineNumber(blocPath);
       if (lastLine != null) {
-        final responseType = (apiPath != null && method != null) ? await extractMethodResponseInnerDataType(apiPath, method) : null;
+        final responseType = (apiPath != null && method != null)
+            ? await extractMethodResponseInnerDataType(apiPath, method)
+            : null;
         final resHitField = responseType?['hitField'] ?? 'body';
-        final apiClassName = apiPath != null ? getFirstClassNameInFile(apiPath) : null;
+        final apiClassName = apiPath != null
+            ? getFirstClassNameInFile(apiPath)
+            : null;
 
-        final apiCodeBlock = apiPath != null && method != null && apiClassName != null
+        final apiCodeBlock =
+            apiPath != null && method != null && apiClassName != null
             ? '''
         try {
            final injectedApi = GetIt.instance<$apiClassName>();
@@ -121,7 +156,8 @@ Future<void> _addSingleEvent(String domain, String? name, String event, String? 
 '''
             : '';
 
-        final newMethod = '''
+        final newMethod =
+            '''
 
   Future<void> $newMethodName(
     ${commonClassName}Event${EventName}Requested event,
@@ -147,9 +183,11 @@ String _getEventCallParams(String? fpath, String? method) {
   final paramString = params.replaceAll(RegExp(r'[()]'), '');
   if (paramString.isEmpty) return '';
   final paramList = paramString.split(',');
-  return paramList.map((p) {
-    final parts = p.trim().split(' ');
-    final name = parts.last;
-    return 'event.$name';
-  }).join(', ');
+  return paramList
+      .map((p) {
+        final parts = p.trim().split(' ');
+        final name = parts.last;
+        return 'event.$name';
+      })
+      .join(', ');
 }
