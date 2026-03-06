@@ -87,7 +87,7 @@ Future<void> _addSingleEvent(
           "(dynamic params)";
     }
     final newEvent =
-        '  const factory $eventClassName.${eventName}Requested$params = $eventClassName${EventName}Requested;';
+        '  const factory $eventClassName.${eventName}Requested$params = _$eventClassName${EventName}Requested;';
     if (!eventContent.contains(newEvent)) {
       final eventLines = eventContent.split('\n');
       eventLines.insert(eventInsertionPoint, newEvent);
@@ -111,7 +111,7 @@ Future<void> _addSingleEvent(
       stateParams = "()";
     }
     final newState =
-        '  const factory $stateClassName.${eventName}Result$stateParams = $stateClassName${EventName}Result;';
+        '  const factory $stateClassName.${eventName}Result$stateParams = _$stateClassName${EventName}Result;';
     if (!stateContent.contains(newState)) {
       final stateLines = stateContent.split('\n');
       stateLines.insert(stateInsertionPoint, newState);
@@ -157,7 +157,7 @@ Future<void> _addSingleEvent(
            final injectedApi = GetIt.instance<$apiClassName>();
           final response = await injectedApi.$method(${_getEventCallParams(apiPath, method)});
           ${resHitField != '' ? '''
-          if (response == null || response.$resHitField == null) {
+          if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));
             return;
           }

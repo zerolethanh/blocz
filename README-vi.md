@@ -46,30 +46,28 @@ dart pub global activate blocz
 Sử dụng lệnh `make` để tạo các thành phần cần thiết.
 
 ```bash
-blocz make --domain <ten_domain> --name <ten_bloc>
+blocz make --domain <ten_domain> --name <ten_bloc> [--apiPath <duong_dan_file_api>]
 ```
 
 - `--domain` (hoặc `-d`): Domain hoặc feature của BLoC (ví dụ: `user`, `product`).
 - `--name` (hoặc `-n`): Tên của BLoC (ví dụ: `authentication`, `product_list`). Đây là tham số không bắt buộc.
+- `--apiPath` (hoặc `-a`): Đường dẫn tùy chọn đến tệp tin service API. Nếu được cung cấp, `blocz` sẽ tự động tạo và triển khai các event cho tất cả các phương thức public trong tệp đó.
 
 **Ví dụ:**
 
+Tạo BLoC cơ bản:
 ```bash
 blocz make --domain user --name login
 ```
 
-Lệnh trên sẽ tạo ra cấu trúc thư mục và các tệp sau:
+Lệnh này tạo ra cấu trúc BLoC. Sau đó bạn sẽ cần chạy `build_runner`.
 
+Tạo BLoC và tự động thêm event từ file API:
+```bash
+blocz make --domain user --name profile --apiPath lib/features/user/data/api/user_api.dart
 ```
-lib/
-└── features/
-    └── user/
-        └── presentation/
-            └── bloc/
-                ├── user_login_bloc.dart
-                ├── user_login_event.dart
-                └── user_login_state.dart
-```
+
+Lệnh này sẽ tạo các tệp BLoC và cũng tự động thêm các event và trình xử lý cho tất cả các phương thức được tìm thấy trong `user_api.dart`.
 
 **Quan trọng:** Sau khi tạo các tệp, vì chúng sử dụng `freezed`, bạn cần chạy `build_runner` để tạo các tệp `.freezed.dart` và `.g.dart`:
 
@@ -82,16 +80,32 @@ dart run build_runner build --delete-conflicting-outputs
 Sử dụng lệnh `add:event` để thêm một event mới vào một BLoC đã tồn tại.
 
 ```bash
-blocz add:event --domain <ten_domain> --name <ten_bloc> --event <ten_event>
+blocz add:event --domain <ten_domain> --name <ten_bloc> <options>
 ```
+
+**Tùy chọn:**
+- `--event <ten_event>`: Thêm một event cụ thể.
+- `--apiPath <duong_dan_file_api>`: Quét tệp API và tạo các event và trình xử lý cho **tất cả** các phương thức public.
+- `--apiPath <duong_dan_file_api> --method <ten_phuong_thuc>`: Tạo một event và trình xử lý cho **chỉ một** phương thức được chỉ định từ tệp API.
 
 **Ví dụ:**
 
+Thêm một event đơn giản:
 ```bash
 blocz add:event --domain user --name login --event LogoutButtonPressed
 ```
 
-Lệnh này sẽ cập nhật các tệp `_event.dart` và `_bloc.dart` tương ứng để thêm event `LogoutButtonPressed`.
+Thêm tất cả các event từ một tệp API:
+```bash
+blocz add:event --domain user --name profile --apiPath lib/features/user/data/api/user_api.dart
+```
+
+Thêm một event từ một phương thức API cụ thể:
+```bash
+blocz add:event --domain user --name profile --event UpdateAvatar --apiPath lib/features/user/data/api/user_api.dart --method uploadAvatar
+```
+
+Lệnh này sẽ cập nhật các tệp BLoC tương ứng để thêm (các) event mới.
 
 ## Các lệnh khác
 
