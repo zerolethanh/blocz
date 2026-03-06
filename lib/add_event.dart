@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:blocz/extractMethodListFromClass.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
+import 'package:blocz/extractMethodResponseTypeWithField.dart';
 import 'package:blocz/findLastClassbodyLineNumber.dart';
 import 'package:blocz/findLastConstFactory.dart';
 import 'package:blocz/findLast_On_LineNumber.dart';
@@ -20,11 +21,15 @@ Future<void> addEvent(
 ) async {
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
     final methods = extractMethodListFromClass(apiPath);
-    if (methods != null && methods.isNotEmpty) {
+    if (methods.isNotEmpty) {
       print(
         'Found ${methods.length} methods in $apiPath. Generating events...',
       );
       for (final methodName in methods) {
+        if (methodName.endsWith("WithHttpInfo")) {
+          // skip ...WithHttpInfo method
+          continue;
+        }
         await _addSingleEvent(domain, name, methodName, apiPath, methodName);
       }
       print('Finished generating events from $apiPath.');
@@ -100,11 +105,15 @@ Future<void> _addSingleEvent(
   final stateClassName = getFirstClassNameInFile(statePath);
   var stateContent = File(statePath).readAsStringSync();
   final stateInsertionPoint = findLastConstFactory(statePath);
+  String stateParams = "()";
   if (stateInsertionPoint != null) {
     final responseType = (apiPath != null && method != null)
-        ? await extractMethodResponseInnerDataType(apiPath, method)
+        ? await extractMethodResponseTypeWithField(apiPath, method, "data,body")
         : null;
-    var stateParams = responseType != null
+    print("// responseType:: \\\\");
+    print(responseType);
+    print("\\\\ responseType:: //");
+    stateParams = responseType != null
         ? '(${responseType['responseDataType']} data)'
         : '(dynamic data)';
     if (stateParams == "(void data)") {
@@ -163,7 +172,11 @@ Future<void> _addSingleEvent(
           }
           emit(${commonClassName}State.${eventName}Result(response.$resHitField));
 ''' : '''
+          ${stateParams == "()" ? '''
           emit(${commonClassName}State.${eventName}Result());
+          ''' : '''
+          emit(${commonClassName}State.${eventName}Result(response));
+          '''}
 '''}
         } catch (e) {
           emit(${commonClassName}State.failure(e.toString()));

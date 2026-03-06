@@ -60,9 +60,10 @@ String _renderTemplate(String templateContent, Map<String, String> data) {
 
 const _blocTemplate = r'''
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-// import 'package:get_it/get_it.dart';
+import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
+import 'package:injectable/injectable.dart';
 
 part '{{common_file_name}}_event.dart';
 part '{{common_file_name}}_state.dart';
@@ -106,7 +107,7 @@ part of '{{common_file_name}}_bloc.dart';
 sealed class {{CommonFileName}}State with _${{CommonFileName}}State {
   const factory {{CommonFileName}}State.initial() = _{{CommonFileName}}StateInitialDone;
   const factory {{CommonFileName}}State.loading() = _{{CommonFileName}}StateLoading;
-  // const factory {{CommonFileName}}State.loaded(dynamic result) = _{{CommonFileName}}StateLoaded;
   const factory {{CommonFileName}}State.failure(String message) = _{{CommonFileName}}StateFailure;
+  // const factory {{CommonFileName}}State.loaded(dynamic result) = _{{CommonFileName}}StateLoaded;
 }
 ''';
