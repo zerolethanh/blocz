@@ -40,6 +40,7 @@ int _findLastClassbodyLineNumber(String filePath) {
         .lineNumber;
     // print('Found last class declaration ending at line: ');
     // print(lineNumber);
+    return lineNumber;
   }
 
   throw Exception('No class declarations found in $filePath');

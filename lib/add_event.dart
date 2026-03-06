@@ -119,29 +119,37 @@ Future<void> _addSingleEvent(
 
   // Bloc
   var blocContent = File(blocPath).readAsStringSync();
-  final onInsertionPoint = findLast_On_LineNumber(blocPath);
-  if (onInsertionPoint != null) {
-    final newOn =
-        '    on<${commonClassName}Event${EventName}Requested>(_on${commonClassName}Event${EventName}Requested);';
-    final newMethodName = '_on${commonClassName}Event${EventName}Requested';
 
-    if (!blocContent.contains(newOn) && !blocContent.contains(newMethodName)) {
-      final blocLines = blocContent.split('\n');
-      blocLines.insert(onInsertionPoint, newOn);
+  final newOn =
+      '    on<${commonClassName}Event${EventName}Requested>(_on${commonClassName}Event${EventName}Requested);';
+  final newMethodName = '_on${commonClassName}Event${EventName}Requested';
 
-      final lastLine = findLastClassbodyLineNumber(blocPath);
-      if (lastLine != null) {
-        final responseType = (apiPath != null && method != null)
-            ? await extractMethodResponseInnerDataType(apiPath, method)
-            : null;
-        final resHitField = responseType?['hitField'] ?? 'body';
-        final apiClassName = apiPath != null
-            ? getFirstClassNameInFile(apiPath)
-            : null;
+  final bool hasOn = blocContent.contains(newOn);
+  final bool hasMethod = blocContent.contains(newMethodName);
 
-        final apiCodeBlock =
-            apiPath != null && method != null && apiClassName != null
-            ? '''
+  if (hasOn && hasMethod) {
+    return; // Already up-to-date for this event, do nothing.
+  }
+
+  final blocLines = blocContent.split('\n');
+  bool isDirty = false;
+
+  // Insert method if it's missing. This is inserted near the end of the file.
+  if (!hasMethod) {
+    final lastLine = findLastClassbodyLineNumber(blocPath);
+    if (lastLine != null) {
+      final responseType = (apiPath != null && method != null)
+          ? await extractMethodResponseInnerDataType(apiPath, method)
+          : null;
+
+      final resHitField = responseType?['hitField'] ?? 'body';
+      final apiClassName = apiPath != null
+          ? getFirstClassNameInFile(apiPath)
+          : null;
+
+      final apiCodeBlock =
+          apiPath != null && method != null && apiClassName != null
+          ? '''
         try {
            final injectedApi = GetIt.instance<$apiClassName>();
           final response = await injectedApi.$method(${_getEventCallParams(apiPath, method)});
@@ -154,10 +162,10 @@ Future<void> _addSingleEvent(
           emit(${commonClassName}State.failure(e.toString()));
         }
 '''
-            : '';
+          : '';
 
-        final newMethod =
-            '''
+      final newMethod =
+          '''
 
   Future<void> $newMethodName(
     ${commonClassName}Event${EventName}Requested event,
@@ -166,28 +174,43 @@ Future<void> _addSingleEvent(
     $apiCodeBlock
   }
 ''';
-        blocLines.insert(lastLine, newMethod);
-      }
-
-      File(blocPath).writeAsStringSync(blocLines.join('\n'));
-      print('Updated: $blocPath');
+      blocLines.insert(lastLine, newMethod);
+      isDirty = true;
     }
+  }
+
+  // Insert the 'on' call if it's missing. This is inserted earlier in the file.
+  // By doing insertions in reverse order, we don't invalidate earlier indices.
+  if (!hasOn) {
+    final onInsertionPoint = findLast_On_LineNumber(blocPath);
+    if (onInsertionPoint != null) {
+      blocLines.insert(onInsertionPoint, newOn);
+      isDirty = true;
+    }
+  }
+
+  if (isDirty) {
+    File(blocPath).writeAsStringSync(blocLines.join('\n'));
+    print('Updated: $blocPath');
   }
 }
 
 String _getEventCallParams(String? fpath, String? method) {
   if (fpath == null || method == null) return '';
   final params = extractMethodParams(fpath, method);
-  if (params == null) return '';
-
-  final paramString = params.replaceAll(RegExp(r'[()]'), '');
+  String result = '(dynamic params)';
+  if (params == null) return result;
+  result = jsonDecode(params)?["data"] as String? ?? result;
+  // print("params:");
+  // print(params);
+  final paramString = result.replaceAll(RegExp(r'[\{()\}]'), '');
   if (paramString.isEmpty) return '';
   final paramList = paramString.split(',');
   return paramList
       .map((p) {
         final parts = p.trim().split(' ');
         final name = parts.last;
-        return 'event.$name';
+        return '$name: event.$name';
       })
       .join(', ');
 }
