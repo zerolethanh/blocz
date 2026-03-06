@@ -81,6 +81,7 @@ cd $MY_PET_API_DIR \
   && dart pub get \
   && (dart run build_runner build || true) \
   && cd "$(git rev-parse --show-toplevel)"
+ls -lh "./apis/$MY_PET_API_PACKAGE_NAME/lib/api/"
 ```
 
 ```yaml
@@ -91,7 +92,7 @@ dependencies:
 ```
 
 ```bash
-blocz make --domain pet --apiPath /Users/lethanh/StudioProjects/eliza/apis/my_pet_api/lib/api/pet_api.dart
+blocz make --domain pet --apiPath ./apis/my_pet_api/lib/api/pet_api.dart
 ```
 
 This command will create the BLoC files and also automatically add events and handlers for all methods found in `user_api.dart`.
