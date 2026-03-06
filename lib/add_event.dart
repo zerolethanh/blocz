@@ -197,20 +197,68 @@ Future<void> _addSingleEvent(
 
 String _getEventCallParams(String? fpath, String? method) {
   if (fpath == null || method == null) return '';
-  final params = extractMethodParams(fpath, method);
-  String result = '(dynamic params)';
-  if (params == null) return result;
-  result = jsonDecode(params)?["data"] as String? ?? result;
-  // print("params:");
-  // print(params);
-  final paramString = result.replaceAll(RegExp(r'[\{()\}]'), '');
-  if (paramString.isEmpty) return '';
-  final paramList = paramString.split(',');
-  return paramList
-      .map((p) {
-        final parts = p.trim().split(' ');
-        final name = parts.last;
-        return '$name: event.$name';
-      })
-      .join(', ');
+
+  final paramsJson = extractMethodParams(fpath, method);
+  if (paramsJson == null) return '';
+
+  final paramsString = jsonDecode(paramsJson)?["data"] as String?;
+  if (paramsString == null || paramsString == '()') return '';
+
+  // remove parentheses `()` to get the content, e.g.:
+  // "String id, { OrderDomainApplyCouponDTO? applyCouponDTO, }"
+  var innerParams = paramsString.substring(1, paramsString.length - 1).trim();
+  if (innerParams.isEmpty) return '';
+
+  List<String> positionalParams = [];
+  List<String> namedParams = [];
+
+  final namedParamsStartIndex = innerParams.indexOf('{');
+  String positionalPartStr;
+  String namedPartStr = '';
+
+  if (namedParamsStartIndex != -1) {
+    // Case with mixed or only named parameters
+    positionalPartStr = innerParams.substring(0, namedParamsStartIndex).trim();
+    final namedParamsEndIndex = innerParams.lastIndexOf('}');
+    if (namedParamsEndIndex != -1) {
+      namedPartStr =
+          innerParams.substring(namedParamsStartIndex + 1, namedParamsEndIndex).trim();
+    }
+  } else {
+    // Case with only positional (required or optional) parameters
+    positionalPartStr = innerParams.replaceAll(RegExp(r'[\[\]]'), '').trim();
+  }
+
+  // Process positional parameters
+  if (positionalPartStr.endsWith(',')) {
+    positionalPartStr = positionalPartStr.substring(0, positionalPartStr.length - 1);
+  }
+  if (positionalPartStr.isNotEmpty) {
+    positionalParams = positionalPartStr
+        .split(',')
+        .where((s) => s.trim().isNotEmpty)
+        .map((p) {
+      final namePart = p.trim().split('=').first.trim();
+      final name = namePart.split(' ').last;
+      return 'event.$name';
+    }).toList();
+  }
+
+  // Process named parameters
+  if (namedPartStr.endsWith(',')) {
+    namedPartStr = namedPartStr.substring(0, namedPartStr.length - 1);
+  }
+  if (namedPartStr.isNotEmpty) {
+    namedParams =
+        namedPartStr.split(',').where((s) => s.trim().isNotEmpty).map((p) {
+      final namePart = p.trim().split('=').first.trim();
+      final name = namePart.split(' ').last;
+      return '$name: event.$name';
+    }).toList();
+  }
+
+  // Combine and return
+  final allParams = [...positionalParams, ...namedParams];
+  return allParams.join(', ');
 }
+
