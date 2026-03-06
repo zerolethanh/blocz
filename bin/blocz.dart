@@ -35,10 +35,15 @@ Future<void> main(List<String> arguments) async {
   );
   parser.addFlag('force', abbr: 'f', help: 'force write', defaultsTo: false);
 
-  parser.addCommand('make')
+  parser.addCommand('make', parser.addCommand('make:bloc'))
     ..addSeparator("Make bloc,state,event")
     ..addOption('domain', abbr: 'd', help: 'domain based name')
-    ..addOption('name', abbr: 'n', help: 'name of bloc,state,event');
+    ..addOption('name', abbr: 'n', help: 'name of bloc,state,event')
+    ..addOption(
+      'apiPath',
+      abbr: 'a',
+      help: 'to be implemented api .dart fullpath',
+    );
 
   parser.addCommand('add:event')
     ..addSeparator("Add event to bloc")
@@ -191,9 +196,11 @@ Future<void> main(List<String> arguments) async {
     // printInfo("↓↓↓ result ↓↓↓");
     switch (command.name) {
       case 'make':
+      case 'make:bloc':
         final domain = command['domain'] as String;
         final name = command['name'] as String?;
-        await makeBloc(domain, name);
+        final apiPath = command['apiPath'] as String?;
+        await makeBloc(domain, name, apiPath);
         break;
       case 'add:event':
       case 'add':

@@ -1,10 +1,11 @@
 import 'dart:io';
 
+import 'package:blocz/add_event.dart';
 import 'package:mustache_template/mustache.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
 
-Future<void> makeBloc(String domain, String? name) async {
+Future<void> makeBloc(String domain, String? name, String? apiPath) async {
   final bool isEmptyName = name == null || name.trim().isEmpty;
   name = isEmptyName ? domain : name;
 
@@ -44,6 +45,12 @@ Future<void> makeBloc(String domain, String? name) async {
   print('Generated: $blocPath');
   print('Generated: $eventPath');
   print('Generated: $statePath');
+
+  if (apiPath != null && apiPath.trim().isNotEmpty) {
+    print('\napiPath provided. Adding events from $apiPath...');
+    await addEvent(domain, isEmptyName ? null : name, null, apiPath, null);
+    print('Finished adding events from apiPath.');
+  }
 }
 
 String _renderTemplate(String templateContent, Map<String, String> data) {
