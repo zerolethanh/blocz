@@ -43,10 +43,10 @@ dart pub global activate blocz
 
 ### 1. Create BLoC, Event, and State
 
-Use the `make:bloc` command to generate the necessary components.
+Use the `make` command to generate the necessary components.
 
 ```bash
-blocz make:bloc --domain <domain_name> --name <bloc_name>
+blocz make --domain <domain_name> --name <bloc_name>
 ```
 
 - `--domain` (or `-d`): The domain or feature of the BLoC (e.g., `user`, `product`).
@@ -55,7 +55,7 @@ blocz make:bloc --domain <domain_name> --name <bloc_name>
 **Example:**
 
 ```bash
-blocz make:bloc --domain user --name login
+blocz make --domain user --name login
 ```
 
 This command will create the following directory structure and files:

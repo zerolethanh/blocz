@@ -43,10 +43,10 @@ dart pub global activate blocz
 
 ### 1. Tạo BLoC, Event, và State
 
-Sử dụng lệnh `make:bloc` để tạo các thành phần cần thiết.
+Sử dụng lệnh `make` để tạo các thành phần cần thiết.
 
 ```bash
-blocz make:bloc --domain <ten_domain> --name <ten_bloc>
+blocz make --domain <ten_domain> --name <ten_bloc>
 ```
 
 - `--domain` (hoặc `-d`): Domain hoặc feature của BLoC (ví dụ: `user`, `product`).
@@ -55,7 +55,7 @@ blocz make:bloc --domain <ten_domain> --name <ten_bloc>
 **Ví dụ:**
 
 ```bash
-blocz make:bloc --domain user --name login
+blocz make --domain user --name login
 ```
 
 Lệnh trên sẽ tạo ra cấu trúc thư mục và các tệp sau:

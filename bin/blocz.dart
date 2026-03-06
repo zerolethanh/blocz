@@ -35,7 +35,7 @@ Future<void> main(List<String> arguments) async {
   );
   parser.addFlag('force', abbr: 'f', help: 'force write', defaultsTo: false);
 
-  parser.addCommand('make:bloc')
+  parser.addCommand('make')
     ..addSeparator("Make bloc,state,event")
     ..addOption('domain', abbr: 'd', help: 'domain based name')
     ..addOption('name', abbr: 'n', help: 'name of bloc,state,event');
@@ -190,12 +190,13 @@ Future<void> main(List<String> arguments) async {
 
     // printInfo("↓↓↓ result ↓↓↓");
     switch (command.name) {
-      case 'make:bloc':
+      case 'make':
         final domain = command['domain'] as String;
         final name = command['name'] as String?;
         await makeBloc(domain, name);
         break;
       case 'add:event':
+      case 'add':
         final domain = command['domain'] as String;
         final name = command['name'] as String?;
         final event = command['event'] as String?;

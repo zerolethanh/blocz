@@ -4,7 +4,6 @@ import 'dart:core';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:blocz/_internal/findNodes.dart';
-// import 'package:blocz/_internal/getImportUri.dart';
 import 'package:blocz/_internal/getInnerType.dart';
 import 'package:blocz/getProjectRootPath.dart';
 import 'package:blocz/importClauseToPath.dart';
