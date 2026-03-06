@@ -104,9 +104,12 @@ Future<void> _addSingleEvent(
     final responseType = (apiPath != null && method != null)
         ? await extractMethodResponseInnerDataType(apiPath, method)
         : null;
-    final stateParams = responseType != null
+    var stateParams = responseType != null
         ? '(${responseType['responseDataType']} data)'
         : '(dynamic data)';
+    if (stateParams == "(void data)") {
+      stateParams = "()";
+    }
     final newState =
         '  const factory $stateClassName.${eventName}Result$stateParams = $stateClassName${EventName}Result;';
     if (!stateContent.contains(newState)) {
@@ -221,8 +224,9 @@ String _getEventCallParams(String? fpath, String? method) {
     positionalPartStr = innerParams.substring(0, namedParamsStartIndex).trim();
     final namedParamsEndIndex = innerParams.lastIndexOf('}');
     if (namedParamsEndIndex != -1) {
-      namedPartStr =
-          innerParams.substring(namedParamsStartIndex + 1, namedParamsEndIndex).trim();
+      namedPartStr = innerParams
+          .substring(namedParamsStartIndex + 1, namedParamsEndIndex)
+          .trim();
     }
   } else {
     // Case with only positional (required or optional) parameters
@@ -231,17 +235,21 @@ String _getEventCallParams(String? fpath, String? method) {
 
   // Process positional parameters
   if (positionalPartStr.endsWith(',')) {
-    positionalPartStr = positionalPartStr.substring(0, positionalPartStr.length - 1);
+    positionalPartStr = positionalPartStr.substring(
+      0,
+      positionalPartStr.length - 1,
+    );
   }
   if (positionalPartStr.isNotEmpty) {
     positionalParams = positionalPartStr
         .split(',')
         .where((s) => s.trim().isNotEmpty)
         .map((p) {
-      final namePart = p.trim().split('=').first.trim();
-      final name = namePart.split(' ').last;
-      return 'event.$name';
-    }).toList();
+          final namePart = p.trim().split('=').first.trim();
+          final name = namePart.split(' ').last;
+          return 'event.$name';
+        })
+        .toList();
   }
 
   // Process named parameters
@@ -249,16 +257,16 @@ String _getEventCallParams(String? fpath, String? method) {
     namedPartStr = namedPartStr.substring(0, namedPartStr.length - 1);
   }
   if (namedPartStr.isNotEmpty) {
-    namedParams =
-        namedPartStr.split(',').where((s) => s.trim().isNotEmpty).map((p) {
-      final namePart = p.trim().split('=').first.trim();
-      final name = namePart.split(' ').last;
-      return '$name: event.$name';
-    }).toList();
+    namedParams = namedPartStr.split(',').where((s) => s.trim().isNotEmpty).map(
+      (p) {
+        final namePart = p.trim().split('=').first.trim();
+        final name = namePart.split(' ').last;
+        return '$name: event.$name';
+      },
+    ).toList();
   }
 
   // Combine and return
   final allParams = [...positionalParams, ...namedParams];
   return allParams.join(', ');
 }
-
