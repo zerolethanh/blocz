@@ -145,7 +145,7 @@ Future<void> _addSingleEvent(
           ? await extractMethodResponseInnerDataType(apiPath, method)
           : null;
 
-      final resHitField = responseType?['hitField'] ?? 'body';
+      final resHitField = responseType?['hitField'] ?? '';
       final apiClassName = apiPath != null
           ? getFirstClassNameInFile(apiPath)
           : null;
@@ -156,11 +156,15 @@ Future<void> _addSingleEvent(
         try {
            final injectedApi = GetIt.instance<$apiClassName>();
           final response = await injectedApi.$method(${_getEventCallParams(apiPath, method)});
+          ${resHitField != '' ? '''
           if (response == null || response.$resHitField == null) {
             emit(const ${commonClassName}State.failure('No data'));
             return;
           }
           emit(${commonClassName}State.${eventName}Result(response.$resHitField));
+''' : '''
+          emit(${commonClassName}State.${eventName}Result());
+'''}
         } catch (e) {
           emit(${commonClassName}State.failure(e.toString()));
         }
