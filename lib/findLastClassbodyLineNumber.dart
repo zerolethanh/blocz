@@ -38,8 +38,9 @@ int _findLastClassbodyLineNumber(String filePath) {
     final lineNumber = parseResult.lineInfo
         .getLocation(classNode.rightBracket.end)
         .lineNumber;
-    print('Found last class declaration ending at line: ');
-    print(lineNumber);
+    // print('Found last class declaration ending at line: ');
+    // print(lineNumber);
+    return lineNumber;
   }
 
   throw Exception('No class declarations found in $filePath');

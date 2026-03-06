@@ -8,10 +8,7 @@ String _trimResultHeader(String value) {
   if (!value.contains(resultIdentifier)) {
     return value;
   }
-  return value
-      .split(resultIdentifier)
-      .last
-      .trim();
+  return value.split(resultIdentifier).last.trim();
 }
 
 final class JSONStringResult with JSONStringMixin {
@@ -35,13 +32,12 @@ final class JSONStringResult with JSONStringMixin {
       }
     }
     // print("$validData ${validData.runtimeType}");
-    assert(validJSON is Map
-        && validJSON!.containsKey("data"),
-    "[JSONStringClass.parse]: input value should be Map<String, dynamic> or Json String, contains 'data' field."
+    assert(
+      validJSON is Map && validJSON!.containsKey("data"),
+      "[JSONStringClass.parse]: input value should be Map<String, dynamic> or Json String, contains 'data' field.",
     );
     return JSONStringResult(data: validJSON!['data'], meta: validJSON['meta']);
   }
-
 
   JSONString toJSONString() {
     return toJSONStringResult(data, meta);
@@ -49,21 +45,17 @@ final class JSONStringResult with JSONStringMixin {
 
   @override
   JSONString toString({LogMethods? method}) {
-    return "$resultIdentifier\n"
-        "${switch(method){
-          .prettyPrint => prettyPrint(toJSONString()),
-          .removeEmpty => removeEmpty(toJSONString()),
-          .removeEmptyThenPrettyPrint =>
-          prettyPrint(removeEmpty(toJSONString())),
-      _ => toJSONString()
-    }}";
+    return //"$resultIdentifier\n"
+    switch (method) {
+      .prettyPrint => prettyPrint(toJSONString()),
+      .removeEmpty => removeEmpty(toJSONString()),
+      .removeEmptyThenPrettyPrint => prettyPrint(removeEmpty(toJSONString())),
+      _ => toJSONString(),
+    };
   }
 
   JSONString expose({LogMethods? method = .prettyPrint}) {
-    return exposeJSON(
-        toJSONString(),
-        method: method
-    );
+    return exposeJSON(toJSONString(), method: method);
   }
 
   Map<String, dynamic>? dataAsMap() {
@@ -87,31 +79,28 @@ final class JSONStringResult with JSONStringMixin {
     if (data is List) {
       return (data as List).cast<T>();
     } else if (data is Map) {
-      if (data["data"]!.isNotEmpty
-          && data["data"] is List
-      ) {
+      if (data["data"]!.isNotEmpty && data["data"] is List) {
         return (data['data'] as List).cast<T>();
       }
     }
     return null;
   }
 
-// List<T>? dataAsListOfType<T>() {
-//   if (data is List) {
-//     return (data as List).cast<T>();
-//   } else if (data is String) {
-//     try {
-//       data = jsonDecode(data);
-//       if (data is List) {
-//         return (data as List).cast<T>();
-//       }
-//     } catch (e) {
-//       return null;
-//     }
-//   }
-//   return null;
-// }
-
+  // List<T>? dataAsListOfType<T>() {
+  //   if (data is List) {
+  //     return (data as List).cast<T>();
+  //   } else if (data is String) {
+  //     try {
+  //       data = jsonDecode(data);
+  //       if (data is List) {
+  //         return (data as List).cast<T>();
+  //       }
+  //     } catch (e) {
+  //       return null;
+  //     }
+  //   }
+  //   return null;
+  // }
 }
 
 JSONString toJSONStringResult(dynamic values, [dynamic meta]) {
@@ -119,7 +108,6 @@ JSONString toJSONStringResult(dynamic values, [dynamic meta]) {
 }
 
 mixin JSONStringMixin {
-
   JSONString removeEmpty(JSONString json) {
     json = _trimResultHeader(json);
     dynamic values = jsonDecode(json);
@@ -146,6 +134,7 @@ mixin JSONStringMixin {
       }
       return data;
     }
+
     values = _removeEmptyRecursive(values);
     final j = jsonEncode(values);
     return j;
@@ -158,8 +147,10 @@ mixin JSONStringMixin {
     return prettyValue;
   }
 
-  String exposeJSON(JSONString jsonString,
-      {LogMethods? method = .prettyPrint}) {
+  String exposeJSON(
+    JSONString jsonString, {
+    LogMethods? method = .prettyPrint,
+  }) {
     JSONString j = jsonString;
     switch (method) {
       case .removeEmpty:
@@ -175,9 +166,4 @@ mixin JSONStringMixin {
   }
 }
 
-
-enum LogMethods {
-  removeEmpty,
-  removeEmptyThenPrettyPrint,
-  prettyPrint,
-}
+enum LogMethods { removeEmpty, removeEmptyThenPrettyPrint, prettyPrint }

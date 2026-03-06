@@ -22,6 +22,7 @@ import 'package:blocz/getClassName.dart';
 import 'package:blocz/getProjectRootPath.dart';
 import 'package:blocz/importClauseToPath.dart';
 import 'package:blocz/make_bloc.dart';
+import 'package:path/path.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser();
@@ -35,10 +36,15 @@ Future<void> main(List<String> arguments) async {
   );
   parser.addFlag('force', abbr: 'f', help: 'force write', defaultsTo: false);
 
-  parser.addCommand('make')
+  parser.addCommand('make', parser.addCommand('make:bloc'))
     ..addSeparator("Make bloc,state,event")
     ..addOption('domain', abbr: 'd', help: 'domain based name')
-    ..addOption('name', abbr: 'n', help: 'name of bloc,state,event');
+    ..addOption('name', abbr: 'n', help: 'name of bloc,state,event')
+    ..addOption(
+      'apiPath',
+      abbr: 'a',
+      help: 'to be implemented api .dart fullpath',
+    );
 
   parser.addCommand('add:event')
     ..addSeparator("Add event to bloc")
@@ -191,16 +197,24 @@ Future<void> main(List<String> arguments) async {
     // printInfo("↓↓↓ result ↓↓↓");
     switch (command.name) {
       case 'make':
+      case 'make:bloc':
         final domain = command['domain'] as String;
         final name = command['name'] as String?;
-        await makeBloc(domain, name);
+        var apiPath = command['apiPath'] as String?;
+        if (apiPath != null && apiPath.isNotEmpty) {
+          apiPath = toAbsPath(apiPath);
+        }
+        await makeBloc(domain, name, apiPath);
         break;
       case 'add:event':
       case 'add':
         final domain = command['domain'] as String;
         final name = command['name'] as String?;
         final event = command['event'] as String?;
-        final apiPath = command['apiPath'] as String?;
+        var apiPath = command['apiPath'] as String?;
+        if (apiPath != null && apiPath.isNotEmpty) {
+          apiPath = toAbsPath(apiPath);
+        }
         final method = command['method'] as String?;
         await addEvent(domain, name, event, apiPath, method);
         break;
@@ -359,4 +373,15 @@ void printResult(dynamic result) {
   print("$blue --- START Result --- $reset");
   print("$green$result$reset");
   print("$blue --- END Result --- $reset");
+}
+
+String toAbsPath(String fp) {
+  if (isAbsolute(fp)) {
+    return fp;
+  }
+  String? r = getProjectRootPath();
+  if (r == null || r.isEmpty) {
+    return fp;
+  }
+  return normalize(join(r, fp));
 }

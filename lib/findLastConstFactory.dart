@@ -7,8 +7,8 @@ import 'package:analyzer/dart/ast/visitor.dart';
 int? findLastConstFactory(String pathOfSourceCode) {
   try {
     final lineNumber = _findLastConstFactoryLineNumber(pathOfSourceCode);
-    print('Found last const factory ending at line: ');
-    print(lineNumber);
+    // print('Found last const factory ending at line: ');
+    // print(lineNumber);
     return lineNumber;
   } catch (e) {
     print('Error: $e');
@@ -29,7 +29,9 @@ int _findLastConstFactoryLineNumber(String filePath) {
   parseResult.unit.visitChildren(visitor);
 
   if (visitor.lastConstFactoryNode != null) {
-    return parseResult.lineInfo.getLocation(visitor.lastConstFactoryNode!.end).lineNumber;
+    return parseResult.lineInfo
+        .getLocation(visitor.lastConstFactoryNode!.end)
+        .lineNumber;
   }
 
   throw Exception('No const factory constructors found in $filePath');
@@ -40,8 +42,10 @@ class _LastConstFactoryVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitConstructorDeclaration(ConstructorDeclaration constructor) {
-    if (constructor.constKeyword != null && constructor.factoryKeyword != null) {
-      if (lastConstFactoryNode == null || constructor.offset > lastConstFactoryNode!.offset) {
+    if (constructor.constKeyword != null &&
+        constructor.factoryKeyword != null) {
+      if (lastConstFactoryNode == null ||
+          constructor.offset > lastConstFactoryNode!.offset) {
         lastConstFactoryNode = constructor;
       }
     }

@@ -10,8 +10,8 @@ int? findLast_On_LineNumber(String pathOfSourceCode) {
 
   try {
     final lineNumber = _findLastOnLineNumber(pathOfSourceCode);
-    print('Found last on<...> ending at line: $lineNumber');
-    print(lineNumber);
+    // print('Found last on<...> ending at line: $lineNumber');
+    // print(lineNumber);
     return lineNumber;
   } catch (e) {
     print('Error: $e');

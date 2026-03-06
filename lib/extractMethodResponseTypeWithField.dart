@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:math';
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
@@ -14,20 +15,22 @@ import '_internal/projectContext.dart';
 import '_internal/visitors/FieldVisitor.dart';
 
 Future<void> main() async {
-  final result = await extractMethodResponseTypeWithField(
-    "/Users/lethanh/StudioProjects/ddd/packages/openapi/lib/api/orders_api.dart",
-    "v1OrdersByCouponCodeGet",
-    "data",
-  );
-  printSuccess(jsonEncode(result));
+  // final result = await extractMethodResponseTypeWithField(
+  //   "/Users/lethanh/StudioProjects/ddd/packages/openapi/lib/api/orders_api.dart",
+  //   "v1OrdersByCouponCodeGet",
+  //   "data",
+  // );
+  // printSuccess(jsonEncode(result));
 }
 
 /// Extracts the type of the 'data' field from a method's response type.
 Future<Map<String, dynamic>> extractMethodResponseTypeWithField(
   String filePath,
   String methodName,
-  dynamic searchFields,
-) async {
+  dynamic searchFields, [
+  bool returnRawType = true,
+  bool stripFutureType = true,
+]) async {
   searchFields =
       searchFields.replaceAll(RegExp(r'\s+'), "").split(",") as List<String>;
   if (searchFields == null ||
@@ -48,6 +51,13 @@ Future<Map<String, dynamic>> extractMethodResponseTypeWithField(
     throw Exception(
       'Method "$methodName" not found or has no return type in $filePath',
     );
+  }
+  if (returnRawType) {
+    // print(" raw return type: $returnType");
+    if (stripFutureType) {
+      return {"responseDataType": unwrapFuture(returnType.toString())};
+    }
+    return {"responseDataType": returnType.toString()};
   }
 
   final innerType = getInnerTypeByPosition(returnType, at: 0);
@@ -180,4 +190,19 @@ class _MethodVisitor extends RecursiveAstVisitor<void> {
       returnType = method.returnType;
     }
   }
+}
+
+String unwrapFuture(String input) {
+  // Explanation:
+  // ^Future<  : Must start with "Future<"
+  // (.*)      : Greedy match - captures everything until the LAST ">"
+  // >$        : Must end with ">"
+  final regex = RegExp(r"^Future<(.*)>$");
+  final match = regex.firstMatch(input.trim());
+
+  if (match != null) {
+    // This will now correctly return "List<Pet>?"
+    return match.group(1)!;
+  }
+  return input;
 }

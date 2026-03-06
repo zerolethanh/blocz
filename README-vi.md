@@ -46,29 +46,104 @@ dart pub global activate blocz
 Sử dụng lệnh `make` để tạo các thành phần cần thiết.
 
 ```bash
-blocz make --domain <ten_domain> --name <ten_bloc>
+blocz make --domain <ten_domain> --name <ten_bloc> [--apiPath <duong_dan_file_api>]
 ```
 
 - `--domain` (hoặc `-d`): Domain hoặc feature của BLoC (ví dụ: `user`, `product`).
-- `--name` (hoặc `-n`): Tên của BLoC (ví dụ: `authentication`, `product_list`). Đây là tham số không bắt buộc.
+- `--name` (hoặc `-n`)(optional): Tên của BLoC (ví dụ: `authentication`, `product_list`).
+- `--apiPath` (hoặc `-a`)(optional): Đường dẫn tùy chọn đến tệp tin service API. Nếu được cung cấp, `blocz` sẽ tự động tạo và triển khai các event cho tất cả các phương thức public trong tệp đó.
 
 **Ví dụ:**
 
+Tạo BLoC cơ bản:
+
 ```bash
-blocz make --domain user --name login
+blocz make --domain user
 ```
 
-Lệnh trên sẽ tạo ra cấu trúc thư mục và các tệp sau:
+> Cây thư mục tệp được tạo
 
 ```
-lib/
-└── features/
-    └── user/
-        └── presentation/
-            └── bloc/
-                ├── user_login_bloc.dart
-                ├── user_login_event.dart
-                └── user_login_state.dart
+lib/features/user/presentation/bloc/
+├── user_bloc.dart
+├── user_event.dart
+└── user_state.dart
+```
+
+Lệnh này tạo ra cấu trúc BLoC. Sau đó bạn sẽ cần chạy `build_runner`.
+
+Tạo BLoC và tự động thêm event từ file API:
+
+#### Ví dụ với OpenAPI generator:
+
+```bash
+export MY_PET_API_PACKAGE_NAME="my_pet_api"
+export MY_PET_API_DIR="./apis/$MY_PET_API_PACKAGE_NAME"
+rm -fr $MY_PET_API_DIR || true # xóa thư mục cũ
+mkdir -p $MY_PET_API_DIR # tạo thư mục nếu chưa có
+npx @openapitools/openapi-generator-cli generate
+  -i https://petstore.swagger.io/v2/swagger.json
+  -g dart
+  --additional-properties=pubName=$MY_PET_API_PACKAGE_NAME
+  -o $MY_PET_API_DIR
+cd $MY_PET_API_DIR
+  && dart pub get
+  && (dart run build_runner build || true)
+  && cd "$(git rev-parse --show-toplevel)"
+ls -lh "./apis/$MY_PET_API_PACKAGE_NAME/lib/api/"
+```
+
+```yaml
+# trong file pubspec.yaml của bạn
+dependencies:
+  my_pet_api: # Thêm gói API cục bộ
+    path: ./apis/my_pet_api
+```
+
+```bash
+blocz make --domain pet --apiPath ./apis/my_pet_api/lib/api/pet_api.dart
+```
+
+Lệnh này sẽ tạo các tệp BLoC và cũng tự động thêm các event và trình xử lý cho tất cả các phương thức được tìm thấy trong `pet_api.dart`.
+
+```dart
+// $PROJECT/lib/features/pet/presentation/bloc/pet_event.dart
+part of 'pet_bloc.dart';
+
+@freezed
+sealed class PetEvent with _$PetEvent {
+  const factory PetEvent.loading() = _PetEventLoading;
+  const factory PetEvent.addPetRequested(Pet body) = _PetEventAddPetRequested;
+  const factory PetEvent.deletePetRequested(int petId, {String? apiKey}) = _PetEventDeletePetRequested;
+  const factory PetEvent.findPetsByStatusRequested(List<String> status) = _PetEventFindPetsByStatusRequested;
+  const factory PetEvent.findPetsByTagsRequested(List<String> tags) = _PetEventFindPetsByTagsRequested;
+  const factory PetEvent.getPetByIdRequested(int petId) = _PetEventGetPetByIdRequested;
+  const factory PetEvent.updatePetRequested(Pet body) = _PetEventUpdatePetRequested;
+  const factory PetEvent.updatePetWithFormRequested(int petId, {String? name, String? status}) = _PetEventUpdatePetWithFormRequested;
+  const factory PetEvent.uploadFileRequested(int petId, {String? additionalMetadata, MultipartFile? file}) = _PetEventUploadFileRequested;
+}
+
+```
+
+```dart
+// $PROJECT/lib/features/pet/presentation/bloc/pet_state.dart
+part of 'pet_bloc.dart';
+
+@freezed
+sealed class PetState with _$PetState {
+  const factory PetState.initial() = _PetStateInitialDone;
+  const factory PetState.loading() = _PetStateLoading;
+  const factory PetState.failure(String message) = _PetStateFailure;
+  const factory PetState.addPetResult() = _PetStateAddPetResult;
+  const factory PetState.deletePetResult() = _PetStateDeletePetResult;
+  const factory PetState.findPetsByStatusResult(List<Pet>? data) = _PetStateFindPetsByStatusResult;
+  const factory PetState.findPetsByTagsResult(List<Pet>? data) = _PetStateFindPetsByTagsResult;
+  const factory PetState.getPetByIdResult(Pet? data) = _PetStateGetPetByIdResult;
+  const factory PetState.updatePetResult() = _PetStateUpdatePetResult;
+  const factory PetState.updatePetWithFormResult() = _PetStateUpdatePetWithFormResult;
+  const factory PetState.uploadFileResult(ApiResponse? data) = _PetStateUploadFileResult;
+  // const factory PetState.loaded(dynamic result) = _PetStateLoaded;
+}
 ```
 
 **Quan trọng:** Sau khi tạo các tệp, vì chúng sử dụng `freezed`, bạn cần chạy `build_runner` để tạo các tệp `.freezed.dart` và `.g.dart`:
@@ -82,16 +157,36 @@ dart run build_runner build --delete-conflicting-outputs
 Sử dụng lệnh `add:event` để thêm một event mới vào một BLoC đã tồn tại.
 
 ```bash
-blocz add:event --domain <ten_domain> --name <ten_bloc> --event <ten_event>
+blocz add:event --domain <ten_domain> --name <ten_bloc> <options>
 ```
 
+**Tùy chọn:**
+
+- `--event <ten_event>`: Thêm một event cụ thể.
+- `--apiPath <duong_dan_file_api>`: Quét tệp API và tạo các event và trình xử lý cho **tất cả** các phương thức public.
+- `--apiPath <duong_dan_file_api> --method <ten_phuong_thuc>`: Tạo một event và trình xử lý cho **chỉ một** phương thức được chỉ định từ tệp API.
+
 **Ví dụ:**
+
+Thêm một event đơn giản:
 
 ```bash
 blocz add:event --domain user --name login --event LogoutButtonPressed
 ```
 
-Lệnh này sẽ cập nhật các tệp `_event.dart` và `_bloc.dart` tương ứng để thêm event `LogoutButtonPressed`.
+Thêm tất cả các event từ một tệp API:
+
+```bash
+blocz add:event --domain user --name profile --apiPath ./packages/my_pet_api/lib/api/pet_api.dart
+```
+
+Thêm một event từ một phương thức API cụ thể:
+
+```bash
+blocz add:event --domain user --name profile --event UpdateAvatar --apiPath lib/features/user/data/api/user_api.dart --method uploadAvatar
+```
+
+Lệnh này sẽ cập nhật các tệp BLoC tương ứng để thêm (các) event mới.
 
 ## Các lệnh khác
 
