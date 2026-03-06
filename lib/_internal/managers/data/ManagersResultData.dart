@@ -30,18 +30,21 @@ class ManagersResultData with JSONStringMixin {
       mergeMaps(otherProps, {currentTaskKey: others});
     }
   }
+
   void mergeTaskResultValue(Map<String, dynamic>? others) {
     return addTaskResultValue(null, others);
   }
 
-  Map<String, dynamic> mergeMaps(Map<String, dynamic> original,
-      Map<String, dynamic> newData) {
+  Map<String, dynamic> mergeMaps(
+    Map<String, dynamic> original,
+    Map<String, dynamic> newData,
+  ) {
     newData.forEach((key, value) {
-      if (original.containsKey(key)
-          && original[key] is Map
-          && value is Map) {
-        mergeMaps(original[key] as Map<String, dynamic>,
-            value as Map<String, dynamic>);
+      if (original.containsKey(key) && original[key] is Map && value is Map) {
+        mergeMaps(
+          original[key] as Map<String, dynamic>,
+          value as Map<String, dynamic>,
+        );
       } else {
         original[key] = value;
       }
@@ -63,7 +66,7 @@ class ManagersResultData with JSONStringMixin {
     this.manager = manager ?? this.manager;
   }
 
-  String fullTaskNameAtFrame([ List<String>? subTasks]) {
+  String fullTaskNameAtFrame([List<String>? subTasks]) {
     subTasks?.removeWhere((val) => val.isEmpty);
     String currentTaskMethodName = "";
 
@@ -80,9 +83,9 @@ class ManagersResultData with JSONStringMixin {
     printWarning("-- adding task: $currentTaskInfo");
     final taskFullName =
         currentTaskMethodName +
-            ((subTasks == null || subTasks.isEmpty)
-                ? ""
-                : ".${subTasks.join(".")}");
+        ((subTasks == null || subTasks.isEmpty)
+            ? ""
+            : ".${subTasks.join(".")}");
     succeedTasks.add(taskFullName);
     return taskFullName;
   }
@@ -124,7 +127,7 @@ class ManagersResultData with JSONStringMixin {
     return null;
   }
 
-  String addTaskResultValueTaskName([List<String>? subTasks,]) {
+  String addTaskResultValueTaskName([List<String>? subTasks]) {
     return fullTaskNameAtFrame(subTasks);
   }
 
@@ -143,13 +146,13 @@ class ManagersResultData with JSONStringMixin {
 
   @override
   JSONString toString({LogMethods? method = .removeEmptyThenPrettyPrint}) {
-    return "$resultIdentifier\n"
-        "${switch (method) {
-          .removeEmpty => removeEmpty(toJSON()),
-          .prettyPrint => prettyPrint(toJSON()),
+    return //"$resultIdentifier\n"
+    switch (method) {
+      .removeEmpty => removeEmpty(toJSON()),
+      .prettyPrint => prettyPrint(toJSON()),
       .removeEmptyThenPrettyPrint => prettyPrint(removeEmpty(toJSON())),
       _ => toJSON(),
-    }}";
+    };
   }
 
   void expose({LogMethods? method = .removeEmptyThenPrettyPrint}) {
