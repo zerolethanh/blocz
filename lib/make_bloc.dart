@@ -61,10 +61,12 @@ String _renderTemplate(String templateContent, Map<String, String> data) {
 const _blocTemplate = r'''
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 // import 'package:get_it/get_it.dart';
 
-import '{{common_file_name}}_event.dart';
-import '{{common_file_name}}_state.dart';
+part '{{common_file_name}}_event.dart';
+part '{{common_file_name}}_state.dart';
+part '{{common_file_name}}_bloc.freezed.dart';
 
 @lazySingleton
 class {{CommonFileName}}Bloc extends Bloc<{{CommonFileName}}Event, {{CommonFileName}}State> {
@@ -75,12 +77,12 @@ class {{CommonFileName}}Bloc extends Bloc<{{CommonFileName}}Event, {{CommonFileN
     {{CommonFileName}}Bloc(
         // this._otherUseCase
     ) : super(const {{CommonFileName}}State.initial()) {
-        on<{{CommonFileName}}EventLoading>(_on{{CommonFileName}}EventLoading);
+        on<_{{CommonFileName}}EventLoading>(_on{{CommonFileName}}EventLoading);
     }
 
     Future<void> _on{{CommonFileName}}EventLoading
     (
-        {{CommonFileName}}EventLoading event,
+        _{{CommonFileName}}EventLoading event,
         Emitter<{{CommonFileName}}State> emit
     ) async {
         emit(const {{CommonFileName}}State.loading());
@@ -89,20 +91,16 @@ class {{CommonFileName}}Bloc extends Bloc<{{CommonFileName}}Event, {{CommonFileN
 ''';
 
 const _eventTemplate = r'''
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part '{{common_file_name}}_event.freezed.dart';
+part of '{{common_file_name}}_bloc.dart';
 
 @freezed
 sealed class {{CommonFileName}}Event with _${{CommonFileName}}Event {
-  const factory {{CommonFileName}}Event.loading() = {{CommonFileName}}EventLoading;
+  const factory {{CommonFileName}}Event.loading() = _{{CommonFileName}}EventLoading;
 }
 ''';
 
 const _stateTemplate = r'''
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part '{{common_file_name}}_state.freezed.dart';
+part of '{{common_file_name}}_bloc.dart';
 
 @freezed
 sealed class {{CommonFileName}}State with _${{CommonFileName}}State {

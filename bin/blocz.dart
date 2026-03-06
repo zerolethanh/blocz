@@ -22,6 +22,7 @@ import 'package:blocz/getClassName.dart';
 import 'package:blocz/getProjectRootPath.dart';
 import 'package:blocz/importClauseToPath.dart';
 import 'package:blocz/make_bloc.dart';
+import 'package:path/path.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser();
@@ -199,7 +200,10 @@ Future<void> main(List<String> arguments) async {
       case 'make:bloc':
         final domain = command['domain'] as String;
         final name = command['name'] as String?;
-        final apiPath = command['apiPath'] as String?;
+        var apiPath = command['apiPath'] as String?;
+        if (apiPath != null && apiPath.isNotEmpty) {
+          apiPath = toAbsPath(apiPath);
+        }
         await makeBloc(domain, name, apiPath);
         break;
       case 'add:event':
@@ -207,7 +211,10 @@ Future<void> main(List<String> arguments) async {
         final domain = command['domain'] as String;
         final name = command['name'] as String?;
         final event = command['event'] as String?;
-        final apiPath = command['apiPath'] as String?;
+        var apiPath = command['apiPath'] as String?;
+        if (apiPath != null && apiPath.isNotEmpty) {
+          apiPath = toAbsPath(apiPath);
+        }
         final method = command['method'] as String?;
         await addEvent(domain, name, event, apiPath, method);
         break;
@@ -366,4 +373,15 @@ void printResult(dynamic result) {
   print("$blue --- START Result --- $reset");
   print("$green$result$reset");
   print("$blue --- END Result --- $reset");
+}
+
+String toAbsPath(String fp) {
+  if (isAbsolute(fp)) {
+    return fp;
+  }
+  String? r = getProjectRootPath();
+  if (r == null || r.isEmpty) {
+    return fp;
+  }
+  return normalize(join(r, fp));
 }

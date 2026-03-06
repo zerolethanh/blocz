@@ -124,7 +124,7 @@ Future<void> _addSingleEvent(
   var blocContent = File(blocPath).readAsStringSync();
 
   final newOn =
-      '    on<${commonClassName}Event${EventName}Requested>(_on${commonClassName}Event${EventName}Requested);';
+      '    on<_${commonClassName}Event${EventName}Requested>(_on${commonClassName}Event${EventName}Requested);';
   final newMethodName = '_on${commonClassName}Event${EventName}Requested';
 
   final bool hasOn = blocContent.contains(newOn);
@@ -154,7 +154,7 @@ Future<void> _addSingleEvent(
           apiPath != null && method != null && apiClassName != null
           ? '''
         try {
-           final injectedApi = GetIt.instance<$apiClassName>();
+          final injectedApi = GetIt.instance<$apiClassName>();
           final response = await injectedApi.$method(${_getEventCallParams(apiPath, method)});
           ${resHitField != '' ? '''
           if (response == null) {
@@ -175,7 +175,7 @@ Future<void> _addSingleEvent(
           '''
 
   Future<void> $newMethodName(
-    ${commonClassName}Event${EventName}Requested event,
+    _${commonClassName}Event${EventName}Requested event,
     Emitter<${commonClassName}State> emit,
   ) async {
     $apiCodeBlock
