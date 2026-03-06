@@ -61,6 +61,15 @@ Basic BLoC creation:
 blocz make --domain user
 ```
 
+> Generated files tree
+
+```
+lib/features/user/presentation/bloc/
+├── user_bloc.dart
+├── user_event.dart
+└── user_state.dart
+```
+
 This command creates the BLoC structure. You will then need to run `build_runner`.
 
 BLoC creation with automatic event implementation from an API file:
@@ -72,14 +81,14 @@ export MY_PET_API_PACKAGE_NAME="my_pet_api"
 export MY_PET_API_DIR="./apis/$MY_PET_API_PACKAGE_NAME"
 rm -fr $MY_PET_API_DIR || true # remove old
 mkdir -p $MY_PET_API_DIR # create if not exists
-npx @openapitools/openapi-generator-cli generate \
-  -i https://petstore.swagger.io/v2/swagger.json \
-  -g dart \
-  --additional-properties=pubName=$MY_PET_API_PACKAGE_NAME \
+npx @openapitools/openapi-generator-cli generate
+  -i https://petstore.swagger.io/v2/swagger.json
+  -g dart
+  --additional-properties=pubName=$MY_PET_API_PACKAGE_NAME
   -o $MY_PET_API_DIR
-cd $MY_PET_API_DIR \
-  && dart pub get \
-  && (dart run build_runner build || true) \
+cd $MY_PET_API_DIR
+  && dart pub get
+  && (dart run build_runner build || true)
   && cd "$(git rev-parse --show-toplevel)"
 ls -lh "./apis/$MY_PET_API_PACKAGE_NAME/lib/api/"
 ```
@@ -95,7 +104,47 @@ dependencies:
 blocz make --domain pet --apiPath ./apis/my_pet_api/lib/api/pet_api.dart
 ```
 
-This command will create the BLoC files and also automatically add events and handlers for all methods found in `user_api.dart`.
+This command will create the BLoC files and also automatically add events and handlers for all methods found in `pet_api.dart`.
+
+```dart
+// $PROJECT/lib/features/pet/presentation/bloc/pet_event.dart
+part of 'pet_bloc.dart';
+
+@freezed
+sealed class PetEvent with _$PetEvent {
+  const factory PetEvent.loading() = _PetEventLoading;
+  const factory PetEvent.addPetRequested(Pet body) = _PetEventAddPetRequested;
+  const factory PetEvent.deletePetRequested(int petId, {String? apiKey}) = _PetEventDeletePetRequested;
+  const factory PetEvent.findPetsByStatusRequested(List<String> status) = _PetEventFindPetsByStatusRequested;
+  const factory PetEvent.findPetsByTagsRequested(List<String> tags) = _PetEventFindPetsByTagsRequested;
+  const factory PetEvent.getPetByIdRequested(int petId) = _PetEventGetPetByIdRequested;
+  const factory PetEvent.updatePetRequested(Pet body) = _PetEventUpdatePetRequested;
+  const factory PetEvent.updatePetWithFormRequested(int petId, {String? name, String? status}) = _PetEventUpdatePetWithFormRequested;
+  const factory PetEvent.uploadFileRequested(int petId, {String? additionalMetadata, MultipartFile? file}) = _PetEventUploadFileRequested;
+}
+
+```
+
+```dart
+// $PROJECT/lib/features/pet/presentation/bloc/pet_state.dart
+part of 'pet_bloc.dart';
+
+@freezed
+sealed class PetState with _$PetState {
+  const factory PetState.initial() = _PetStateInitialDone;
+  const factory PetState.loading() = _PetStateLoading;
+  const factory PetState.failure(String message) = _PetStateFailure;
+  const factory PetState.addPetResult() = _PetStateAddPetResult;
+  const factory PetState.deletePetResult() = _PetStateDeletePetResult;
+  const factory PetState.findPetsByStatusResult(List<Pet>? data) = _PetStateFindPetsByStatusResult;
+  const factory PetState.findPetsByTagsResult(List<Pet>? data) = _PetStateFindPetsByTagsResult;
+  const factory PetState.getPetByIdResult(Pet? data) = _PetStateGetPetByIdResult;
+  const factory PetState.updatePetResult() = _PetStateUpdatePetResult;
+  const factory PetState.updatePetWithFormResult() = _PetStateUpdatePetWithFormResult;
+  const factory PetState.uploadFileResult(ApiResponse? data) = _PetStateUploadFileResult;
+  // const factory PetState.loaded(dynamic result) = _PetStateLoaded;
+}
+```
 
 **Important:** Since the generated files use `freezed`, you need to run `build_runner` after generation:
 
