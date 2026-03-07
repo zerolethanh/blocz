@@ -1,13 +1,11 @@
-import 'dart:convert';
 import 'dart:core';
-import 'dart:math';
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:blocz/_internal/findNodes.dart';
+import 'package:blocz/_internal/find_nodes.dart';
 import 'package:blocz/_internal/getInnerType.dart';
-import 'package:blocz/getProjectRootPath.dart';
-import 'package:blocz/importClauseToPath.dart';
+import 'package:blocz/get_project_root_path.dart';
+import 'package:blocz/import_clause_to_path.dart';
 import 'package:path/path.dart' as p;
 
 import '_internal/colors.dart';

@@ -19,8 +19,8 @@ import 'package:blocz/findLastClassbodyLineNumber.dart';
 import 'package:blocz/findLastConstFactory.dart';
 import 'package:blocz/findLast_On_LineNumber.dart';
 import 'package:blocz/getClassName.dart';
-import 'package:blocz/getProjectRootPath.dart';
-import 'package:blocz/importClauseToPath.dart';
+import 'package:blocz/get_project_root_path.dart';
+import 'package:blocz/import_clause_to_path.dart';
 import 'package:blocz/make_bloc.dart';
 import 'package:path/path.dart';
 
