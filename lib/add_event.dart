@@ -39,6 +39,7 @@ Future<void> addEvent(
       sleep(const Duration(milliseconds: 100));
       if (results.isNotEmpty) {
         String dir = results[0].$1;
+        printInfo("running dart format for $dir");
         // run format
         Process.runSync("dart", ["run", "format", dir]);
       }
@@ -104,7 +105,7 @@ Future<dynamic> _addSingleEvent(
           "(dynamic params)";
     }
     final newEvent =
-        '  const factory $eventClassName.${eventName}Requested$params = _${EventName}Requested;';
+        '  const factory $eventClassName.${eventName}$params = _${EventName}Requested;';
     if (!eventContent.contains(newEvent)) {
       final eventLines = eventContent.split('\n');
       eventLines.insert(eventInsertionPoint, newEvent);
