@@ -36,7 +36,7 @@ int _findLastClassbodyLineNumber(String filePath) {
     // 5. Calculate line number from the 'end' offset of the closing brace
     final classNode = visitor.lastClassNode!;
     final lineNumber = parseResult.lineInfo
-        .getLocation(classNode.rightBracket.end)
+        .getLocation(classNode.body.end)
         .lineNumber;
     // print('Found last class declaration ending at line: ');
     // print(lineNumber);

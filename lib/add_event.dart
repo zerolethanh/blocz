@@ -194,7 +194,7 @@ Future<void> _addSingleEvent(
     $apiCodeBlock
   }
 ''';
-      blocLines.insert(lastLine, newMethod);
+      blocLines.insert(lastLine - 1, newMethod);
       isDirty = true;
     }
   }
