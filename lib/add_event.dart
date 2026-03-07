@@ -25,12 +25,20 @@ Future<void> addEvent(
       print(
         'Found ${methods.length} methods in $apiPath. Generating events...',
       );
+      List<dynamic> results = [];
       for (final methodName in methods) {
         if (methodName.endsWith("WithHttpInfo")) {
           // skip ...WithHttpInfo method
           continue;
         }
-        await _addSingleEvent(domain, name, methodName, apiPath, methodName);
+        results.add(
+          await _addSingleEvent(domain, name, methodName, apiPath, methodName),
+        );
+      }
+      sleep(const Duration(milliseconds: 100));
+      if (results.isNotEmpty) {
+        String dir = results[0].$1;
+        Process.runSync("dart", ["run", "format", dir]);
       }
       print('Finished generating events from $apiPath.');
     } else {
@@ -47,7 +55,7 @@ Future<void> addEvent(
   await _addSingleEvent(domain, name, event, apiPath, method ?? event);
 }
 
-Future<void> _addSingleEvent(
+Future<dynamic> _addSingleEvent(
   String domain,
   String? name,
   String event,
@@ -110,9 +118,9 @@ Future<void> _addSingleEvent(
     final responseType = (apiPath != null && method != null)
         ? await extractMethodResponseTypeWithField(apiPath, method, "data,body")
         : null;
-    print("// responseType:: \\\\");
-    print(responseType);
-    print("\\\\ responseType:: //");
+    // print("// responseType:: \\\\");
+    // print(responseType);
+    // print("\\\\ responseType:: //");
     stateParams = responseType != null
         ? '(${responseType['responseDataType']} data)'
         : '(dynamic data)';
@@ -213,6 +221,7 @@ Future<void> _addSingleEvent(
     File(blocPath).writeAsStringSync(blocLines.join('\n'));
     print('Updated: $blocPath');
   }
+  return (writeDir, blocPath, eventPath, statePath);
 }
 
 String _getEventCallParams(String? fpath, String? method) {
