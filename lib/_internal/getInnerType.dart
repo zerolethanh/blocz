@@ -2,9 +2,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:blocz/_internal/visitors/FieldVisitor.dart';
 import 'package:path/path.dart' as p;
 
-import '../getProjectRootPath.dart';
+import '../get_project_root_path.dart';
 import 'colors.dart';
-import 'findNodes.dart';
+import 'find_nodes.dart';
 
 // getInnerTypeAt
 // eg: if Response<String,int>, at = 1 then return int, 0 then return String. default is 0

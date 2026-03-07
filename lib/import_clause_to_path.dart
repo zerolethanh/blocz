@@ -3,7 +3,7 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 
 import '_internal/getSdkPath.dart';
 import '_internal/typedef.dart';
-import 'getProjectRootPath.dart';
+import 'get_project_root_path.dart';
 
 JSONString? importClauseToPath(String codePath) {
   final projectRootPath = getProjectRootPath(scriptPath: codePath);

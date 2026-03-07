@@ -8,7 +8,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:blocz/_internal/colors.dart';
 
-import '../getProjectRootPath.dart';
+import '../get_project_root_path.dart';
 import 'getSdkPath.dart';
 
 AnalysisContextCollection? getCollection(String codePath) {
