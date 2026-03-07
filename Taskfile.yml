@@ -2,11 +2,9 @@
 
 version: "3"
 
-#vars:
-#  PUB_BIN:
-#    linux: $HOME/.pub-cache/bin
-#    darwin: $HOME/.pub-cache/bin
-#    windows: '%LOCALAPPDATA%\Pub\Cache\bin'
+vars:
+  VERSION:
+    sh: "grep '^version:' pubspec.yaml | awk '{print $2}'"
 
 tasks:
   compile:
@@ -46,6 +44,13 @@ tasks:
       - task: _copy:bin:{{OS}}
       # - task: setup:path
       - echo " ✅ Successfully activated blocz locally."
+  
+  publish:
+    desc: "Create git tag for version from pubspec.yaml and publish to pub.dev"
+    cmds:
+      - git tag "v{{.VERSION}}"
+      - git push origin "v{{.VERSION}}"
+      - dart pub publish
 
   _copy:bin:darwin:
     internal: true
@@ -62,8 +67,8 @@ tasks:
   _copy:bin:windows:
     internal: true
     cmds:
-      - powershell -Command "New-Item -ItemType Directory -Force -Path \"$env:LOCALAPPDATA\Pub\Cache\bin\""
-      - powershell -Command "Copy-Item -Path 'bin\blocz.exe' -Destination \"$env:LOCALAPPDATA\Pub\Cache\bin\blocz.exe\" -Force"
+      - powershell -Command "New-Item -ItemType Directory -Force -Path "$env:LOCALAPPDATA\Pub\Cache\bin""
+      - powershell -Command "Copy-Item -Path 'bin\blocz.exe' -Destination "$env:LOCALAPPDATA\Pub\Cache\bin\blocz.exe" -Force"
 
   setup:path:
     desc: Automatically add pub cache bin to PATH based on OS
