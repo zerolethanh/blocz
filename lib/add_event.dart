@@ -104,7 +104,7 @@ Future<dynamic> _addSingleEvent(
           "(dynamic params)";
     }
     final newEvent =
-        '  const factory $eventClassName.${eventName}Requested$params = _$eventClassName${EventName}Requested;';
+        '  const factory $eventClassName.${eventName}Requested$params = _${EventName}Requested;';
     if (!eventContent.contains(newEvent)) {
       final eventLines = eventContent.split('\n');
       eventLines.insert(eventInsertionPoint, newEvent);
@@ -147,9 +147,8 @@ Future<dynamic> _addSingleEvent(
   // Bloc
   var blocContent = File(blocPath).readAsStringSync();
 
-  final newOn =
-      '    on<_${commonClassName}Event${EventName}Requested>(_on${commonClassName}Event${EventName}Requested);';
-  final newMethodName = '_on${commonClassName}Event${EventName}Requested';
+  final newOn = '    on<_${EventName}Requested>(_on${EventName}Requested);';
+  final newMethodName = '_on${EventName}Requested';
 
   final bool hasOn = blocContent.contains(newOn);
   // ignore: no_leading_underscores_for_local_identifiers
@@ -209,7 +208,7 @@ Future<dynamic> _addSingleEvent(
           '''
 
   Future<void> $newMethodName(
-    _${commonClassName}Event${EventName}Requested event,
+    _${EventName}Requested event,
     Emitter<${commonClassName}State> emit,
   ) async {
     $apiCodeBlock
