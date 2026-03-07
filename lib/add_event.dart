@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/extractMethodListFromClass.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
@@ -38,17 +39,20 @@ Future<void> addEvent(
       sleep(const Duration(milliseconds: 100));
       if (results.isNotEmpty) {
         String dir = results[0].$1;
+        // run format
         Process.runSync("dart", ["run", "format", dir]);
       }
-      print('Finished generating events from $apiPath.');
+      printSuccess(' ✅ Finished generating events from $apiPath.');
     } else {
-      print('No public methods found in $apiPath to generate events from.');
+      printWarning(
+        'No public methods found in $apiPath to generate events from.',
+      );
     }
     return;
   }
 
   if (event == null || event.trim().isEmpty) {
-    print('Event name is required (or apiPath must be provided).');
+    printError(' ❗️ Event name is required (or apiPath must be provided).');
     return;
   }
 
@@ -121,12 +125,15 @@ Future<dynamic> _addSingleEvent(
     // print("// responseType:: \\\\");
     // print(responseType);
     // print("\\\\ responseType:: //");
-    stateParams = responseType != null
-        ? '(${responseType['responseDataType']} data)'
-        : '(dynamic data)';
-    if (stateParams == "(void data)") {
-      stateParams = "()";
+    String responseDataType = "dynamic";
+    if (responseType != null) {
+      responseDataType = responseType['responseDataType'];
+      stateParams = "($responseDataType data)";
+      if (stateParams == "(void data)") {
+        stateParams = "()";
+      }
     }
+
     final newState =
         '  const factory $stateClassName.${eventName}Result$stateParams = _$stateClassName${EventName}Result;';
     if (!stateContent.contains(newState)) {
@@ -145,9 +152,15 @@ Future<dynamic> _addSingleEvent(
   final newMethodName = '_on${commonClassName}Event${EventName}Requested';
 
   final bool hasOn = blocContent.contains(newOn);
-  final bool hasMethod = blocContent.contains(newMethodName);
+  // ignore: no_leading_underscores_for_local_identifiers
+  final bool _hasMethod = hasMethod(blocPath, newMethodName);
 
-  if (hasOn && hasMethod) {
+  if (_hasMethod) {
+    print("$yellow method $newMethodName already exists. skip...");
+    return;
+  }
+  if (hasOn) {
+    print("$yellow `on` $newOn already exists. skip...");
     return; // Already up-to-date for this event, do nothing.
   }
 
@@ -155,7 +168,7 @@ Future<dynamic> _addSingleEvent(
   bool isDirty = false;
 
   // Insert method if it's missing. This is inserted near the end of the file.
-  if (!hasMethod) {
+  if (!_hasMethod) {
     final lastLine = findLastClassbodyLineNumber(blocPath);
     if (lastLine != null) {
       final responseType = (apiPath != null && method != null)
