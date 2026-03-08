@@ -131,9 +131,9 @@ part of 'pet_bloc.dart';
 
 @freezed
 sealed class PetState with _$PetState {
-  const factory PetState.initial() = _PetStateInitialDone;
-  const factory PetState.loading() = _PetStateLoading;
-  const factory PetState.failure(String message) = _PetStateFailure;
+  const factory PetState.initial() = _InitialDone;
+  const factory PetState.loading() = _Loading;
+  const factory PetState.failure(String message) = _Failure;
   const factory PetState.addPetResult() = _AddPetResult;
   const factory PetState.deletePetResult() = _DeletePetResult;
   const factory PetState.findPetsByStatusResult(List<Pet>? data) = _FindPetsByStatusResult;
@@ -142,7 +142,7 @@ sealed class PetState with _$PetState {
   const factory PetState.updatePetResult() = _UpdatePetResult;
   const factory PetState.updatePetWithFormResult() = _UpdatePetWithFormResult;
   const factory PetState.uploadFileResult(ApiResponse? data) = _UploadFileResult;
-  // const factory PetState.loaded(dynamic result) = _PetStateLoaded;
+  // const factory PetState.loaded(dynamic result) = _Loaded;
 }
 
 ```
