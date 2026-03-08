@@ -105,9 +105,9 @@ part of '{{common_file_name}}_bloc.dart';
 
 @freezed
 sealed class {{CommonFileName}}State with _${{CommonFileName}}State {
-  const factory {{CommonFileName}}State.initial() = _{{CommonFileName}}StateInitialDone;
-  const factory {{CommonFileName}}State.loading() = _{{CommonFileName}}StateLoading;
-  const factory {{CommonFileName}}State.failure(String message) = _{{CommonFileName}}StateFailure;
-  // const factory {{CommonFileName}}State.loaded(dynamic result) = _{{CommonFileName}}StateLoaded;
+  const factory {{CommonFileName}}State.initial() = _InitialDone;
+  const factory {{CommonFileName}}State.loading() = _Loading;
+  const factory {{CommonFileName}}State.failure(String message) = _Failure;
+  // const factory {{CommonFileName}}State.loaded(dynamic result) = _Loaded;
 }
 ''';

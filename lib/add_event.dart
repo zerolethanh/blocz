@@ -136,7 +136,7 @@ Future<dynamic> _addSingleEvent(
     }
 
     final newState =
-        '  const factory $stateClassName.${eventName}Result$stateParams = _$stateClassName${EventName}Result;';
+        '  const factory $stateClassName.${eventName}Result$stateParams = _${EventName}Result;';
     if (!stateContent.contains(newState)) {
       final stateLines = stateContent.split('\n');
       stateLines.insert(stateInsertionPoint, newState);
