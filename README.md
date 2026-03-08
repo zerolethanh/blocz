@@ -113,16 +113,15 @@ part of 'pet_bloc.dart';
 @freezed
 sealed class PetEvent with _$PetEvent {
   const factory PetEvent.loading() = _PetEventLoading;
-  const factory PetEvent.addPetRequested(Pet body) = _PetEventAddPetRequested;
-  const factory PetEvent.deletePetRequested(int petId, {String? apiKey}) = _PetEventDeletePetRequested;
-  const factory PetEvent.findPetsByStatusRequested(List<String> status) = _PetEventFindPetsByStatusRequested;
-  const factory PetEvent.findPetsByTagsRequested(List<String> tags) = _PetEventFindPetsByTagsRequested;
-  const factory PetEvent.getPetByIdRequested(int petId) = _PetEventGetPetByIdRequested;
-  const factory PetEvent.updatePetRequested(Pet body) = _PetEventUpdatePetRequested;
-  const factory PetEvent.updatePetWithFormRequested(int petId, {String? name, String? status}) = _PetEventUpdatePetWithFormRequested;
-  const factory PetEvent.uploadFileRequested(int petId, {String? additionalMetadata, MultipartFile? file}) = _PetEventUploadFileRequested;
+  const factory PetEvent.addPet(Pet body) = _AddPetRequested;
+  const factory PetEvent.deletePet(int petId, {String? apiKey}) = _DeletePetRequested;
+  const factory PetEvent.findPetsByStatus(List<String> status) = _FindPetsByStatusRequested;
+  const factory PetEvent.findPetsByTags(List<String> tags) = _FindPetsByTagsRequested;
+  const factory PetEvent.getPetById(int petId) = _GetPetByIdRequested;
+  const factory PetEvent.updatePet(Pet body) = _UpdatePetRequested;
+  const factory PetEvent.updatePetWithForm(int petId, {String? name, String? status}) = _UpdatePetWithFormRequested;
+  const factory PetEvent.uploadFile(int petId, {String? additionalMetadata, MultipartFile? file}) = _UploadFileRequested;
 }
-
 
 ```
 
