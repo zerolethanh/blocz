@@ -55,3 +55,8 @@ class _MethodVisitor extends GeneralizingAstVisitor<void> {
     }
   }
 }
+
+bool hasMethod(String filePath, String methodName, [String? className]) {
+  final methods = extractMethodListFromClass(filePath, className);
+  return methods.contains(methodName);
+}
