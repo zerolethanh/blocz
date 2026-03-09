@@ -1,3 +1,7 @@
+## 1.2.1
+
+- auto run `dart format` and `dart run build_runner build --delete-conflicting-outputs` after generation
+
 ## 1.2.0
 
 - simplicit
