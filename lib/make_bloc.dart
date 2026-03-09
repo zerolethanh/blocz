@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/add_event.dart';
 import 'package:blocz/onDoneUtils.dart';
 import 'package:mustache_template/mustache.dart';
