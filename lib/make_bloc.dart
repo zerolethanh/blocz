@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/add_event.dart';
+import 'package:blocz/onDoneUtils.dart';
 import 'package:mustache_template/mustache.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
@@ -51,6 +53,9 @@ Future<void> makeBloc(String domain, String? name, String? apiPath) async {
     await addEvent(domain, isEmptyName ? null : name, null, apiPath, null);
     print('Finished adding events from apiPath.');
   }
+
+  runDartFormat(writeDir);
+  runBuildRunner(writeDir);
 }
 
 String _renderTemplate(String templateContent, Map<String, String> data) {

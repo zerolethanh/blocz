@@ -10,6 +10,7 @@ import 'package:blocz/findLastClassbodyLineNumber.dart';
 import 'package:blocz/findLastConstFactory.dart';
 import 'package:blocz/findLast_On_LineNumber.dart';
 import 'package:blocz/getClassName.dart';
+import 'package:blocz/onDoneUtils.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
 
@@ -20,6 +21,7 @@ Future<void> addEvent(
   String? apiPath,
   String? method,
 ) async {
+  // multiple event generate
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
     final methods = extractMethodListFromClass(apiPath);
     if (methods.isNotEmpty) {
@@ -42,12 +44,22 @@ Future<void> addEvent(
           await _addSingleEvent(domain, name, methodName, apiPath, methodName),
         );
       }
+
       sleep(const Duration(milliseconds: 100));
       if (results.isNotEmpty) {
-        String dir = results[0].$1;
-        printInfo("running dart format for $dir");
-        // run format
-        Process.runSync("dart", ["run", "format", dir]);
+        String dir = "";
+        for (final result in results) {
+          dir = result.$1;
+          if (dir.isNotEmpty) {
+            break;
+          }
+        }
+        if (dir.isEmpty) {
+          printWarning("No events generated.");
+          return;
+        }
+        runDartFormat(dir);
+        runBuildRunner(dir);
       }
       printSuccess(' ✅ Finished generating events from $apiPath.');
     } else {
@@ -63,10 +75,24 @@ Future<void> addEvent(
     return;
   }
 
-  await _addSingleEvent(domain, name, event, apiPath, method ?? event);
+  // signle event generate
+  final result = await _addSingleEvent(
+    domain,
+    name,
+    event,
+    apiPath,
+    method ?? event,
+  );
+  if (result.$1.isEmpty) {
+    printWarning("No events generated.");
+    return;
+  }
+  runDartFormat(result.$1);
+  runBuildRunner(result.$1);
+  printSuccess(' ✅ Finished generating events from $apiPath.');
 }
 
-Future<dynamic> _addSingleEvent(
+Future<(String, String, String, String)> _addSingleEvent(
   String domain,
   String? name,
   String event,
@@ -92,7 +118,7 @@ Future<dynamic> _addSingleEvent(
   for (var f in [eventPath, statePath, blocPath]) {
     if (!File(f).existsSync()) {
       print('File not found: $f');
-      return;
+      return ("", "", "", "");
     }
   }
 
@@ -163,11 +189,11 @@ Future<dynamic> _addSingleEvent(
 
   if (_hasMethod) {
     print("$yellow method $newMethodName already exists. skip...");
-    return;
+    return ("", "", "", "");
   }
   if (hasOn) {
     print("$yellow `on` $newOn already exists. skip...");
-    return; // Already up-to-date for this event, do nothing.
+    return ("", "", "", ""); // Already up-to-date for this event, do nothing.
   }
 
   final blocLines = blocContent.split('\n');
