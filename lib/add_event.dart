@@ -32,6 +32,12 @@ Future<void> addEvent(
           // skip ...WithHttpInfo method
           continue;
         }
+        if (method != null &&
+            method.trim().isNotEmpty &&
+            methodName != method) {
+          // skip method that is not the one specified
+          continue;
+        }
         results.add(
           await _addSingleEvent(domain, name, methodName, apiPath, methodName),
         );
