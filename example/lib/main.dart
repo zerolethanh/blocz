@@ -26,8 +26,7 @@ void main() async {
       deleteUserResult: (int data) => print('[State] Success: User deleted'),
       getUserByIdWithApiKeyResult: (User data) =>
           print('[State] Success: Found user ${data.name}'),
-      updateUserResult: (User data) =>
-          print('[State] Success: Updated user ${data.name}'),
+      updateUserResult: (bool data) => print('[State] Success: Updated user'),
     );
   });
 
