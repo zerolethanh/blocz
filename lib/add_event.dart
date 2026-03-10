@@ -58,8 +58,8 @@ Future<void> addEvent(
           printWarning("No events generated.");
           return;
         }
-        runDartFormat(dir);
         runBuildRunner(dir);
+        runDartFormat(dir);
       }
       printSuccess(' ✅ Finished generating events from $apiPath.');
     } else {
@@ -87,8 +87,8 @@ Future<void> addEvent(
     printWarning("No events generated.");
     return;
   }
-  runDartFormat(result.$1);
   runBuildRunner(result.$1);
+  runDartFormat(result.$1);
   printSuccess(' ✅ Finished generating events from $apiPath.');
 }
 

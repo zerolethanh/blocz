@@ -53,8 +53,8 @@ Future<void> makeBloc(String domain, String? name, String? apiPath) async {
     print('Finished adding events from apiPath.');
   }
 
-  runDartFormat(writeDir);
   runBuildRunner(writeDir);
+  runDartFormat(writeDir);
 }
 
 String _renderTemplate(String templateContent, Map<String, String> data) {
