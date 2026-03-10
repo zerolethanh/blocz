@@ -17,18 +17,11 @@ A command-line interface (CLI) tool to speed up Flutter app development by scaff
 
 ## Prerequisites
 
-Your Flutter project must have the following dependencies in your `pubspec.yaml`:
+Run these commands in your Flutter project directory to add the required dependencies:
 
-```yaml
-dependencies:
-  flutter_bloc: <version>
-  freezed_annotation: <version>
-  injectable: <version>
-
-dev_dependencies:
-  build_runner: <version>
-  freezed: <version>
-  injectable_generator: <version>
+```bash
+flutter pub add flutter_bloc freezed_annotation injectable get_it
+flutter pub add --dev build_runner freezed injectable_generator
 ```
 
 ## Installation
@@ -50,7 +43,7 @@ blocz make --domain <domain_name> --name <bloc_name> [--apiPath <path_to_api_fil
 ```
 
 - `--domain` (or `-d`): The domain or feature of the BLoC (e.g., `pet`, `product`).
-- `--name` (or `-n`)(optional): The name of the BLoC, or a sub-domain/sub-feature name (e.g., `authentication`, `profile-edit`).
+- `--name` (or `-n`)(optional): The name of the BLoC, or a sub-domain/sub-feature name (e.g., `authentication`, `profile`).
 - `--apiPath` (or `-a`)(optional): Optional path to an API service file. If provided, `blocz` will automatically generate and implement events for all public methods in that file.
 - `--writeDir` (or `-w`)(optional): Custom directory to generate files. Defaults to `lib/features/<domain>/presentation/bloc`.
 
@@ -176,7 +169,7 @@ blocz add:event --domain <domain_name> --name <sub_domain_name> <options>
 
 **Options:**
 
-- `--name <sub_domain_name>` (or `-n`): The name of the BLoC or sub-domain (e.g., `profile-edit`).
+- `--name <sub_domain_name>` (or `-n`): The name of the BLoC or sub-domain (e.g., `profile`).
 - `--event <event_name>`: Adds a single, specified event.
 - `--apiPath <path_to_api_file>`: Scans the API file and generates events and handlers for **all** public methods.
 - `--apiPath <path_to_api_file> --method <method_name>`: Generates an event and handler for **only one** specified method from the API file.
@@ -187,19 +180,19 @@ blocz add:event --domain <domain_name> --name <sub_domain_name> <options>
 Add a simple event:
 
 ```bash
-blocz add:event --domain pet --name login --event LogoutButtonPressed
+blocz add:event --domain pet --event bark
 ```
 
 Add all events from an API file:
 
 ```bash
-blocz add:event --domain pet --name profile --apiPath ./packages/my_pet_api/lib/api/pet_api.dart
+blocz add:event --domain pet --apiPath ./apis/my_pet_api/lib/api/pet_api.dart
 ```
 
 Add a single event from a specific API method:
 
 ```bash
-blocz add:event --domain pet --name profile --event UpdateAvatar --apiPath lib/features/pet/data/api/pet_api.dart --method uploadAvatar
+blocz add:event --domain pet --name profile --event UpdateAvatar --apiPath ./apis/my_pet_api/lib/api/pet_api.dart --method uploadFile
 ```
 
 This command will update the corresponding BLoC files to add the new event(s).

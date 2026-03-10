@@ -17,18 +17,11 @@ Một công cụ dòng lệnh (CLI) giúp tăng tốc độ phát triển ứng 
 
 ## Điều kiện tiên quyết
 
-Dự án Flutter của bạn cần phải có các dependencies sau trong `pubspec.yaml`:
+Chạy các lệnh sau trong thư mục dự án Flutter của bạn để thêm các dependency cần thiết:
 
-```yaml
-dependencies:
-  flutter_bloc: <version>
-  freezed_annotation: <version>
-  injectable: <version>
-
-dev_dependencies:
-  build_runner: <version>
-  freezed: <version>
-  injectable_generator: <version>
+```bash
+flutter pub add flutter_bloc freezed_annotation injectable get_it
+flutter pub add --dev build_runner freezed injectable_generator
 ```
 
 ## Cài đặt
@@ -50,7 +43,7 @@ blocz make --domain <ten_domain> --name <ten_bloc> [--apiPath <duong_dan_file_ap
 ```
 
 - `--domain` (hoặc `-d`): Domain hoặc feature của BLoC (ví dụ: `pet`, `product`).
-- `--name` (hoặc `-n`)(optional): Tên của BLoC, hoặc tên sub-domain/sub-feature (ví dụ: `authentication`, `profile-edit`).
+- `--name` (hoặc `-n`)(optional): Tên của BLoC, hoặc tên sub-domain/sub-feature (ví dụ: `authentication`, `profile`).
 - `--apiPath` (hoặc `-a`)(optional): Đường dẫn tùy chọn đến tệp tin service API. Nếu được cung cấp, `blocz` sẽ tự động tạo và triển khai các event cho tất cả các phương thức public trong tệp đó.
 - `--writeDir` (hoặc `-w`)(optional): Đường dẫn tùy chỉnh để tạo các tệp. Mặc định là `lib/features/<domain>/presentation/bloc`.
 
@@ -176,7 +169,7 @@ blocz add:event --domain <ten_domain> --name <ten_sub_domain> <options>
 
 **Tùy chọn:**
 
-- `--name <ten_sub_domain>` (hoặc `-n`): Tên của BLoC hoặc sub-domain (ví dụ: `profile-edit`).
+- `--name <ten_sub_domain>` (hoặc `-n`): Tên của BLoC hoặc sub-domain (ví dụ: `profile`).
 - `--event <ten_event>`: Thêm một event cụ thể.
 - `--apiPath <duong_dan_file_api>`: Quét tệp API và tạo các event và trình xử lý cho **tất cả** các phương thức public.
 - `--apiPath <duong_dan_file_api> --method <ten_phuong_thuc>`: Tạo một event và trình xử lý cho **chỉ một** phương thức được chỉ định từ tệp API.

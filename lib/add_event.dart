@@ -127,11 +127,25 @@ Future<(String, String, String, String)> _addSingleEvent(
   final eventPath = p.join(effectiveWriteDir, '${commonFileName}_event.dart');
   final statePath = p.join(effectiveWriteDir, '${commonFileName}_state.dart');
 
+  bool shouldMakeFirst = false;
   for (var f in [eventPath, statePath, blocPath]) {
     if (!File(f).existsSync()) {
-      print('File not found: $f');
-      return ("", "", "", "");
+      // print('File not found: $f');
+      // create file
+      // File(f).createSync(recursive: true);
+      // return ("", "", "", "");
+      shouldMakeFirst = true;
     }
+  }
+  if (shouldMakeFirst) {
+    await Process.run("blocz", [
+      "make",
+      "--domain",
+      domain,
+      if (!isEmptyName) ...["--name", name],
+      "--writeDir",
+      effectiveWriteDir,
+    ]);
   }
 
   final eventName = event.camelCase;
