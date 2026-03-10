@@ -493,8 +493,9 @@ Future<void> main(List<String> arguments) async {
   } on FormatException catch (e) {
     printError('ArgParser FormatException: ${e.message}');
     exit(1);
-  } catch (e) {
+  } catch (e, stackTrace) {
     printError("General error: ${e.toString()}");
+    print(stackTrace);
     exit(2);
   }
 }

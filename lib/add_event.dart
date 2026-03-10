@@ -11,7 +11,7 @@ import 'package:blocz/findLastClassbodyLineNumber.dart';
 import 'package:blocz/findLastConstFactory.dart';
 import 'package:blocz/findLast_On_LineNumber.dart';
 import 'package:blocz/getClassName.dart';
-import 'package:blocz/onDoneUtils.dart';
+import 'package:blocz/makeUtils.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
 
@@ -121,8 +121,14 @@ Future<(String, String, String, String)> _addSingleEvent(
   final String commonClassName =
       '${domain.pascalCase}${isEmptyName ? '' : name.pascalCase}';
 
-  final effectiveWriteDir =
+  String effectiveWriteDir =
       writeDir ?? p.join('lib', 'features', domain, 'presentation', 'bloc');
+  // Support template variables in custom writeDir
+  if (writeDir != null) {
+    effectiveWriteDir = replaceDomainKey(writeDir, domain);
+  }
+  Directory(effectiveWriteDir).createSync(recursive: true);
+
   final blocPath = p.join(effectiveWriteDir, '${commonFileName}_bloc.dart');
   final eventPath = p.join(effectiveWriteDir, '${commonFileName}_event.dart');
   final statePath = p.join(effectiveWriteDir, '${commonFileName}_state.dart');

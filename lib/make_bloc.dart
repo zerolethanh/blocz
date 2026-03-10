@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/add_event.dart';
-import 'package:blocz/onDoneUtils.dart';
+import 'package:blocz/makeUtils.dart';
 import 'package:mustache_template/mustache.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
@@ -43,10 +43,7 @@ Future<void> makeBloc(
 
   // Support template variables in custom writeDir
   if (writeDir != null) {
-    effectiveWriteDir = effectiveWriteDir
-        .replaceAll('{{DOMAIN}}', domainSnake)
-        .replaceAll('{{domain}}', domainSnake)
-        .replaceAll('{{Domain}}', domain.pascalCase);
+    effectiveWriteDir = replaceDomainKey(writeDir, domain);
   }
 
   Directory(effectiveWriteDir).createSync(recursive: true);
