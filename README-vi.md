@@ -46,28 +46,42 @@ dart pub global activate blocz
 Sử dụng lệnh `make` để tạo các thành phần cần thiết.
 
 ```bash
-blocz make --domain <ten_domain> --name <ten_bloc> [--apiPath <duong_dan_file_api>]
+blocz make --domain <ten_domain> --name <ten_bloc> [--apiPath <duong_dan_file_api>] [--writeDir <duong_dan_tuy_chinh>]
 ```
 
-- `--domain` (hoặc `-d`): Domain hoặc feature của BLoC (ví dụ: `user`, `product`).
-- `--name` (hoặc `-n`)(optional): Tên của BLoC (ví dụ: `authentication`, `product_list`).
+- `--domain` (hoặc `-d`): Domain hoặc feature của BLoC (ví dụ: `pet`, `product`).
+- `--name` (hoặc `-n`)(optional): Tên của BLoC, hoặc tên sub-domain/sub-feature (ví dụ: `authentication`, `profile-edit`).
 - `--apiPath` (hoặc `-a`)(optional): Đường dẫn tùy chọn đến tệp tin service API. Nếu được cung cấp, `blocz` sẽ tự động tạo và triển khai các event cho tất cả các phương thức public trong tệp đó.
+- `--writeDir` (hoặc `-w`)(optional): Đường dẫn tùy chỉnh để tạo các tệp. Mặc định là `lib/features/<domain>/presentation/bloc`.
+
+#### Hỗ trợ Template cho `writeDir`
+
+Bạn có thể sử dụng các biến template trong đường dẫn `--writeDir`:
+
+- `{{DOMAIN}}` hoặc `{{domain}}`: Được thay thế bằng tên domain định dạng snake_case.
+- `{{Domain}}`: Được thay thế bằng tên domain định dạng PascalCase.
+
+**Ví dụ:**
+
+```bash
+blocz make --domain pet --writeDir "lib/App/screens/{{DOMAIN}}_page/bloc"
+```
 
 **Ví dụ:**
 
 Tạo BLoC cơ bản:
 
 ```bash
-blocz make --domain user
+blocz make --domain pet
 ```
 
 > Cây thư mục tệp được tạo
 
 ```
-lib/features/user/presentation/bloc/
-├── user_bloc.dart
-├── user_event.dart
-└── user_state.dart
+lib/features/pet/presentation/bloc/
+├── pet_bloc.dart
+├── pet_event.dart
+└── pet_state.dart
 ```
 
 Lệnh này tạo ra cấu trúc BLoC. Sau đó bạn sẽ cần chạy `build_runner`.
@@ -157,33 +171,35 @@ dart run build_runner build --delete-conflicting-outputs
 Sử dụng lệnh `add:event` để thêm một event mới vào một BLoC đã tồn tại.
 
 ```bash
-blocz add:event --domain <ten_domain> --name <ten_bloc> <options>
+blocz add:event --domain <ten_domain> --name <ten_sub_domain> <options>
 ```
 
 **Tùy chọn:**
 
+- `--name <ten_sub_domain>` (hoặc `-n`): Tên của BLoC hoặc sub-domain (ví dụ: `profile-edit`).
 - `--event <ten_event>`: Thêm một event cụ thể.
 - `--apiPath <duong_dan_file_api>`: Quét tệp API và tạo các event và trình xử lý cho **tất cả** các phương thức public.
 - `--apiPath <duong_dan_file_api> --method <ten_phuong_thuc>`: Tạo một event và trình xử lý cho **chỉ một** phương thức được chỉ định từ tệp API.
+- `--writeDir <duong_dan_tuy_chinh>` (hoặc `-w`): Đường dẫn tùy chỉnh nơi chứa các tệp BLoC.
 
 **Ví dụ:**
 
 Thêm một event đơn giản:
 
 ```bash
-blocz add:event --domain user --name login --event LogoutButtonPressed
+blocz add:event --domain pet --name login --event LogoutButtonPressed
 ```
 
 Thêm tất cả các event từ một tệp API:
 
 ```bash
-blocz add:event --domain user --name profile --apiPath ./packages/my_pet_api/lib/api/pet_api.dart
+blocz add:event --domain pet --name profile --apiPath ./packages/my_pet_api/lib/api/pet_api.dart
 ```
 
 Thêm một event từ một phương thức API cụ thể:
 
 ```bash
-blocz add:event --domain user --name profile --event UpdateAvatar --apiPath lib/features/user/data/api/user_api.dart --method uploadAvatar
+blocz add:event --domain pet --name profile --event UpdateAvatar --apiPath lib/features/pet/data/api/pet_api.dart --method uploadAvatar
 ```
 
 Lệnh này sẽ cập nhật các tệp BLoC tương ứng để thêm (các) event mới.

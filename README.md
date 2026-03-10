@@ -46,28 +46,42 @@ dart pub global activate blocz
 Use the `make` command to generate the necessary components.
 
 ```bash
-blocz make --domain <domain_name> --name <bloc_name> [--apiPath <path_to_api_file>]
+blocz make --domain <domain_name> --name <bloc_name> [--apiPath <path_to_api_file>] [--writeDir <custom_path>]
 ```
 
-- `--domain` (or `-d`): The domain or feature of the BLoC (e.g., `user`, `product`).
-- `--name` (or `-n`)(optional): The name of the BLoC (e.g., `authentication`, `product_list`).
+- `--domain` (or `-d`): The domain or feature of the BLoC (e.g., `pet`, `product`).
+- `--name` (or `-n`)(optional): The name of the BLoC, or a sub-domain/sub-feature name (e.g., `authentication`, `profile-edit`).
 - `--apiPath` (or `-a`)(optional): Optional path to an API service file. If provided, `blocz` will automatically generate and implement events for all public methods in that file.
+- `--writeDir` (or `-w`)(optional): Custom directory to generate files. Defaults to `lib/features/<domain>/presentation/bloc`.
+
+#### `writeDir` Template Support
+
+You can use template variables in the `--writeDir` path:
+
+- `{{DOMAIN}}` or `{{domain}}`: Replaced by the domain name in snake_case.
+- `{{Domain}}`: Replaced by the domain name in PascalCase.
+
+**Example:**
+
+```bash
+blocz make --domain pet --writeDir "lib/App/screens/{{DOMAIN}}_page/bloc"
+```
 
 **Examples:**
 
 Basic BLoC creation:
 
 ```bash
-blocz make --domain user
+blocz make --domain pet
 ```
 
 > Generated files tree
 
 ```
-lib/features/user/presentation/bloc/
-├── user_bloc.dart
-├── user_event.dart
-└── user_state.dart
+lib/features/pet/presentation/bloc/
+├── pet_bloc.dart
+├── pet_event.dart
+└── pet_state.dart
 ```
 
 This command creates the BLoC structure. You will then need to run `build_runner`.
@@ -157,33 +171,35 @@ dart run build_runner build --delete-conflicting-outputs
 Use the `add:event` command to add a new event to an existing BLoC.
 
 ```bash
-blocz add:event --domain <domain_name> --name <bloc_name> <options>
+blocz add:event --domain <domain_name> --name <sub_domain_name> <options>
 ```
 
 **Options:**
 
+- `--name <sub_domain_name>` (or `-n`): The name of the BLoC or sub-domain (e.g., `profile-edit`).
 - `--event <event_name>`: Adds a single, specified event.
 - `--apiPath <path_to_api_file>`: Scans the API file and generates events and handlers for **all** public methods.
 - `--apiPath <path_to_api_file> --method <method_name>`: Generates an event and handler for **only one** specified method from the API file.
+- `--writeDir <custom_path>` (or `-w`): Custom directory where the BLoC files are located.
 
 **Examples:**
 
 Add a simple event:
 
 ```bash
-blocz add:event --domain user --name login --event LogoutButtonPressed
+blocz add:event --domain pet --name login --event LogoutButtonPressed
 ```
 
 Add all events from an API file:
 
 ```bash
-blocz add:event --domain user --name profile --apiPath ./packages/my_pet_api/lib/api/pet_api.dart
+blocz add:event --domain pet --name profile --apiPath ./packages/my_pet_api/lib/api/pet_api.dart
 ```
 
 Add a single event from a specific API method:
 
 ```bash
-blocz add:event --domain user --name profile --event UpdateAvatar --apiPath lib/features/user/data/api/user_api.dart --method uploadAvatar
+blocz add:event --domain pet --name profile --event UpdateAvatar --apiPath lib/features/pet/data/api/pet_api.dart --method uploadAvatar
 ```
 
 This command will update the corresponding BLoC files to add the new event(s).

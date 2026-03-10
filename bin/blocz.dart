@@ -39,7 +39,12 @@ Future<void> main(List<String> arguments) async {
   parser.addCommand('make', parser.addCommand('make:bloc'))
     ..addSeparator("Make bloc,state,event")
     ..addOption('domain', abbr: 'd', help: 'domain based name')
-    ..addOption('name', abbr: 'n', help: 'name of bloc,state,event')
+    ..addOption(
+      'name',
+      abbr: 'n',
+      help:
+          'The name of the BLoC, or a sub-domain/sub-feature name (e.g., authentication)',
+    )
     ..addOption(
       'apiPath',
       abbr: 'a',
@@ -172,20 +177,35 @@ Future<void> main(List<String> arguments) async {
 
   final commandList = parser.commands;
   // printInfo(commandList);
-  if (arguments.isNotEmpty) {
-    if (commandList[arguments[0]] == null) {
-      printError("Command '${arguments[0]}' not found.");
-      return;
-    }
+  if (arguments.isNotEmpty &&
+      !arguments[0].startsWith('-') &&
+      commandList[arguments[0]] == null) {
+    printError("Command '${arguments[0]}' not found.");
+    return;
   }
   try {
     final parserResult = parser.parse(arguments);
 
     if (parserResult['help'] as bool || parserResult.command == null) {
       print('Available commands:');
+
+      final commandGroups = <ArgParser, List<String>>{};
+      final groupOrder = <ArgParser>[];
+
       parser.commands.forEach((name, command) {
-        print("$green$name$reset: ${command.usage}\n");
+        if (!commandGroups.containsKey(command)) {
+          groupOrder.add(command);
+          commandGroups[command] = [];
+        }
+        commandGroups[command]!.add(name);
       });
+
+      for (final command in groupOrder) {
+        final names = commandGroups[command]!;
+        final displayNames = names.join(' | ');
+        print("$green$displayNames$reset: ${command.usage}\n");
+      }
+
       print('\n${parser.usage}');
       exit(0);
     }
