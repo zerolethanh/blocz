@@ -52,17 +52,21 @@ Future<void> makeBloc(
   final eventPath = p.join(effectiveWriteDir, '${commonFileName}_event.dart');
   final statePath = p.join(effectiveWriteDir, '${commonFileName}_state.dart');
   // check exists
+  bool hasGenerated = false;
   if (!File(blocPath).existsSync()) {
     File(blocPath).writeAsStringSync(bloc);
     printSuccess('Generated: $blocPath');
+    hasGenerated = true;
   }
   if (!File(eventPath).existsSync()) {
     File(eventPath).writeAsStringSync(event);
     printSuccess('Generated: $eventPath');
+    hasGenerated = true;
   }
   if (!File(statePath).existsSync()) {
     File(statePath).writeAsStringSync(state);
     printSuccess('Generated: $statePath');
+    hasGenerated = true;
   }
 
   if (apiPath != null && apiPath.trim().isNotEmpty) {
@@ -78,8 +82,12 @@ Future<void> makeBloc(
 
     printSuccess('Finished adding events from apiPath: $apiPath .');
   } else {
-    runBuildRunner(effectiveWriteDir);
-    runDartFormat(effectiveWriteDir);
+    if (hasGenerated) {
+      runBuildRunner(effectiveWriteDir);
+      runDartFormat(effectiveWriteDir);
+    } else {
+      printWarning("Done. No Changes");
+    }
   }
 }
 
