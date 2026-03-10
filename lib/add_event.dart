@@ -99,7 +99,11 @@ Future<void> addEvent(
   }
   runBuildRunner(result.$1);
   runDartFormat(result.$1);
-  printSuccess(' ✅ Finished generating events from $apiPath.');
+  if (apiPath != null && apiPath.trim().isNotEmpty) {
+    printSuccess(' ✅ Finished generating events from $apiPath.');
+  } else {
+    printSuccess(' ✅ Finished generating events.');
+  }
 }
 
 Future<(String, String, String, String)> _addSingleEvent(
