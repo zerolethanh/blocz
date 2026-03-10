@@ -42,9 +42,10 @@ tasks:
     cmds:
       - task: compile
       - task: _copy:bin:{{OS}}
+      - rm bin/blocz # remove binary on done
       # - task: setup:path
       - echo " ✅ Successfully activated blocz locally."
-  
+
   publish:
     desc: "Create git tag for version from pubspec.yaml and publish to pub.dev"
     cmds:
