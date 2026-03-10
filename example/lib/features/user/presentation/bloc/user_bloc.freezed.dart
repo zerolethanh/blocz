@@ -24,6 +24,8 @@ mixin _$UserEvent {
     required TResult Function() getUsers,
     required TResult Function(User user) createUser,
     required TResult Function(int id) deleteUser,
+    required TResult Function(int id, String apiKey) getUserByIdWithApiKey,
+    required TResult Function(User user) updateUser,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
@@ -32,6 +34,8 @@ mixin _$UserEvent {
     TResult? Function()? getUsers,
     TResult? Function(User user)? createUser,
     TResult? Function(int id)? deleteUser,
+    TResult? Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult? Function(User user)? updateUser,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
@@ -40,6 +44,8 @@ mixin _$UserEvent {
     TResult Function()? getUsers,
     TResult Function(User user)? createUser,
     TResult Function(int id)? deleteUser,
+    TResult Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult Function(User user)? updateUser,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -49,6 +55,9 @@ mixin _$UserEvent {
     required TResult Function(_GetUsersRequested value) getUsers,
     required TResult Function(_CreateUserRequested value) createUser,
     required TResult Function(_DeleteUserRequested value) deleteUser,
+    required TResult Function(_GetUserByIdWithApiKeyRequested value)
+    getUserByIdWithApiKey,
+    required TResult Function(_UpdateUserRequested value) updateUser,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
@@ -57,6 +66,9 @@ mixin _$UserEvent {
     TResult? Function(_GetUsersRequested value)? getUsers,
     TResult? Function(_CreateUserRequested value)? createUser,
     TResult? Function(_DeleteUserRequested value)? deleteUser,
+    TResult? Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult? Function(_UpdateUserRequested value)? updateUser,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
@@ -65,6 +77,9 @@ mixin _$UserEvent {
     TResult Function(_GetUsersRequested value)? getUsers,
     TResult Function(_CreateUserRequested value)? createUser,
     TResult Function(_DeleteUserRequested value)? deleteUser,
+    TResult Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult Function(_UpdateUserRequested value)? updateUser,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
 }
@@ -137,6 +152,8 @@ class _$UserEventLoadingImpl implements _UserEventLoading {
     required TResult Function() getUsers,
     required TResult Function(User user) createUser,
     required TResult Function(int id) deleteUser,
+    required TResult Function(int id, String apiKey) getUserByIdWithApiKey,
+    required TResult Function(User user) updateUser,
   }) {
     return loading();
   }
@@ -149,6 +166,8 @@ class _$UserEventLoadingImpl implements _UserEventLoading {
     TResult? Function()? getUsers,
     TResult? Function(User user)? createUser,
     TResult? Function(int id)? deleteUser,
+    TResult? Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult? Function(User user)? updateUser,
   }) {
     return loading?.call();
   }
@@ -161,6 +180,8 @@ class _$UserEventLoadingImpl implements _UserEventLoading {
     TResult Function()? getUsers,
     TResult Function(User user)? createUser,
     TResult Function(int id)? deleteUser,
+    TResult Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult Function(User user)? updateUser,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -177,6 +198,9 @@ class _$UserEventLoadingImpl implements _UserEventLoading {
     required TResult Function(_GetUsersRequested value) getUsers,
     required TResult Function(_CreateUserRequested value) createUser,
     required TResult Function(_DeleteUserRequested value) deleteUser,
+    required TResult Function(_GetUserByIdWithApiKeyRequested value)
+    getUserByIdWithApiKey,
+    required TResult Function(_UpdateUserRequested value) updateUser,
   }) {
     return loading(this);
   }
@@ -189,6 +213,9 @@ class _$UserEventLoadingImpl implements _UserEventLoading {
     TResult? Function(_GetUsersRequested value)? getUsers,
     TResult? Function(_CreateUserRequested value)? createUser,
     TResult? Function(_DeleteUserRequested value)? deleteUser,
+    TResult? Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult? Function(_UpdateUserRequested value)? updateUser,
   }) {
     return loading?.call(this);
   }
@@ -201,6 +228,9 @@ class _$UserEventLoadingImpl implements _UserEventLoading {
     TResult Function(_GetUsersRequested value)? getUsers,
     TResult Function(_CreateUserRequested value)? createUser,
     TResult Function(_DeleteUserRequested value)? deleteUser,
+    TResult Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult Function(_UpdateUserRequested value)? updateUser,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -293,6 +323,8 @@ class _$GetUserByIdRequestedImpl implements _GetUserByIdRequested {
     required TResult Function() getUsers,
     required TResult Function(User user) createUser,
     required TResult Function(int id) deleteUser,
+    required TResult Function(int id, String apiKey) getUserByIdWithApiKey,
+    required TResult Function(User user) updateUser,
   }) {
     return getUserById(id);
   }
@@ -305,6 +337,8 @@ class _$GetUserByIdRequestedImpl implements _GetUserByIdRequested {
     TResult? Function()? getUsers,
     TResult? Function(User user)? createUser,
     TResult? Function(int id)? deleteUser,
+    TResult? Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult? Function(User user)? updateUser,
   }) {
     return getUserById?.call(id);
   }
@@ -317,6 +351,8 @@ class _$GetUserByIdRequestedImpl implements _GetUserByIdRequested {
     TResult Function()? getUsers,
     TResult Function(User user)? createUser,
     TResult Function(int id)? deleteUser,
+    TResult Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult Function(User user)? updateUser,
     required TResult orElse(),
   }) {
     if (getUserById != null) {
@@ -333,6 +369,9 @@ class _$GetUserByIdRequestedImpl implements _GetUserByIdRequested {
     required TResult Function(_GetUsersRequested value) getUsers,
     required TResult Function(_CreateUserRequested value) createUser,
     required TResult Function(_DeleteUserRequested value) deleteUser,
+    required TResult Function(_GetUserByIdWithApiKeyRequested value)
+    getUserByIdWithApiKey,
+    required TResult Function(_UpdateUserRequested value) updateUser,
   }) {
     return getUserById(this);
   }
@@ -345,6 +384,9 @@ class _$GetUserByIdRequestedImpl implements _GetUserByIdRequested {
     TResult? Function(_GetUsersRequested value)? getUsers,
     TResult? Function(_CreateUserRequested value)? createUser,
     TResult? Function(_DeleteUserRequested value)? deleteUser,
+    TResult? Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult? Function(_UpdateUserRequested value)? updateUser,
   }) {
     return getUserById?.call(this);
   }
@@ -357,6 +399,9 @@ class _$GetUserByIdRequestedImpl implements _GetUserByIdRequested {
     TResult Function(_GetUsersRequested value)? getUsers,
     TResult Function(_CreateUserRequested value)? createUser,
     TResult Function(_DeleteUserRequested value)? deleteUser,
+    TResult Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult Function(_UpdateUserRequested value)? updateUser,
     required TResult orElse(),
   }) {
     if (getUserById != null) {
@@ -427,6 +472,8 @@ class _$GetUsersRequestedImpl implements _GetUsersRequested {
     required TResult Function() getUsers,
     required TResult Function(User user) createUser,
     required TResult Function(int id) deleteUser,
+    required TResult Function(int id, String apiKey) getUserByIdWithApiKey,
+    required TResult Function(User user) updateUser,
   }) {
     return getUsers();
   }
@@ -439,6 +486,8 @@ class _$GetUsersRequestedImpl implements _GetUsersRequested {
     TResult? Function()? getUsers,
     TResult? Function(User user)? createUser,
     TResult? Function(int id)? deleteUser,
+    TResult? Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult? Function(User user)? updateUser,
   }) {
     return getUsers?.call();
   }
@@ -451,6 +500,8 @@ class _$GetUsersRequestedImpl implements _GetUsersRequested {
     TResult Function()? getUsers,
     TResult Function(User user)? createUser,
     TResult Function(int id)? deleteUser,
+    TResult Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult Function(User user)? updateUser,
     required TResult orElse(),
   }) {
     if (getUsers != null) {
@@ -467,6 +518,9 @@ class _$GetUsersRequestedImpl implements _GetUsersRequested {
     required TResult Function(_GetUsersRequested value) getUsers,
     required TResult Function(_CreateUserRequested value) createUser,
     required TResult Function(_DeleteUserRequested value) deleteUser,
+    required TResult Function(_GetUserByIdWithApiKeyRequested value)
+    getUserByIdWithApiKey,
+    required TResult Function(_UpdateUserRequested value) updateUser,
   }) {
     return getUsers(this);
   }
@@ -479,6 +533,9 @@ class _$GetUsersRequestedImpl implements _GetUsersRequested {
     TResult? Function(_GetUsersRequested value)? getUsers,
     TResult? Function(_CreateUserRequested value)? createUser,
     TResult? Function(_DeleteUserRequested value)? deleteUser,
+    TResult? Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult? Function(_UpdateUserRequested value)? updateUser,
   }) {
     return getUsers?.call(this);
   }
@@ -491,6 +548,9 @@ class _$GetUsersRequestedImpl implements _GetUsersRequested {
     TResult Function(_GetUsersRequested value)? getUsers,
     TResult Function(_CreateUserRequested value)? createUser,
     TResult Function(_DeleteUserRequested value)? deleteUser,
+    TResult Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult Function(_UpdateUserRequested value)? updateUser,
     required TResult orElse(),
   }) {
     if (getUsers != null) {
@@ -582,6 +642,8 @@ class _$CreateUserRequestedImpl implements _CreateUserRequested {
     required TResult Function() getUsers,
     required TResult Function(User user) createUser,
     required TResult Function(int id) deleteUser,
+    required TResult Function(int id, String apiKey) getUserByIdWithApiKey,
+    required TResult Function(User user) updateUser,
   }) {
     return createUser(user);
   }
@@ -594,6 +656,8 @@ class _$CreateUserRequestedImpl implements _CreateUserRequested {
     TResult? Function()? getUsers,
     TResult? Function(User user)? createUser,
     TResult? Function(int id)? deleteUser,
+    TResult? Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult? Function(User user)? updateUser,
   }) {
     return createUser?.call(user);
   }
@@ -606,6 +670,8 @@ class _$CreateUserRequestedImpl implements _CreateUserRequested {
     TResult Function()? getUsers,
     TResult Function(User user)? createUser,
     TResult Function(int id)? deleteUser,
+    TResult Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult Function(User user)? updateUser,
     required TResult orElse(),
   }) {
     if (createUser != null) {
@@ -622,6 +688,9 @@ class _$CreateUserRequestedImpl implements _CreateUserRequested {
     required TResult Function(_GetUsersRequested value) getUsers,
     required TResult Function(_CreateUserRequested value) createUser,
     required TResult Function(_DeleteUserRequested value) deleteUser,
+    required TResult Function(_GetUserByIdWithApiKeyRequested value)
+    getUserByIdWithApiKey,
+    required TResult Function(_UpdateUserRequested value) updateUser,
   }) {
     return createUser(this);
   }
@@ -634,6 +703,9 @@ class _$CreateUserRequestedImpl implements _CreateUserRequested {
     TResult? Function(_GetUsersRequested value)? getUsers,
     TResult? Function(_CreateUserRequested value)? createUser,
     TResult? Function(_DeleteUserRequested value)? deleteUser,
+    TResult? Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult? Function(_UpdateUserRequested value)? updateUser,
   }) {
     return createUser?.call(this);
   }
@@ -646,6 +718,9 @@ class _$CreateUserRequestedImpl implements _CreateUserRequested {
     TResult Function(_GetUsersRequested value)? getUsers,
     TResult Function(_CreateUserRequested value)? createUser,
     TResult Function(_DeleteUserRequested value)? deleteUser,
+    TResult Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult Function(_UpdateUserRequested value)? updateUser,
     required TResult orElse(),
   }) {
     if (createUser != null) {
@@ -746,6 +821,8 @@ class _$DeleteUserRequestedImpl implements _DeleteUserRequested {
     required TResult Function() getUsers,
     required TResult Function(User user) createUser,
     required TResult Function(int id) deleteUser,
+    required TResult Function(int id, String apiKey) getUserByIdWithApiKey,
+    required TResult Function(User user) updateUser,
   }) {
     return deleteUser(id);
   }
@@ -758,6 +835,8 @@ class _$DeleteUserRequestedImpl implements _DeleteUserRequested {
     TResult? Function()? getUsers,
     TResult? Function(User user)? createUser,
     TResult? Function(int id)? deleteUser,
+    TResult? Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult? Function(User user)? updateUser,
   }) {
     return deleteUser?.call(id);
   }
@@ -770,6 +849,8 @@ class _$DeleteUserRequestedImpl implements _DeleteUserRequested {
     TResult Function()? getUsers,
     TResult Function(User user)? createUser,
     TResult Function(int id)? deleteUser,
+    TResult Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult Function(User user)? updateUser,
     required TResult orElse(),
   }) {
     if (deleteUser != null) {
@@ -786,6 +867,9 @@ class _$DeleteUserRequestedImpl implements _DeleteUserRequested {
     required TResult Function(_GetUsersRequested value) getUsers,
     required TResult Function(_CreateUserRequested value) createUser,
     required TResult Function(_DeleteUserRequested value) deleteUser,
+    required TResult Function(_GetUserByIdWithApiKeyRequested value)
+    getUserByIdWithApiKey,
+    required TResult Function(_UpdateUserRequested value) updateUser,
   }) {
     return deleteUser(this);
   }
@@ -798,6 +882,9 @@ class _$DeleteUserRequestedImpl implements _DeleteUserRequested {
     TResult? Function(_GetUsersRequested value)? getUsers,
     TResult? Function(_CreateUserRequested value)? createUser,
     TResult? Function(_DeleteUserRequested value)? deleteUser,
+    TResult? Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult? Function(_UpdateUserRequested value)? updateUser,
   }) {
     return deleteUser?.call(this);
   }
@@ -810,6 +897,9 @@ class _$DeleteUserRequestedImpl implements _DeleteUserRequested {
     TResult Function(_GetUsersRequested value)? getUsers,
     TResult Function(_CreateUserRequested value)? createUser,
     TResult Function(_DeleteUserRequested value)? deleteUser,
+    TResult Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult Function(_UpdateUserRequested value)? updateUser,
     required TResult orElse(),
   }) {
     if (deleteUser != null) {
@@ -832,6 +922,379 @@ abstract class _DeleteUserRequested implements UserEvent {
 }
 
 /// @nodoc
+abstract class _$$GetUserByIdWithApiKeyRequestedImplCopyWith<$Res> {
+  factory _$$GetUserByIdWithApiKeyRequestedImplCopyWith(
+    _$GetUserByIdWithApiKeyRequestedImpl value,
+    $Res Function(_$GetUserByIdWithApiKeyRequestedImpl) then,
+  ) = __$$GetUserByIdWithApiKeyRequestedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({int id, String apiKey});
+}
+
+/// @nodoc
+class __$$GetUserByIdWithApiKeyRequestedImplCopyWithImpl<$Res>
+    extends _$UserEventCopyWithImpl<$Res, _$GetUserByIdWithApiKeyRequestedImpl>
+    implements _$$GetUserByIdWithApiKeyRequestedImplCopyWith<$Res> {
+  __$$GetUserByIdWithApiKeyRequestedImplCopyWithImpl(
+    _$GetUserByIdWithApiKeyRequestedImpl _value,
+    $Res Function(_$GetUserByIdWithApiKeyRequestedImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of UserEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? id = null, Object? apiKey = null}) {
+    return _then(
+      _$GetUserByIdWithApiKeyRequestedImpl(
+        null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as int,
+        null == apiKey
+            ? _value.apiKey
+            : apiKey // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$GetUserByIdWithApiKeyRequestedImpl
+    implements _GetUserByIdWithApiKeyRequested {
+  const _$GetUserByIdWithApiKeyRequestedImpl(this.id, this.apiKey);
+
+  @override
+  final int id;
+  @override
+  final String apiKey;
+
+  @override
+  String toString() {
+    return 'UserEvent.getUserByIdWithApiKey(id: $id, apiKey: $apiKey)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$GetUserByIdWithApiKeyRequestedImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.apiKey, apiKey) || other.apiKey == apiKey));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, apiKey);
+
+  /// Create a copy of UserEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$GetUserByIdWithApiKeyRequestedImplCopyWith<
+    _$GetUserByIdWithApiKeyRequestedImpl
+  >
+  get copyWith =>
+      __$$GetUserByIdWithApiKeyRequestedImplCopyWithImpl<
+        _$GetUserByIdWithApiKeyRequestedImpl
+      >(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loading,
+    required TResult Function(int id) getUserById,
+    required TResult Function() getUsers,
+    required TResult Function(User user) createUser,
+    required TResult Function(int id) deleteUser,
+    required TResult Function(int id, String apiKey) getUserByIdWithApiKey,
+    required TResult Function(User user) updateUser,
+  }) {
+    return getUserByIdWithApiKey(id, apiKey);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loading,
+    TResult? Function(int id)? getUserById,
+    TResult? Function()? getUsers,
+    TResult? Function(User user)? createUser,
+    TResult? Function(int id)? deleteUser,
+    TResult? Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult? Function(User user)? updateUser,
+  }) {
+    return getUserByIdWithApiKey?.call(id, apiKey);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loading,
+    TResult Function(int id)? getUserById,
+    TResult Function()? getUsers,
+    TResult Function(User user)? createUser,
+    TResult Function(int id)? deleteUser,
+    TResult Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult Function(User user)? updateUser,
+    required TResult orElse(),
+  }) {
+    if (getUserByIdWithApiKey != null) {
+      return getUserByIdWithApiKey(id, apiKey);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UserEventLoading value) loading,
+    required TResult Function(_GetUserByIdRequested value) getUserById,
+    required TResult Function(_GetUsersRequested value) getUsers,
+    required TResult Function(_CreateUserRequested value) createUser,
+    required TResult Function(_DeleteUserRequested value) deleteUser,
+    required TResult Function(_GetUserByIdWithApiKeyRequested value)
+    getUserByIdWithApiKey,
+    required TResult Function(_UpdateUserRequested value) updateUser,
+  }) {
+    return getUserByIdWithApiKey(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UserEventLoading value)? loading,
+    TResult? Function(_GetUserByIdRequested value)? getUserById,
+    TResult? Function(_GetUsersRequested value)? getUsers,
+    TResult? Function(_CreateUserRequested value)? createUser,
+    TResult? Function(_DeleteUserRequested value)? deleteUser,
+    TResult? Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult? Function(_UpdateUserRequested value)? updateUser,
+  }) {
+    return getUserByIdWithApiKey?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UserEventLoading value)? loading,
+    TResult Function(_GetUserByIdRequested value)? getUserById,
+    TResult Function(_GetUsersRequested value)? getUsers,
+    TResult Function(_CreateUserRequested value)? createUser,
+    TResult Function(_DeleteUserRequested value)? deleteUser,
+    TResult Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult Function(_UpdateUserRequested value)? updateUser,
+    required TResult orElse(),
+  }) {
+    if (getUserByIdWithApiKey != null) {
+      return getUserByIdWithApiKey(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _GetUserByIdWithApiKeyRequested implements UserEvent {
+  const factory _GetUserByIdWithApiKeyRequested(
+    final int id,
+    final String apiKey,
+  ) = _$GetUserByIdWithApiKeyRequestedImpl;
+
+  int get id;
+  String get apiKey;
+
+  /// Create a copy of UserEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$GetUserByIdWithApiKeyRequestedImplCopyWith<
+    _$GetUserByIdWithApiKeyRequestedImpl
+  >
+  get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$UpdateUserRequestedImplCopyWith<$Res> {
+  factory _$$UpdateUserRequestedImplCopyWith(
+    _$UpdateUserRequestedImpl value,
+    $Res Function(_$UpdateUserRequestedImpl) then,
+  ) = __$$UpdateUserRequestedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({User user});
+}
+
+/// @nodoc
+class __$$UpdateUserRequestedImplCopyWithImpl<$Res>
+    extends _$UserEventCopyWithImpl<$Res, _$UpdateUserRequestedImpl>
+    implements _$$UpdateUserRequestedImplCopyWith<$Res> {
+  __$$UpdateUserRequestedImplCopyWithImpl(
+    _$UpdateUserRequestedImpl _value,
+    $Res Function(_$UpdateUserRequestedImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of UserEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? user = null}) {
+    return _then(
+      _$UpdateUserRequestedImpl(
+        null == user
+            ? _value.user
+            : user // ignore: cast_nullable_to_non_nullable
+                  as User,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$UpdateUserRequestedImpl implements _UpdateUserRequested {
+  const _$UpdateUserRequestedImpl(this.user);
+
+  @override
+  final User user;
+
+  @override
+  String toString() {
+    return 'UserEvent.updateUser(user: $user)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UpdateUserRequestedImpl &&
+            (identical(other.user, user) || other.user == user));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, user);
+
+  /// Create a copy of UserEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UpdateUserRequestedImplCopyWith<_$UpdateUserRequestedImpl> get copyWith =>
+      __$$UpdateUserRequestedImplCopyWithImpl<_$UpdateUserRequestedImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loading,
+    required TResult Function(int id) getUserById,
+    required TResult Function() getUsers,
+    required TResult Function(User user) createUser,
+    required TResult Function(int id) deleteUser,
+    required TResult Function(int id, String apiKey) getUserByIdWithApiKey,
+    required TResult Function(User user) updateUser,
+  }) {
+    return updateUser(user);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loading,
+    TResult? Function(int id)? getUserById,
+    TResult? Function()? getUsers,
+    TResult? Function(User user)? createUser,
+    TResult? Function(int id)? deleteUser,
+    TResult? Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult? Function(User user)? updateUser,
+  }) {
+    return updateUser?.call(user);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loading,
+    TResult Function(int id)? getUserById,
+    TResult Function()? getUsers,
+    TResult Function(User user)? createUser,
+    TResult Function(int id)? deleteUser,
+    TResult Function(int id, String apiKey)? getUserByIdWithApiKey,
+    TResult Function(User user)? updateUser,
+    required TResult orElse(),
+  }) {
+    if (updateUser != null) {
+      return updateUser(user);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UserEventLoading value) loading,
+    required TResult Function(_GetUserByIdRequested value) getUserById,
+    required TResult Function(_GetUsersRequested value) getUsers,
+    required TResult Function(_CreateUserRequested value) createUser,
+    required TResult Function(_DeleteUserRequested value) deleteUser,
+    required TResult Function(_GetUserByIdWithApiKeyRequested value)
+    getUserByIdWithApiKey,
+    required TResult Function(_UpdateUserRequested value) updateUser,
+  }) {
+    return updateUser(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UserEventLoading value)? loading,
+    TResult? Function(_GetUserByIdRequested value)? getUserById,
+    TResult? Function(_GetUsersRequested value)? getUsers,
+    TResult? Function(_CreateUserRequested value)? createUser,
+    TResult? Function(_DeleteUserRequested value)? deleteUser,
+    TResult? Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult? Function(_UpdateUserRequested value)? updateUser,
+  }) {
+    return updateUser?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UserEventLoading value)? loading,
+    TResult Function(_GetUserByIdRequested value)? getUserById,
+    TResult Function(_GetUsersRequested value)? getUsers,
+    TResult Function(_CreateUserRequested value)? createUser,
+    TResult Function(_DeleteUserRequested value)? deleteUser,
+    TResult Function(_GetUserByIdWithApiKeyRequested value)?
+    getUserByIdWithApiKey,
+    TResult Function(_UpdateUserRequested value)? updateUser,
+    required TResult orElse(),
+  }) {
+    if (updateUser != null) {
+      return updateUser(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _UpdateUserRequested implements UserEvent {
+  const factory _UpdateUserRequested(final User user) =
+      _$UpdateUserRequestedImpl;
+
+  User get user;
+
+  /// Create a copy of UserEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UpdateUserRequestedImplCopyWith<_$UpdateUserRequestedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$UserState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
@@ -840,8 +1303,10 @@ mixin _$UserState {
     required TResult Function(String message) failure,
     required TResult Function(User data) getUserByIdResult,
     required TResult Function(List<User> data) getUsersResult,
-    required TResult Function() createUserResult,
-    required TResult Function() deleteUserResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
@@ -850,8 +1315,10 @@ mixin _$UserState {
     TResult? Function(String message)? failure,
     TResult? Function(User data)? getUserByIdResult,
     TResult? Function(List<User> data)? getUsersResult,
-    TResult? Function()? createUserResult,
-    TResult? Function()? deleteUserResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
@@ -860,8 +1327,10 @@ mixin _$UserState {
     TResult Function(String message)? failure,
     TResult Function(User data)? getUserByIdResult,
     TResult Function(List<User> data)? getUsersResult,
-    TResult Function()? createUserResult,
-    TResult Function()? deleteUserResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -873,6 +1342,9 @@ mixin _$UserState {
     required TResult Function(_GetUsersResult value) getUsersResult,
     required TResult Function(_CreateUserResult value) createUserResult,
     required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
@@ -883,6 +1355,9 @@ mixin _$UserState {
     TResult? Function(_GetUsersResult value)? getUsersResult,
     TResult? Function(_CreateUserResult value)? createUserResult,
     TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
@@ -893,6 +1368,9 @@ mixin _$UserState {
     TResult Function(_GetUsersResult value)? getUsersResult,
     TResult Function(_CreateUserResult value)? createUserResult,
     TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
 }
@@ -965,8 +1443,10 @@ class _$InitialDoneImpl implements _InitialDone {
     required TResult Function(String message) failure,
     required TResult Function(User data) getUserByIdResult,
     required TResult Function(List<User> data) getUsersResult,
-    required TResult Function() createUserResult,
-    required TResult Function() deleteUserResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
   }) {
     return initial();
   }
@@ -979,8 +1459,10 @@ class _$InitialDoneImpl implements _InitialDone {
     TResult? Function(String message)? failure,
     TResult? Function(User data)? getUserByIdResult,
     TResult? Function(List<User> data)? getUsersResult,
-    TResult? Function()? createUserResult,
-    TResult? Function()? deleteUserResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
   }) {
     return initial?.call();
   }
@@ -993,8 +1475,10 @@ class _$InitialDoneImpl implements _InitialDone {
     TResult Function(String message)? failure,
     TResult Function(User data)? getUserByIdResult,
     TResult Function(List<User> data)? getUsersResult,
-    TResult Function()? createUserResult,
-    TResult Function()? deleteUserResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -1013,6 +1497,9 @@ class _$InitialDoneImpl implements _InitialDone {
     required TResult Function(_GetUsersResult value) getUsersResult,
     required TResult Function(_CreateUserResult value) createUserResult,
     required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
   }) {
     return initial(this);
   }
@@ -1027,6 +1514,9 @@ class _$InitialDoneImpl implements _InitialDone {
     TResult? Function(_GetUsersResult value)? getUsersResult,
     TResult? Function(_CreateUserResult value)? createUserResult,
     TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
   }) {
     return initial?.call(this);
   }
@@ -1041,6 +1531,9 @@ class _$InitialDoneImpl implements _InitialDone {
     TResult Function(_GetUsersResult value)? getUsersResult,
     TResult Function(_CreateUserResult value)? createUserResult,
     TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -1102,8 +1595,10 @@ class _$LoadingImpl implements _Loading {
     required TResult Function(String message) failure,
     required TResult Function(User data) getUserByIdResult,
     required TResult Function(List<User> data) getUsersResult,
-    required TResult Function() createUserResult,
-    required TResult Function() deleteUserResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
   }) {
     return loading();
   }
@@ -1116,8 +1611,10 @@ class _$LoadingImpl implements _Loading {
     TResult? Function(String message)? failure,
     TResult? Function(User data)? getUserByIdResult,
     TResult? Function(List<User> data)? getUsersResult,
-    TResult? Function()? createUserResult,
-    TResult? Function()? deleteUserResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
   }) {
     return loading?.call();
   }
@@ -1130,8 +1627,10 @@ class _$LoadingImpl implements _Loading {
     TResult Function(String message)? failure,
     TResult Function(User data)? getUserByIdResult,
     TResult Function(List<User> data)? getUsersResult,
-    TResult Function()? createUserResult,
-    TResult Function()? deleteUserResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -1150,6 +1649,9 @@ class _$LoadingImpl implements _Loading {
     required TResult Function(_GetUsersResult value) getUsersResult,
     required TResult Function(_CreateUserResult value) createUserResult,
     required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
   }) {
     return loading(this);
   }
@@ -1164,6 +1666,9 @@ class _$LoadingImpl implements _Loading {
     TResult? Function(_GetUsersResult value)? getUsersResult,
     TResult? Function(_CreateUserResult value)? createUserResult,
     TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
   }) {
     return loading?.call(this);
   }
@@ -1178,6 +1683,9 @@ class _$LoadingImpl implements _Loading {
     TResult Function(_GetUsersResult value)? getUsersResult,
     TResult Function(_CreateUserResult value)? createUserResult,
     TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -1266,8 +1774,10 @@ class _$FailureImpl implements _Failure {
     required TResult Function(String message) failure,
     required TResult Function(User data) getUserByIdResult,
     required TResult Function(List<User> data) getUsersResult,
-    required TResult Function() createUserResult,
-    required TResult Function() deleteUserResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
   }) {
     return failure(message);
   }
@@ -1280,8 +1790,10 @@ class _$FailureImpl implements _Failure {
     TResult? Function(String message)? failure,
     TResult? Function(User data)? getUserByIdResult,
     TResult? Function(List<User> data)? getUsersResult,
-    TResult? Function()? createUserResult,
-    TResult? Function()? deleteUserResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
   }) {
     return failure?.call(message);
   }
@@ -1294,8 +1806,10 @@ class _$FailureImpl implements _Failure {
     TResult Function(String message)? failure,
     TResult Function(User data)? getUserByIdResult,
     TResult Function(List<User> data)? getUsersResult,
-    TResult Function()? createUserResult,
-    TResult Function()? deleteUserResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
     required TResult orElse(),
   }) {
     if (failure != null) {
@@ -1314,6 +1828,9 @@ class _$FailureImpl implements _Failure {
     required TResult Function(_GetUsersResult value) getUsersResult,
     required TResult Function(_CreateUserResult value) createUserResult,
     required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
   }) {
     return failure(this);
   }
@@ -1328,6 +1845,9 @@ class _$FailureImpl implements _Failure {
     TResult? Function(_GetUsersResult value)? getUsersResult,
     TResult? Function(_CreateUserResult value)? createUserResult,
     TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
   }) {
     return failure?.call(this);
   }
@@ -1342,6 +1862,9 @@ class _$FailureImpl implements _Failure {
     TResult Function(_GetUsersResult value)? getUsersResult,
     TResult Function(_CreateUserResult value)? createUserResult,
     TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
     required TResult orElse(),
   }) {
     if (failure != null) {
@@ -1441,8 +1964,10 @@ class _$GetUserByIdResultImpl implements _GetUserByIdResult {
     required TResult Function(String message) failure,
     required TResult Function(User data) getUserByIdResult,
     required TResult Function(List<User> data) getUsersResult,
-    required TResult Function() createUserResult,
-    required TResult Function() deleteUserResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
   }) {
     return getUserByIdResult(data);
   }
@@ -1455,8 +1980,10 @@ class _$GetUserByIdResultImpl implements _GetUserByIdResult {
     TResult? Function(String message)? failure,
     TResult? Function(User data)? getUserByIdResult,
     TResult? Function(List<User> data)? getUsersResult,
-    TResult? Function()? createUserResult,
-    TResult? Function()? deleteUserResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
   }) {
     return getUserByIdResult?.call(data);
   }
@@ -1469,8 +1996,10 @@ class _$GetUserByIdResultImpl implements _GetUserByIdResult {
     TResult Function(String message)? failure,
     TResult Function(User data)? getUserByIdResult,
     TResult Function(List<User> data)? getUsersResult,
-    TResult Function()? createUserResult,
-    TResult Function()? deleteUserResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
     required TResult orElse(),
   }) {
     if (getUserByIdResult != null) {
@@ -1489,6 +2018,9 @@ class _$GetUserByIdResultImpl implements _GetUserByIdResult {
     required TResult Function(_GetUsersResult value) getUsersResult,
     required TResult Function(_CreateUserResult value) createUserResult,
     required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
   }) {
     return getUserByIdResult(this);
   }
@@ -1503,6 +2035,9 @@ class _$GetUserByIdResultImpl implements _GetUserByIdResult {
     TResult? Function(_GetUsersResult value)? getUsersResult,
     TResult? Function(_CreateUserResult value)? createUserResult,
     TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
   }) {
     return getUserByIdResult?.call(this);
   }
@@ -1517,6 +2052,9 @@ class _$GetUserByIdResultImpl implements _GetUserByIdResult {
     TResult Function(_GetUsersResult value)? getUsersResult,
     TResult Function(_CreateUserResult value)? createUserResult,
     TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
     required TResult orElse(),
   }) {
     if (getUserByIdResult != null) {
@@ -1622,8 +2160,10 @@ class _$GetUsersResultImpl implements _GetUsersResult {
     required TResult Function(String message) failure,
     required TResult Function(User data) getUserByIdResult,
     required TResult Function(List<User> data) getUsersResult,
-    required TResult Function() createUserResult,
-    required TResult Function() deleteUserResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
   }) {
     return getUsersResult(data);
   }
@@ -1636,8 +2176,10 @@ class _$GetUsersResultImpl implements _GetUsersResult {
     TResult? Function(String message)? failure,
     TResult? Function(User data)? getUserByIdResult,
     TResult? Function(List<User> data)? getUsersResult,
-    TResult? Function()? createUserResult,
-    TResult? Function()? deleteUserResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
   }) {
     return getUsersResult?.call(data);
   }
@@ -1650,8 +2192,10 @@ class _$GetUsersResultImpl implements _GetUsersResult {
     TResult Function(String message)? failure,
     TResult Function(User data)? getUserByIdResult,
     TResult Function(List<User> data)? getUsersResult,
-    TResult Function()? createUserResult,
-    TResult Function()? deleteUserResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
     required TResult orElse(),
   }) {
     if (getUsersResult != null) {
@@ -1670,6 +2214,9 @@ class _$GetUsersResultImpl implements _GetUsersResult {
     required TResult Function(_GetUsersResult value) getUsersResult,
     required TResult Function(_CreateUserResult value) createUserResult,
     required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
   }) {
     return getUsersResult(this);
   }
@@ -1684,6 +2231,9 @@ class _$GetUsersResultImpl implements _GetUsersResult {
     TResult? Function(_GetUsersResult value)? getUsersResult,
     TResult? Function(_CreateUserResult value)? createUserResult,
     TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
   }) {
     return getUsersResult?.call(this);
   }
@@ -1698,6 +2248,9 @@ class _$GetUsersResultImpl implements _GetUsersResult {
     TResult Function(_GetUsersResult value)? getUsersResult,
     TResult Function(_CreateUserResult value)? createUserResult,
     TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
     required TResult orElse(),
   }) {
     if (getUsersResult != null) {
@@ -1725,6 +2278,8 @@ abstract class _$$CreateUserResultImplCopyWith<$Res> {
     _$CreateUserResultImpl value,
     $Res Function(_$CreateUserResultImpl) then,
   ) = __$$CreateUserResultImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({User data});
 }
 
 /// @nodoc
@@ -1738,26 +2293,54 @@ class __$$CreateUserResultImplCopyWithImpl<$Res>
 
   /// Create a copy of UserState
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? data = null}) {
+    return _then(
+      _$CreateUserResultImpl(
+        null == data
+            ? _value.data
+            : data // ignore: cast_nullable_to_non_nullable
+                  as User,
+      ),
+    );
+  }
 }
 
 /// @nodoc
 
 class _$CreateUserResultImpl implements _CreateUserResult {
-  const _$CreateUserResultImpl();
+  const _$CreateUserResultImpl(this.data);
+
+  @override
+  final User data;
 
   @override
   String toString() {
-    return 'UserState.createUserResult()';
+    return 'UserState.createUserResult(data: $data)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$CreateUserResultImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$CreateUserResultImpl &&
+            (identical(other.data, data) || other.data == data));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, data);
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CreateUserResultImplCopyWith<_$CreateUserResultImpl> get copyWith =>
+      __$$CreateUserResultImplCopyWithImpl<_$CreateUserResultImpl>(
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
@@ -1767,10 +2350,12 @@ class _$CreateUserResultImpl implements _CreateUserResult {
     required TResult Function(String message) failure,
     required TResult Function(User data) getUserByIdResult,
     required TResult Function(List<User> data) getUsersResult,
-    required TResult Function() createUserResult,
-    required TResult Function() deleteUserResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
   }) {
-    return createUserResult();
+    return createUserResult(data);
   }
 
   @override
@@ -1781,10 +2366,12 @@ class _$CreateUserResultImpl implements _CreateUserResult {
     TResult? Function(String message)? failure,
     TResult? Function(User data)? getUserByIdResult,
     TResult? Function(List<User> data)? getUsersResult,
-    TResult? Function()? createUserResult,
-    TResult? Function()? deleteUserResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
   }) {
-    return createUserResult?.call();
+    return createUserResult?.call(data);
   }
 
   @override
@@ -1795,12 +2382,14 @@ class _$CreateUserResultImpl implements _CreateUserResult {
     TResult Function(String message)? failure,
     TResult Function(User data)? getUserByIdResult,
     TResult Function(List<User> data)? getUsersResult,
-    TResult Function()? createUserResult,
-    TResult Function()? deleteUserResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
     required TResult orElse(),
   }) {
     if (createUserResult != null) {
-      return createUserResult();
+      return createUserResult(data);
     }
     return orElse();
   }
@@ -1815,6 +2404,9 @@ class _$CreateUserResultImpl implements _CreateUserResult {
     required TResult Function(_GetUsersResult value) getUsersResult,
     required TResult Function(_CreateUserResult value) createUserResult,
     required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
   }) {
     return createUserResult(this);
   }
@@ -1829,6 +2421,9 @@ class _$CreateUserResultImpl implements _CreateUserResult {
     TResult? Function(_GetUsersResult value)? getUsersResult,
     TResult? Function(_CreateUserResult value)? createUserResult,
     TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
   }) {
     return createUserResult?.call(this);
   }
@@ -1843,6 +2438,9 @@ class _$CreateUserResultImpl implements _CreateUserResult {
     TResult Function(_GetUsersResult value)? getUsersResult,
     TResult Function(_CreateUserResult value)? createUserResult,
     TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
     required TResult orElse(),
   }) {
     if (createUserResult != null) {
@@ -1853,7 +2451,15 @@ class _$CreateUserResultImpl implements _CreateUserResult {
 }
 
 abstract class _CreateUserResult implements UserState {
-  const factory _CreateUserResult() = _$CreateUserResultImpl;
+  const factory _CreateUserResult(final User data) = _$CreateUserResultImpl;
+
+  User get data;
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CreateUserResultImplCopyWith<_$CreateUserResultImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -1862,6 +2468,8 @@ abstract class _$$DeleteUserResultImplCopyWith<$Res> {
     _$DeleteUserResultImpl value,
     $Res Function(_$DeleteUserResultImpl) then,
   ) = __$$DeleteUserResultImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({int data});
 }
 
 /// @nodoc
@@ -1875,26 +2483,54 @@ class __$$DeleteUserResultImplCopyWithImpl<$Res>
 
   /// Create a copy of UserState
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? data = null}) {
+    return _then(
+      _$DeleteUserResultImpl(
+        null == data
+            ? _value.data
+            : data // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
+  }
 }
 
 /// @nodoc
 
 class _$DeleteUserResultImpl implements _DeleteUserResult {
-  const _$DeleteUserResultImpl();
+  const _$DeleteUserResultImpl(this.data);
+
+  @override
+  final int data;
 
   @override
   String toString() {
-    return 'UserState.deleteUserResult()';
+    return 'UserState.deleteUserResult(data: $data)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$DeleteUserResultImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$DeleteUserResultImpl &&
+            (identical(other.data, data) || other.data == data));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, data);
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DeleteUserResultImplCopyWith<_$DeleteUserResultImpl> get copyWith =>
+      __$$DeleteUserResultImplCopyWithImpl<_$DeleteUserResultImpl>(
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
@@ -1904,10 +2540,12 @@ class _$DeleteUserResultImpl implements _DeleteUserResult {
     required TResult Function(String message) failure,
     required TResult Function(User data) getUserByIdResult,
     required TResult Function(List<User> data) getUsersResult,
-    required TResult Function() createUserResult,
-    required TResult Function() deleteUserResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
   }) {
-    return deleteUserResult();
+    return deleteUserResult(data);
   }
 
   @override
@@ -1918,10 +2556,12 @@ class _$DeleteUserResultImpl implements _DeleteUserResult {
     TResult? Function(String message)? failure,
     TResult? Function(User data)? getUserByIdResult,
     TResult? Function(List<User> data)? getUsersResult,
-    TResult? Function()? createUserResult,
-    TResult? Function()? deleteUserResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
   }) {
-    return deleteUserResult?.call();
+    return deleteUserResult?.call(data);
   }
 
   @override
@@ -1932,12 +2572,14 @@ class _$DeleteUserResultImpl implements _DeleteUserResult {
     TResult Function(String message)? failure,
     TResult Function(User data)? getUserByIdResult,
     TResult Function(List<User> data)? getUsersResult,
-    TResult Function()? createUserResult,
-    TResult Function()? deleteUserResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
     required TResult orElse(),
   }) {
     if (deleteUserResult != null) {
-      return deleteUserResult();
+      return deleteUserResult(data);
     }
     return orElse();
   }
@@ -1952,6 +2594,9 @@ class _$DeleteUserResultImpl implements _DeleteUserResult {
     required TResult Function(_GetUsersResult value) getUsersResult,
     required TResult Function(_CreateUserResult value) createUserResult,
     required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
   }) {
     return deleteUserResult(this);
   }
@@ -1966,6 +2611,9 @@ class _$DeleteUserResultImpl implements _DeleteUserResult {
     TResult? Function(_GetUsersResult value)? getUsersResult,
     TResult? Function(_CreateUserResult value)? createUserResult,
     TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
   }) {
     return deleteUserResult?.call(this);
   }
@@ -1980,6 +2628,9 @@ class _$DeleteUserResultImpl implements _DeleteUserResult {
     TResult Function(_GetUsersResult value)? getUsersResult,
     TResult Function(_CreateUserResult value)? createUserResult,
     TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
     required TResult orElse(),
   }) {
     if (deleteUserResult != null) {
@@ -1990,5 +2641,395 @@ class _$DeleteUserResultImpl implements _DeleteUserResult {
 }
 
 abstract class _DeleteUserResult implements UserState {
-  const factory _DeleteUserResult() = _$DeleteUserResultImpl;
+  const factory _DeleteUserResult(final int data) = _$DeleteUserResultImpl;
+
+  int get data;
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DeleteUserResultImplCopyWith<_$DeleteUserResultImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$GetUserByIdWithApiKeyResultImplCopyWith<$Res> {
+  factory _$$GetUserByIdWithApiKeyResultImplCopyWith(
+    _$GetUserByIdWithApiKeyResultImpl value,
+    $Res Function(_$GetUserByIdWithApiKeyResultImpl) then,
+  ) = __$$GetUserByIdWithApiKeyResultImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({User data});
+}
+
+/// @nodoc
+class __$$GetUserByIdWithApiKeyResultImplCopyWithImpl<$Res>
+    extends _$UserStateCopyWithImpl<$Res, _$GetUserByIdWithApiKeyResultImpl>
+    implements _$$GetUserByIdWithApiKeyResultImplCopyWith<$Res> {
+  __$$GetUserByIdWithApiKeyResultImplCopyWithImpl(
+    _$GetUserByIdWithApiKeyResultImpl _value,
+    $Res Function(_$GetUserByIdWithApiKeyResultImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? data = null}) {
+    return _then(
+      _$GetUserByIdWithApiKeyResultImpl(
+        null == data
+            ? _value.data
+            : data // ignore: cast_nullable_to_non_nullable
+                  as User,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$GetUserByIdWithApiKeyResultImpl
+    implements _GetUserByIdWithApiKeyResult {
+  const _$GetUserByIdWithApiKeyResultImpl(this.data);
+
+  @override
+  final User data;
+
+  @override
+  String toString() {
+    return 'UserState.getUserByIdWithApiKeyResult(data: $data)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$GetUserByIdWithApiKeyResultImpl &&
+            (identical(other.data, data) || other.data == data));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, data);
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$GetUserByIdWithApiKeyResultImplCopyWith<_$GetUserByIdWithApiKeyResultImpl>
+  get copyWith =>
+      __$$GetUserByIdWithApiKeyResultImplCopyWithImpl<
+        _$GetUserByIdWithApiKeyResultImpl
+      >(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(String message) failure,
+    required TResult Function(User data) getUserByIdResult,
+    required TResult Function(List<User> data) getUsersResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
+  }) {
+    return getUserByIdWithApiKeyResult(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(String message)? failure,
+    TResult? Function(User data)? getUserByIdResult,
+    TResult? Function(List<User> data)? getUsersResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
+  }) {
+    return getUserByIdWithApiKeyResult?.call(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(String message)? failure,
+    TResult Function(User data)? getUserByIdResult,
+    TResult Function(List<User> data)? getUsersResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
+    required TResult orElse(),
+  }) {
+    if (getUserByIdWithApiKeyResult != null) {
+      return getUserByIdWithApiKeyResult(data);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_InitialDone value) initial,
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Failure value) failure,
+    required TResult Function(_GetUserByIdResult value) getUserByIdResult,
+    required TResult Function(_GetUsersResult value) getUsersResult,
+    required TResult Function(_CreateUserResult value) createUserResult,
+    required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
+  }) {
+    return getUserByIdWithApiKeyResult(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_InitialDone value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Failure value)? failure,
+    TResult? Function(_GetUserByIdResult value)? getUserByIdResult,
+    TResult? Function(_GetUsersResult value)? getUsersResult,
+    TResult? Function(_CreateUserResult value)? createUserResult,
+    TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
+  }) {
+    return getUserByIdWithApiKeyResult?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_InitialDone value)? initial,
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Failure value)? failure,
+    TResult Function(_GetUserByIdResult value)? getUserByIdResult,
+    TResult Function(_GetUsersResult value)? getUsersResult,
+    TResult Function(_CreateUserResult value)? createUserResult,
+    TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
+    required TResult orElse(),
+  }) {
+    if (getUserByIdWithApiKeyResult != null) {
+      return getUserByIdWithApiKeyResult(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _GetUserByIdWithApiKeyResult implements UserState {
+  const factory _GetUserByIdWithApiKeyResult(final User data) =
+      _$GetUserByIdWithApiKeyResultImpl;
+
+  User get data;
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$GetUserByIdWithApiKeyResultImplCopyWith<_$GetUserByIdWithApiKeyResultImpl>
+  get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$UpdateUserResultImplCopyWith<$Res> {
+  factory _$$UpdateUserResultImplCopyWith(
+    _$UpdateUserResultImpl value,
+    $Res Function(_$UpdateUserResultImpl) then,
+  ) = __$$UpdateUserResultImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool data});
+}
+
+/// @nodoc
+class __$$UpdateUserResultImplCopyWithImpl<$Res>
+    extends _$UserStateCopyWithImpl<$Res, _$UpdateUserResultImpl>
+    implements _$$UpdateUserResultImplCopyWith<$Res> {
+  __$$UpdateUserResultImplCopyWithImpl(
+    _$UpdateUserResultImpl _value,
+    $Res Function(_$UpdateUserResultImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? data = null}) {
+    return _then(
+      _$UpdateUserResultImpl(
+        null == data
+            ? _value.data
+            : data // ignore: cast_nullable_to_non_nullable
+                  as bool,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$UpdateUserResultImpl implements _UpdateUserResult {
+  const _$UpdateUserResultImpl(this.data);
+
+  @override
+  final bool data;
+
+  @override
+  String toString() {
+    return 'UserState.updateUserResult(data: $data)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UpdateUserResultImpl &&
+            (identical(other.data, data) || other.data == data));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, data);
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UpdateUserResultImplCopyWith<_$UpdateUserResultImpl> get copyWith =>
+      __$$UpdateUserResultImplCopyWithImpl<_$UpdateUserResultImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(String message) failure,
+    required TResult Function(User data) getUserByIdResult,
+    required TResult Function(List<User> data) getUsersResult,
+    required TResult Function(User data) createUserResult,
+    required TResult Function(int data) deleteUserResult,
+    required TResult Function(User data) getUserByIdWithApiKeyResult,
+    required TResult Function(bool data) updateUserResult,
+  }) {
+    return updateUserResult(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(String message)? failure,
+    TResult? Function(User data)? getUserByIdResult,
+    TResult? Function(List<User> data)? getUsersResult,
+    TResult? Function(User data)? createUserResult,
+    TResult? Function(int data)? deleteUserResult,
+    TResult? Function(User data)? getUserByIdWithApiKeyResult,
+    TResult? Function(bool data)? updateUserResult,
+  }) {
+    return updateUserResult?.call(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(String message)? failure,
+    TResult Function(User data)? getUserByIdResult,
+    TResult Function(List<User> data)? getUsersResult,
+    TResult Function(User data)? createUserResult,
+    TResult Function(int data)? deleteUserResult,
+    TResult Function(User data)? getUserByIdWithApiKeyResult,
+    TResult Function(bool data)? updateUserResult,
+    required TResult orElse(),
+  }) {
+    if (updateUserResult != null) {
+      return updateUserResult(data);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_InitialDone value) initial,
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Failure value) failure,
+    required TResult Function(_GetUserByIdResult value) getUserByIdResult,
+    required TResult Function(_GetUsersResult value) getUsersResult,
+    required TResult Function(_CreateUserResult value) createUserResult,
+    required TResult Function(_DeleteUserResult value) deleteUserResult,
+    required TResult Function(_GetUserByIdWithApiKeyResult value)
+    getUserByIdWithApiKeyResult,
+    required TResult Function(_UpdateUserResult value) updateUserResult,
+  }) {
+    return updateUserResult(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_InitialDone value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Failure value)? failure,
+    TResult? Function(_GetUserByIdResult value)? getUserByIdResult,
+    TResult? Function(_GetUsersResult value)? getUsersResult,
+    TResult? Function(_CreateUserResult value)? createUserResult,
+    TResult? Function(_DeleteUserResult value)? deleteUserResult,
+    TResult? Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult? Function(_UpdateUserResult value)? updateUserResult,
+  }) {
+    return updateUserResult?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_InitialDone value)? initial,
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Failure value)? failure,
+    TResult Function(_GetUserByIdResult value)? getUserByIdResult,
+    TResult Function(_GetUsersResult value)? getUsersResult,
+    TResult Function(_CreateUserResult value)? createUserResult,
+    TResult Function(_DeleteUserResult value)? deleteUserResult,
+    TResult Function(_GetUserByIdWithApiKeyResult value)?
+    getUserByIdWithApiKeyResult,
+    TResult Function(_UpdateUserResult value)? updateUserResult,
+    required TResult orElse(),
+  }) {
+    if (updateUserResult != null) {
+      return updateUserResult(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _UpdateUserResult implements UserState {
+  const factory _UpdateUserResult(final bool data) = _$UpdateUserResultImpl;
+
+  bool get data;
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UpdateUserResultImplCopyWith<_$UpdateUserResultImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }

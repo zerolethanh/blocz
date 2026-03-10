@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:blocz_example/api/example_api.dart';
+
 import 'features/user/presentation/bloc/user_bloc.dart';
 import 'injection.dart';
 
@@ -20,8 +22,12 @@ void main() async {
           print('[State] Success: Found user ${user.name}'),
       getUsersResult: (users) =>
           print('[State] Success: Fetched ${users.length} users'),
-      createUserResult: () => print('[State] Success: User created'),
-      deleteUserResult: () => print('[State] Success: User deleted'),
+      createUserResult: (User user) => print('[State] Success: User created'),
+      deleteUserResult: (int data) => print('[State] Success: User deleted'),
+      getUserByIdWithApiKeyResult: (User data) =>
+          print('[State] Success: Found user ${data.name}'),
+      updateUserResult: (User data) =>
+          print('[State] Success: Updated user ${data.name}'),
     );
   });
 

@@ -26,9 +26,7 @@ JSONString? extractMethodParams(String filePath, [String? methodName]) {
     params = _extractSingleMethodParams(filePath, methodName);
   }
   // print(params);
-  return JSONStringResult(
-    data: params,
-  ).toString();
+  return JSONStringResult(data: params).toString();
 }
 
 String? _extractSingleMethodParams(String filePath, String methodName) {

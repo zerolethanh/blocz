@@ -1,12 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:blocz/_internal/colors.dart';
+import 'package:blocz/_internal/managers/ClassManager.dart';
 import 'package:blocz/_internal/managers/ConstructorManager.dart';
+import 'package:blocz/_internal/managers/MethodManager.dart';
+import 'package:blocz/extractConstructorParams.dart';
 import 'package:blocz/extractMethodListFromClass.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
 import 'package:blocz/extractMethodResponseTypeWithField.dart';
+import 'package:blocz/findClassNameByMethodName.dart';
 import 'package:blocz/findLastClassbodyLineNumber.dart';
 import 'package:blocz/findLastConstFactory.dart';
 import 'package:blocz/findLast_On_LineNumber.dart';
@@ -27,6 +32,7 @@ Future<void> addEvent(
   String? apiPath,
   String? method, {
   String? writeDir,
+  bool update = false,
 }) async {
   // multiple event generate
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
@@ -55,6 +61,7 @@ Future<void> addEvent(
             apiPath,
             methodName,
             writeDir: writeDir,
+            update: update,
           ),
         );
       }
@@ -97,6 +104,7 @@ Future<void> addEvent(
     apiPath,
     method ?? event,
     writeDir: writeDir,
+    update: update,
   );
   if (result.$1.isEmpty) {
     printWarning("No events generated.");
@@ -123,6 +131,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   String? apiPath,
   String? method, {
   String? writeDir,
+  bool update = false,
 }) async {
   final bool isEmptyName = name == null || name.trim().isEmpty;
   name = isEmptyName ? domain : name;
@@ -150,10 +159,6 @@ Future<(String, String, String, String)> _addSingleEvent(
   bool shouldMakeFirst = false;
   for (var f in [eventPath, statePath, blocPath]) {
     if (!File(f).existsSync()) {
-      // print('File not found: $f');
-      // create file
-      // File(f).createSync(recursive: true);
-      // return ("", "", "", "");
       shouldMakeFirst = true;
     }
   }
@@ -176,26 +181,42 @@ Future<(String, String, String, String)> _addSingleEvent(
   var eventContent = File(eventPath).readAsStringSync();
   final eventInsertionPoint = findLastConstFactory(eventPath);
   if (eventInsertionPoint != null) {
-    String params = "(dynamic params)";
-    if (apiPath != null && method != null) {
-      params =
-          jsonDecode(extractMethodParams(apiPath, method) ?? "{}")?["data"] ??
-          "(dynamic params)";
-    }
     String constructorName = '$eventClassName.$eventName';
-    var hasFactoryConstructor = ConstructorManager(
+    var eventManager = ConstructorManager(
       filePath: eventPath,
       identifier: constructorName,
-    ).hasFactoryConstructor();
+    );
 
-    if (!hasFactoryConstructor) {
-      final newEvent =
-          '  const factory $constructorName$params = _${EventName}Requested;';
-      if (!eventContent.contains(newEvent)) {
-        final eventLines = eventContent.split('\n');
-        eventLines.insert(eventInsertionPoint, newEvent);
-        File(eventPath).writeAsStringSync(eventLines.join('\n'));
-        print('Updated: $eventPath');
+    String newEventParam = "(dynamic params)";
+    String currentEventParam = "()";
+    if (apiPath != null && method != null) {
+      newEventParam = _eventParam(apiPath, method, true);
+      currentEventParam = _eventParam(eventPath, constructorName, false);
+    }
+
+    final newEvent =
+        '  const factory $constructorName$newEventParam = _${EventName}Requested;';
+
+    if (!eventManager.hasFactoryConstructor()) {
+      // write new event
+      final eventLines = eventContent.split('\n');
+      eventLines.insert(eventInsertionPoint, newEvent);
+      File(eventPath).writeAsStringSync(eventLines.join('\n'));
+      printSuccess('Updated: $eventPath');
+    }
+    // printInfo("constructorName: $constructorName");
+    // printInfo("newEventParam: $newEventParam");
+    // printInfo("currentEventParam: $currentEventParam");
+    if (update && (newEventParam != currentEventParam)) {
+      // update if changed
+      final result = eventManager.findOrReplace(replacementText: newEvent);
+      final taskResult =
+          result.otherProps["findOrReplace_result"] as Map<String, dynamic>?;
+      final newSource = taskResult?["newSourceCode"] as String?;
+      if (newSource != null) {
+        File(eventPath).writeAsStringSync(newSource);
+        printWarning('Updated (refresh): $eventPath');
+        eventContent = newSource; // update local content for subsequent checks
       }
     }
   }
@@ -204,36 +225,42 @@ Future<(String, String, String, String)> _addSingleEvent(
   final stateClassName = getFirstClassNameInFile(statePath);
   var stateContent = File(statePath).readAsStringSync();
   final stateInsertionPoint = findLastConstFactory(statePath);
-  String stateParams = "()";
+  String newStateParams = "()";
+  String currentStateParams = "()";
   if (stateInsertionPoint != null) {
-    final responseType = (apiPath != null && method != null)
-        ? await extractMethodResponseTypeWithField(apiPath, method, "data,body")
-        : null;
-    // print("// responseType:: \\\\");
-    // print(responseType);
-    // print("\\\\ responseType:: //");
-    String responseDataType = "dynamic";
-    if (responseType != null) {
-      responseDataType = responseType['responseDataType'];
-      stateParams = "($responseDataType data)";
-      if (stateParams == "(void data)") {
-        stateParams = "()";
-      }
-    }
-
     String constructorName = '$stateClassName.${eventName}Result';
-    var hasFactoryConstructor = ConstructorManager(
+    var stateManager = ConstructorManager(
       filePath: statePath,
       identifier: constructorName,
-    ).hasFactoryConstructor();
-    if (!hasFactoryConstructor) {
-      final newState =
-          '  const factory $constructorName$stateParams = _${EventName}Result;';
-      if (!stateContent.contains(newState)) {
-        final stateLines = stateContent.split('\n');
-        stateLines.insert(stateInsertionPoint, newState);
-        File(statePath).writeAsStringSync(stateLines.join('\n'));
-        print('Updated: $statePath');
+    );
+
+    // state params
+    newStateParams = await _stateParam(apiPath, method, true);
+    currentStateParams = await _stateParam(statePath, constructorName, false);
+    //     printInfo("""
+
+    // newStateParams: $newStateParams,
+    // currentStateParams: $currentStateParams,
+    // """);
+
+    final newFactory =
+        '  const factory $constructorName$newStateParams = _${EventName}Result;';
+
+    if (!stateManager.hasFactoryConstructor()) {
+      final stateLines = stateContent.split('\n');
+      stateLines.insert(stateInsertionPoint, newFactory);
+      File(statePath).writeAsStringSync(stateLines.join('\n'));
+      print('Updated: $statePath');
+    }
+    if (update && (newStateParams != currentStateParams)) {
+      final result = stateManager.findOrReplace(replacementText: newFactory);
+      final taskResult =
+          result.otherProps["findOrReplace_result"] as Map<String, dynamic>?;
+      final newSource = taskResult?["newSourceCode"] as String?;
+      if (newSource != null) {
+        File(statePath).writeAsStringSync(newSource);
+        printWarning('Updated (refresh): $statePath');
+        stateContent = newSource; // update local content for subsequent checks
       }
     }
   }
@@ -248,11 +275,11 @@ Future<(String, String, String, String)> _addSingleEvent(
   // ignore: no_leading_underscores_for_local_identifiers
   final bool _hasMethod = hasMethod(blocPath, newMethodName);
 
-  if (_hasMethod) {
+  if (_hasMethod && !update) {
     print("$yellow method $newMethodName already exists. skip...");
     return ("", "", "", "");
   }
-  if (hasOn) {
+  if (hasOn && !update) {
     print("$yellow `on` $newOn already exists. skip...");
     return ("", "", "", ""); // Already up-to-date for this event, do nothing.
   }
@@ -269,8 +296,8 @@ Future<(String, String, String, String)> _addSingleEvent(
           : null;
 
       final resHitField = responseType?['hitField'] ?? '';
-      final apiClassName = apiPath != null
-          ? getFirstClassNameInFile(apiPath)
+      final apiClassName = apiPath != null && method != null
+          ? findClassNameByMethodName(apiPath, method)
           : null;
 
       final apiClassNameCamelCase = apiClassName?.camelCase;
@@ -287,7 +314,7 @@ Future<(String, String, String, String)> _addSingleEvent(
           }
           emit(${commonClassName}State.${eventName}Result(response.$resHitField));
 ''' : '''
-          ${stateParams == "()" ? '''
+          ${newStateParams == "()" ? '''
           emit(${commonClassName}State.${eventName}Result());
           ''' : '''
           emit(${commonClassName}State.${eventName}Result(response));
@@ -327,6 +354,63 @@ Future<(String, String, String, String)> _addSingleEvent(
   if (isDirty) {
     File(blocPath).writeAsStringSync(blocLines.join('\n'));
     print('Updated: $blocPath');
+  } else if (update && _hasMethod) {
+    // try update method body
+    final responseType = (apiPath != null && method != null)
+        ? await extractMethodResponseInnerDataType(apiPath, method)
+        : null;
+
+    final resHitField = responseType?['hitField'] ?? '';
+    final apiClassName = apiPath != null && method != null
+        ? findClassNameByMethodName(apiPath, method)
+        : null;
+    final apiClassNameCamelCase = apiClassName?.camelCase;
+
+    final apiCodeBlock =
+        apiPath != null && method != null && apiClassName != null
+        ? '''
+        try {
+          final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
+          final response = await $apiClassNameCamelCase.$method(${_getEventCallParams(apiPath, method)});
+          ${resHitField != '' ? '''
+          if (response == null) {
+            emit(const ${commonClassName}State.failure('No data'));
+            return;
+          }
+          emit(${commonClassName}State.${eventName}Result(response.$resHitField));
+''' : '''
+          ${newStateParams == "()" ? '''
+          emit(${commonClassName}State.${eventName}Result());
+          ''' : '''
+          emit(${commonClassName}State.${eventName}Result(response));
+          '''}
+'''}
+        } catch (e) {
+          emit(${commonClassName}State.failure(e.toString()));
+        }
+'''
+        : '';
+
+    final newMethodBody =
+        '''async {
+    $apiCodeBlock
+  }''';
+
+    final manager = MethodManager(
+      filePath: blocPath,
+      identifier: ".$newMethodName",
+    );
+    final result = manager.ON_invocationFindByMethodName(
+      replacementHandlerBody: newMethodBody,
+    );
+    final taskResult =
+        result.otherProps["ON_invocationFindByMethodName_result"]
+            as Map<String, dynamic>?;
+    final newSource = taskResult?["fullNewSourceCode"] as String?;
+    if (newSource != null) {
+      File(blocPath).writeAsStringSync(newSource);
+      print('Updated (refresh): $blocPath');
+    }
   }
   return (effectiveWriteDir, blocPath, eventPath, statePath);
 }
@@ -406,4 +490,67 @@ String _getEventCallParams(String? fpath, String? method) {
   // Combine and return
   final allParams = [...positionalParams, ...namedParams];
   return allParams.join(', ');
+}
+
+Future<String> _stateParam(String? fp, String? method, bool? isApiPath) async {
+  if (fp == null || method == null) {
+    return "()";
+  }
+  if (isApiPath != null && isApiPath) {
+    Map<String, dynamic>? responseType;
+    try {
+      responseType = await extractMethodResponseTypeWithField(
+        fp,
+        method,
+        "data,body",
+      );
+      String responseDataType = "dynamic";
+      String result = "()";
+      if (responseType != null) {
+        responseDataType = responseType['responseDataType'];
+        result = "($responseDataType data)";
+        if (result == "(void data)") {
+          result = "()";
+        }
+      }
+      return result;
+    } catch (e) {
+      print("Error: $e");
+    }
+    return "()";
+  } else {
+    // current statePath;
+    Map<String, dynamic>? eResult = jsonDecode(
+      extractConstructorParams(fp, method),
+    );
+    // printInfo("currentstateparam eResult $eResult");
+    final params = eResult?["data"]?["constructorParams"] ?? "()";
+    // printInfo("fp: $fp, method:$method ,\neResult $params");
+    return params;
+  }
+}
+
+String _eventParam(String? fp, String method, bool? isApiPath) {
+  if (fp == null) return "(dynamic params)";
+  if (isApiPath != null && isApiPath) {
+    // fp = apiPath
+    try {
+      Map<String, dynamic>? eResult = jsonDecode(
+        extractMethodParams(fp, method) ?? "{}",
+      );
+      final params = eResult?["data"] ?? "(dynamic params)";
+      // printInfo("fp: $fp, method:$method ,\neResult $params");
+      return params;
+    } catch (e) {
+      return "()";
+    }
+  } else {
+    // fp = eventPath
+    Map<String, dynamic>? eResult = jsonDecode(
+      extractConstructorParams(fp, method),
+    );
+    final params = eResult?["data"]?["constructorParams"] ?? "()";
+    // printInfo("fp: $fp, method:$method ,\neResult $params");
+    return params;
+  }
 }
