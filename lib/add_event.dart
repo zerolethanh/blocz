@@ -15,6 +15,11 @@ import 'package:blocz/makeUtils.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
 
+/// Adds one or more events to a BLoC.
+///
+/// If [apiPath] is provided and [event] is null or empty, it extracts all public methods
+/// from the specified API class and generates an event for each.
+/// Otherwise, it generates a single event specified by [event].
 Future<void> addEvent(
   String domain,
   String? name,
@@ -33,7 +38,7 @@ Future<void> addEvent(
       List<dynamic> results = [];
       for (final methodName in methods) {
         if (methodName.endsWith("WithHttpInfo")) {
-          // skip ...WithHttpInfo method
+          // skip ...WithHttpInfo openapi generated method
           continue;
         }
         if (method != null &&
@@ -106,6 +111,11 @@ Future<void> addEvent(
   }
 }
 
+/// Generates a single event, including its corresponding event and state classes,
+/// and updates the BLoC to handle the event.
+///
+/// Returns a record containing the directory where the files were written and the paths to the
+/// generated BLoC, event, and state files.
 Future<(String, String, String, String)> _addSingleEvent(
   String domain,
   String? name,
@@ -121,7 +131,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   final String domainSnake = domain.snakeCase;
   final String commonFileName = isEmptyName
       ? nameSnake
-      : '${domainSnake}_${nameSnake}';
+      : '${domainSnake}_$nameSnake';
   final String commonClassName =
       '${domain.pascalCase}${isEmptyName ? '' : name.pascalCase}';
 
@@ -321,6 +331,10 @@ Future<(String, String, String, String)> _addSingleEvent(
   return (effectiveWriteDir, blocPath, eventPath, statePath);
 }
 
+/// Extracts and formats the parameters for calling an API method within a BLoC event handler.
+///
+/// It parses the method's parameters and returns a string of formatted arguments
+/// (e.g., `id, name: event.name`) to be used in the generated code.
 String _getEventCallParams(String? fpath, String? method) {
   if (fpath == null || method == null) return '';
 
