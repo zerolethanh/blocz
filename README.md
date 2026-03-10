@@ -14,6 +14,7 @@ A command-line interface (CLI) tool to speed up Flutter app development by scaff
 - Automatically create a domain-based directory structure.
 - The generated code is compatible with popular packages like `flutter_bloc`, `freezed`, and `injectable`.
 - Supports quickly adding new events to a BLoC.
+- Automatically import events and handlers from an API service file.
 
 ## Prerequisites
 

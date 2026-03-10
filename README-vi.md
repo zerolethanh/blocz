@@ -14,6 +14,7 @@ Một công cụ dòng lệnh (CLI) giúp tăng tốc độ phát triển ứng 
 - Tự động tạo cấu trúc thư mục theo domain.
 - Mã nguồn được tạo ra tương thích với các package phổ biến như `flutter_bloc`, `freezed`, và `injectable`.
 - Hỗ trợ thêm nhanh các event vào BLoC.
+- Tự động nhập (import) các event và trình xử lý từ tệp tin service API.
 
 ## Điều kiện tiên quyết
 
