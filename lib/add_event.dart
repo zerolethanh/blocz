@@ -20,8 +20,9 @@ Future<void> addEvent(
   String? name,
   String? event,
   String? apiPath,
-  String? method,
-) async {
+  String? method, {
+  String? writeDir,
+}) async {
   // multiple event generate
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
     final methods = extractMethodListFromClass(apiPath);
@@ -42,7 +43,14 @@ Future<void> addEvent(
           continue;
         }
         results.add(
-          await _addSingleEvent(domain, name, methodName, apiPath, methodName),
+          await _addSingleEvent(
+            domain,
+            name,
+            methodName,
+            apiPath,
+            methodName,
+            writeDir: writeDir,
+          ),
         );
       }
 
@@ -83,6 +91,7 @@ Future<void> addEvent(
     event,
     apiPath,
     method ?? event,
+    writeDir: writeDir,
   );
   if (result.$1.isEmpty) {
     printWarning("No events generated.");
@@ -98,8 +107,9 @@ Future<(String, String, String, String)> _addSingleEvent(
   String? name,
   String event,
   String? apiPath,
-  String? method,
-) async {
+  String? method, {
+  String? writeDir,
+}) async {
   final bool isEmptyName = name == null || name.trim().isEmpty;
   name = isEmptyName ? domain : name;
 
@@ -111,10 +121,11 @@ Future<(String, String, String, String)> _addSingleEvent(
   final String commonClassName =
       '${domain.pascalCase}${isEmptyName ? '' : name.pascalCase}';
 
-  final writeDir = p.join('lib', 'features', domain, 'presentation', 'bloc');
-  final blocPath = p.join(writeDir, '${commonFileName}_bloc.dart');
-  final eventPath = p.join(writeDir, '${commonFileName}_event.dart');
-  final statePath = p.join(writeDir, '${commonFileName}_state.dart');
+  final effectiveWriteDir =
+      writeDir ?? p.join('lib', 'features', domain, 'presentation', 'bloc');
+  final blocPath = p.join(effectiveWriteDir, '${commonFileName}_bloc.dart');
+  final eventPath = p.join(effectiveWriteDir, '${commonFileName}_event.dart');
+  final statePath = p.join(effectiveWriteDir, '${commonFileName}_state.dart');
 
   for (var f in [eventPath, statePath, blocPath]) {
     if (!File(f).existsSync()) {
@@ -283,7 +294,7 @@ Future<(String, String, String, String)> _addSingleEvent(
     File(blocPath).writeAsStringSync(blocLines.join('\n'));
     print('Updated: $blocPath');
   }
-  return (writeDir, blocPath, eventPath, statePath);
+  return (effectiveWriteDir, blocPath, eventPath, statePath);
 }
 
 String _getEventCallParams(String? fpath, String? method) {

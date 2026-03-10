@@ -142,7 +142,6 @@ sealed class PetState with _$PetState {
   const factory PetState.updatePetResult() = _UpdatePetResult;
   const factory PetState.updatePetWithFormResult() = _UpdatePetWithFormResult;
   const factory PetState.uploadFileResult(ApiResponse? data) = _UploadFileResult;
-  // const factory PetState.loaded(dynamic result) = _Loaded;
 }
 
 ```

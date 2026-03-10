@@ -44,6 +44,11 @@ Future<void> main(List<String> arguments) async {
       'apiPath',
       abbr: 'a',
       help: 'to be implemented api .dart fullpath',
+    )
+    ..addOption(
+      'writeDir',
+      abbr: 'w',
+      help: 'custom directory to generate bloc files',
     );
 
   parser.addCommand('add:event')
@@ -61,6 +66,11 @@ Future<void> main(List<String> arguments) async {
       'implementAllApiMethods',
       abbr: 'A',
       help: 'implement all methods from apiPath',
+    )
+    ..addOption(
+      'writeDir',
+      abbr: 'w',
+      help: 'custom directory to find bloc files',
     );
 
   parser.addCommand('pr', parser.addCommand("project:root"))
@@ -204,7 +214,8 @@ Future<void> main(List<String> arguments) async {
         if (apiPath != null && apiPath.isNotEmpty) {
           apiPath = toAbsPath(apiPath);
         }
-        await makeBloc(domain, name, apiPath);
+        final writeDir = command['writeDir'] as String?;
+        await makeBloc(domain, name, apiPath, writeDir: writeDir);
         break;
       case 'add:event':
       case 'add':
@@ -216,7 +227,15 @@ Future<void> main(List<String> arguments) async {
           apiPath = toAbsPath(apiPath);
         }
         final method = command['method'] as String?;
-        await addEvent(domain, name, event, apiPath, method);
+        final writeDir = command['writeDir'] as String?;
+        await addEvent(
+          domain,
+          name,
+          event,
+          apiPath,
+          method,
+          writeDir: writeDir,
+        );
         break;
       case 'pr':
       case 'project:root':
