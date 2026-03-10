@@ -11,36 +11,6 @@ import '../visitors/MethodVisitors.dart';
 import 'data/ManagersResultData.dart';
 import 'interfaces/IMethodManager.dart';
 
-Future<void> main() async {
-  final manager = MethodManager(
-    filePath:
-    "/Users/lethanh/StudioProjects/ddd/packages/openapi/lib/api/orders_api.dart",
-    // "/Users/lethanh/StudioProjects/ddd/lib/features/order/presentation/bloc/order_bloc.dart",
-    // identifier: ".v1OrdersByCouponCodeGetWithHttpInfo",
-    identifier: ".v1OrdersIdGet",
-  );
-  manager
-  //   // ..ON_invocationLastLineNumber()
-  //   // ..info()
-  //   // ..ON_invocationListAllMethods()
-  //   // ..ON_invocationFindByMethodName(
-  //     // replacementHandlerBody: "THIS_IS_TEST_BODY"
-  //   // )
-  //   // ..listAllMethods()
-  //   ..returnType()
-  //   ..returnInnerType()
-    ..returnInnerPropType('data,meta,body,requiredKeys,success, hashCode,,')
-          ..paramsList()
-    //       // ..getMethodReturnInnerPropType('meta')
-        .expose();
-
-  // final result1 = await manager.returnInnerTypeOfHttpResponse(
-  //   propName: "bodyBytes",
-  // );
-  //
-  // print(result1);
-}
-
 class MethodManager with ParseStringResultMixin implements IMethodManager {
   @override
   final String filePath;

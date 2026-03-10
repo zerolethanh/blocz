@@ -44,22 +44,6 @@ List<AnalysisContext>? getProjectContextList(String codePath) {
   return collection?.contexts;
 }
 
-void main() {
-  findClassElementWithLibraryUriAndClassName(
-    codePath:
-        '/Users/lethanh/StudioProjects/ddd/packages/openapi/lib/api/orders_api.dart',
-    targetLibraryUri: 'package:http/http.dart',
-    targetClassName: "Response",
-  ).then((cls) {
-    if (cls == null) {
-      return;
-    }
-    print(cls.getField("body").toString());
-    // print(val.fields.toString());
-    // print(val.toString());
-  });
-}
-
 Future<ClassElement?> findClassElementWithLibraryUriAndClassName({
   required String codePath,
   required String targetLibraryUri,
@@ -100,8 +84,9 @@ Future<ClassDeclaration?> findClassDeclarationWithHttpResponse({
   targetLibraryUri ??= 'package:http/src/response.dart';
   targetClassName ??= 'Response';
 
-  final uriResult =
-  context.currentSession.uriConverter.uriToPath(Uri.parse(targetLibraryUri));
+  final uriResult = context.currentSession.uriConverter.uriToPath(
+    Uri.parse(targetLibraryUri),
+  );
   if (uriResult == null) {
     printError('Could not find path for library "$targetLibraryUri"');
     return null;

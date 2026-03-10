@@ -6,22 +6,6 @@ import '../visitors/ClassVisitors.dart';
 import 'data/ManagersResultData.dart';
 import 'interfaces/IConstructorManager.dart';
 
-void main() {
-  ConstructorManager(
-      filePath:
-          "/Users/lethanh/StudioProjects/ddd/lib/features/order/presentation/bloc/order_event.dart",
-      identifier: ".test",
-    )
-    ..listAllConstructors()
-        // ..listAllConstructorsIgnoreIdentifier()
-        // ..findOrReplace(
-        // //   replacementText: '''
-        // //     ___THIS ___ THIS ___TEST
-        // //     ''',
-        // )
-        .expose();
-}
-
 class ConstructorManager
     with ParseStringResultMixin
     implements IConstructorManager {
