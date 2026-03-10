@@ -1,3 +1,9 @@
+## 1.3.0
+
+- Added documentation for "Import from API" feature in READMEs.
+- Improved CLI help messages and command descriptions.
+- Minor bug fixes and technical descriptions enhancements.
+
 ## 1.2.1
 
 - auto run `dart format` and `dart run build_runner build --delete-conflicting-outputs` after generation
