@@ -1,5 +1,3 @@
-import 'package:injectable/injectable.dart';
-
 class User {
   final int id;
   final String name;
@@ -8,7 +6,6 @@ class User {
   User({required this.id, required this.name, required this.email});
 }
 
-@lazySingleton
 class ExampleApi {
   Future<User> getUserById(int id) async {
     // Simulated API call

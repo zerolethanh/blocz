@@ -28,6 +28,8 @@ With events and handlers automatically generated for `getUserById`, `getUsers`, 
 
 ## Testing
 
+Run `dart run build_runner build --delete-conflicting-outputs` if needed.
+
 ```bash
 dart run lib/main.dart
 ```
