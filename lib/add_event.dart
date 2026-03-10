@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:blocz/_internal/colors.dart';
+import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/extractMethodListFromClass.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
@@ -136,13 +137,21 @@ Future<(String, String, String, String)> _addSingleEvent(
           jsonDecode(extractMethodParams(apiPath, method) ?? "{}")?["data"] ??
           "(dynamic params)";
     }
-    final newEvent =
-        '  const factory $eventClassName.${eventName}$params = _${EventName}Requested;';
-    if (!eventContent.contains(newEvent)) {
-      final eventLines = eventContent.split('\n');
-      eventLines.insert(eventInsertionPoint, newEvent);
-      File(eventPath).writeAsStringSync(eventLines.join('\n'));
-      print('Updated: $eventPath');
+    String constructorName = '$eventClassName.$eventName';
+    var hasFactoryConstructor = ConstructorManager(
+      filePath: eventPath,
+      identifier: constructorName,
+    ).hasFactoryConstructor();
+
+    if (!hasFactoryConstructor) {
+      final newEvent =
+          '  const factory $constructorName$params = _${EventName}Requested;';
+      if (!eventContent.contains(newEvent)) {
+        final eventLines = eventContent.split('\n');
+        eventLines.insert(eventInsertionPoint, newEvent);
+        File(eventPath).writeAsStringSync(eventLines.join('\n'));
+        print('Updated: $eventPath');
+      }
     }
   }
 
@@ -167,13 +176,20 @@ Future<(String, String, String, String)> _addSingleEvent(
       }
     }
 
-    final newState =
-        '  const factory $stateClassName.${eventName}Result$stateParams = _${EventName}Result;';
-    if (!stateContent.contains(newState)) {
-      final stateLines = stateContent.split('\n');
-      stateLines.insert(stateInsertionPoint, newState);
-      File(statePath).writeAsStringSync(stateLines.join('\n'));
-      print('Updated: $statePath');
+    String constructorName = '$stateClassName.${eventName}Result';
+    var hasFactoryConstructor = ConstructorManager(
+      filePath: statePath,
+      identifier: constructorName,
+    ).hasFactoryConstructor();
+    if (!hasFactoryConstructor) {
+      final newState =
+          '  const factory $constructorName$stateParams = _${EventName}Result;';
+      if (!stateContent.contains(newState)) {
+        final stateLines = stateContent.split('\n');
+        stateLines.insert(stateInsertionPoint, newState);
+        File(statePath).writeAsStringSync(stateLines.join('\n'));
+        print('Updated: $statePath');
+      }
     }
   }
 
@@ -212,12 +228,13 @@ Future<(String, String, String, String)> _addSingleEvent(
           ? getFirstClassNameInFile(apiPath)
           : null;
 
+      final apiClassNameCamelCase = apiClassName?.camelCase;
       final apiCodeBlock =
           apiPath != null && method != null && apiClassName != null
           ? '''
         try {
-          final injectedApi = GetIt.instance<$apiClassName>();
-          final response = await injectedApi.$method(${_getEventCallParams(apiPath, method)});
+          final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
+          final response = await $apiClassNameCamelCase.$method(${_getEventCallParams(apiPath, method)});
           ${resHitField != '' ? '''
           if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/add_event.dart';
 import 'package:blocz/onDoneUtils.dart';
 import 'package:mustache_template/mustache.dart';
@@ -14,7 +15,7 @@ Future<void> makeBloc(String domain, String? name, String? apiPath) async {
   final String domainSnake = domain.snakeCase;
   final String commonFileName = isEmptyName
       ? domainSnake
-      : '${domainSnake}_${nameSnake}';
+      : '${domainSnake}_$nameSnake';
   final String commonClassName = commonFileName.pascalCase;
 
   final Map<String, String> data = {
@@ -38,23 +39,29 @@ Future<void> makeBloc(String domain, String? name, String? apiPath) async {
   final blocPath = p.join(writeDir, '${commonFileName}_bloc.dart');
   final eventPath = p.join(writeDir, '${commonFileName}_event.dart');
   final statePath = p.join(writeDir, '${commonFileName}_state.dart');
-
-  File(blocPath).writeAsStringSync(bloc);
-  File(eventPath).writeAsStringSync(event);
-  File(statePath).writeAsStringSync(state);
-
-  print('Generated: $blocPath');
-  print('Generated: $eventPath');
-  print('Generated: $statePath');
-
-  if (apiPath != null && apiPath.trim().isNotEmpty) {
-    print('\napiPath provided. Adding events from $apiPath...');
-    await addEvent(domain, isEmptyName ? null : name, null, apiPath, null);
-    print('Finished adding events from apiPath.');
+  // check exists
+  if (!File(blocPath).existsSync()) {
+    File(blocPath).writeAsStringSync(bloc);
+    printSuccess('Generated: $blocPath');
+  }
+  if (!File(eventPath).existsSync()) {
+    File(eventPath).writeAsStringSync(event);
+    printSuccess('Generated: $eventPath');
+  }
+  if (!File(statePath).existsSync()) {
+    File(statePath).writeAsStringSync(state);
+    printSuccess('Generated: $statePath');
   }
 
-  runBuildRunner(writeDir);
-  runDartFormat(writeDir);
+  if (apiPath != null && apiPath.trim().isNotEmpty) {
+    printInfo('\napiPath provided. Adding events from $apiPath...');
+    await addEvent(domain, isEmptyName ? null : name, null, apiPath, null);
+
+    printSuccess('Finished adding events from apiPath.');
+  }
+
+  // runBuildRunner(writeDir);
+  // runDartFormat(writeDir);
 }
 
 String _renderTemplate(String templateContent, Map<String, String> data) {

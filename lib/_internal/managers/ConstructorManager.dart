@@ -132,6 +132,24 @@ class ConstructorManager
     dataSingleton.addTaskResultValue(finder.constructorList.toList());
     return dataSingleton;
   }
+
+  @override
+  bool hasFactoryConstructor() {
+    // Use the visitor to crawl the file
+    final finder = ConstructorVisitor(className);
+    parsedFileUnit.visitChildren(finder);
+
+    var constList = finder.constructorList;
+
+    // Ensure the target we are looking for is formatted exactly like the list items
+    String target;
+    if (constructorName == null || constructorName!.isEmpty) {
+      target = className!;
+    } else {
+      target = "$className.$constructorName";
+    }
+    return constList.contains(target);
+  }
 }
 
 // Class Visitor giúp đi qua từng node trong cây AST

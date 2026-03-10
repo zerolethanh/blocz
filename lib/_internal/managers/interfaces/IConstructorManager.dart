@@ -12,4 +12,6 @@ abstract class IConstructorManager {
   ConstructorManagerResultData listAllConstructors();
 
   ConstructorManagerResultData listAllConstructorsIgnoreIdentifier();
+
+  bool hasFactoryConstructor();
 }
