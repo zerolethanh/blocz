@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:blocz/_internal/colors.dart';
-import 'package:blocz/_internal/managers/ClassManager.dart';
 import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/_internal/managers/MethodManager.dart';
 import 'package:blocz/extractConstructorParams.dart';
@@ -96,7 +94,7 @@ Future<void> addEvent(
     return;
   }
 
-  // signle event generate
+  // single event generate
   final result = await _addSingleEvent(
     domain,
     name,
@@ -160,6 +158,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   for (var f in [eventPath, statePath, blocPath]) {
     if (!File(f).existsSync()) {
       shouldMakeFirst = true;
+      break;
     }
   }
   if (shouldMakeFirst) {
@@ -174,6 +173,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   }
 
   final eventName = event.camelCase;
+  // ignore: non_constant_identifier_names
   final EventName = eventName.pascalCase;
 
   // Event
@@ -191,8 +191,8 @@ Future<(String, String, String, String)> _addSingleEvent(
     String currentEventParam = "()";
     if (apiPath != null && method != null) {
       newEventParam = _eventParam(apiPath, method, true);
-      currentEventParam = _eventParam(eventPath, constructorName, false);
     }
+    currentEventParam = _eventParam(eventPath, constructorName, false);
 
     final newEvent =
         '  const factory $constructorName$newEventParam = _${EventName}Requested;';
@@ -202,12 +202,12 @@ Future<(String, String, String, String)> _addSingleEvent(
       final eventLines = eventContent.split('\n');
       eventLines.insert(eventInsertionPoint, newEvent);
       File(eventPath).writeAsStringSync(eventLines.join('\n'));
-      printSuccess('Updated: $eventPath');
+      printSuccess('Created: $constructorName');
     }
-    // printInfo("constructorName: $constructorName");
-    // printInfo("newEventParam: $newEventParam");
-    // printInfo("currentEventParam: $currentEventParam");
     if (update && (newEventParam != currentEventParam)) {
+      // printInfo("constructorName: $constructorName");
+      // printInfo("newEventParam: $newEventParam");
+      // printInfo("currentEventParam: $currentEventParam");
       // update if changed
       final result = eventManager.findOrReplace(replacementText: newEvent);
       final taskResult =
@@ -215,7 +215,9 @@ Future<(String, String, String, String)> _addSingleEvent(
       final newSource = taskResult?["newSourceCode"] as String?;
       if (newSource != null) {
         File(eventPath).writeAsStringSync(newSource);
-        printWarning('Updated (refresh): $eventPath');
+        printWarning(
+          'Updated (refresh): $constructorName $currentEventParam -> $newEventParam',
+        );
         eventContent = newSource; // update local content for subsequent checks
       }
     }
@@ -250,7 +252,7 @@ Future<(String, String, String, String)> _addSingleEvent(
       final stateLines = stateContent.split('\n');
       stateLines.insert(stateInsertionPoint, newFactory);
       File(statePath).writeAsStringSync(stateLines.join('\n'));
-      print('Updated: $statePath');
+      printSuccess('Created: $constructorName');
     }
     if (update && (newStateParams != currentStateParams)) {
       final result = stateManager.findOrReplace(replacementText: newFactory);
@@ -259,7 +261,9 @@ Future<(String, String, String, String)> _addSingleEvent(
       final newSource = taskResult?["newSourceCode"] as String?;
       if (newSource != null) {
         File(statePath).writeAsStringSync(newSource);
-        printWarning('Updated (refresh): $statePath');
+        printWarning(
+          'Updated: $constructorName $currentStateParams -> $newStateParams',
+        );
         stateContent = newSource; // update local content for subsequent checks
       }
     }
@@ -506,12 +510,10 @@ Future<String> _stateParam(String? fp, String? method, bool? isApiPath) async {
       );
       String responseDataType = "dynamic";
       String result = "()";
-      if (responseType != null) {
-        responseDataType = responseType['responseDataType'];
-        result = "($responseDataType data)";
-        if (result == "(void data)") {
-          result = "()";
-        }
+      responseDataType = responseType['responseDataType'];
+      result = "($responseDataType data)";
+      if (result == "(void data)") {
+        result = "()";
       }
       return result;
     } catch (e) {

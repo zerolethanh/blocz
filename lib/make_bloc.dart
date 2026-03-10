@@ -77,6 +77,9 @@ Future<void> makeBloc(
     );
 
     printSuccess('Finished adding events from apiPath: $apiPath .');
+  } else {
+    runBuildRunner(effectiveWriteDir);
+    runDartFormat(effectiveWriteDir);
   }
 }
 
