@@ -37,30 +37,59 @@ Future<void> main(List<String> arguments) async {
   parser.addFlag('force', abbr: 'f', help: 'force write', defaultsTo: false);
 
   parser.addCommand('make', parser.addCommand('make:bloc'))
-    ..addSeparator("Make bloc,state,event")
-    ..addOption('domain', abbr: 'd', help: 'domain based name')
-    ..addOption('name', abbr: 'n', help: 'name of bloc,state,event')
+    ..addSeparator("Generate BLoC, State, and Event files")
+    ..addOption(
+      'domain',
+      abbr: 'd',
+      help: 'Domain name (required)',
+      mandatory: true,
+    )
+    ..addOption(
+      'name',
+      abbr: 'n',
+      help:
+          'The name of the BLoC, or a sub-domain/sub-feature name (optional) (e.g., authentication)',
+    )
     ..addOption(
       'apiPath',
       abbr: 'a',
-      help: 'to be implemented api .dart fullpath',
+      help: 'Path to the API service file (optional)',
+    )
+    ..addOption(
+      'writeDir',
+      abbr: 'w',
+      help: 'Custom directory to generate BLoC files (optional)',
     );
 
   parser.addCommand('add:event')
-    ..addSeparator("Add event to bloc")
-    ..addOption('domain', abbr: 'd', help: 'domain name')
-    ..addOption('name', abbr: 'n', help: 'name of bloc,state,event')
-    ..addOption('event', abbr: 'e', help: 'event name')
+    ..addSeparator("Add an event to an existing BLoC")
+    ..addOption(
+      'domain',
+      abbr: 'd',
+      help: 'Domain name (required)',
+      mandatory: true,
+    )
+    ..addOption(
+      'name',
+      abbr: 'n',
+      help:
+          'The name of the BLoC, or a sub-domain/sub-feature name (optional) (e.g., authentication)',
+    )
+    ..addOption('event', abbr: 'e', help: 'Event name (optional)')
     ..addOption(
       'apiPath',
       abbr: 'a',
-      help: 'to be implemented api .dart fullpath',
+      help: 'Path to the API service file (optional)',
     )
-    ..addOption('method', abbr: 'm', help: 'to be implemented api\'s method')
     ..addOption(
-      'implementAllApiMethods',
-      abbr: 'A',
-      help: 'implement all methods from apiPath',
+      'method',
+      abbr: 'm',
+      help: 'Target method name in the API file (optional)',
+    )
+    ..addOption(
+      'writeDir',
+      abbr: 'w',
+      help: 'Custom directory to find BLoC files (optional)',
     );
 
   parser.addCommand('pr', parser.addCommand("project:root"))
@@ -68,7 +97,7 @@ Future<void> main(List<String> arguments) async {
     ..addOption(
       'path',
       abbr: 'p',
-      help: 'Source file full path; defaults to current directory',
+      help: 'Source file full path (optional); defaults to current directory',
     );
 
   parser.addCommand('sdk:path').addSeparator("Get dart sdk path");
@@ -79,103 +108,208 @@ Future<void> main(List<String> arguments) async {
 
   parser.addCommand('constructor:params')
     ..addSeparator("Extract constructor parameters")
-    ..addOption('path', abbr: 'p', help: 'Source file full path')
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
     ..addOption('name', abbr: 'n', help: 'Constructor name (optional)');
 
   parser.addCommand('constructor:params:and:fields')
     ..addSeparator("Extract constructor params and their corresponding fields")
-    ..addOption('path', abbr: 'p', help: 'Source file full path')
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
     ..addOption('name', abbr: 'n', help: 'Constructor name (optional)');
 
   // ... other commands
   parser.addCommand('clause:import')
     ..addSeparator(
-      "get import clause from filepath; eg: import 'package:abc/abc.dart'",
+      "Get the import clause for a file (e.g., import 'package:abc/abc.dart')",
     )
-    ..addOption('path', abbr: 'p', help: 'source file full path');
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    );
 
   parser.addCommand('find:last:on:line:number')
-    ..addSeparator("find:last:on:line:number")
-    ..addOption('path', abbr: 'p', help: 'source file full path');
+    ..addSeparator("Find the last line number for a specific pattern")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    );
 
   parser.addCommand('find:last:const:factory')
-    ..addSeparator("find:last:const:factory")
-    ..addOption('path', abbr: 'p', help: 'source file full path');
+    ..addSeparator("Find the last 'const factory' in a file")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    );
 
   parser.addCommand('find:last:class:body:line:number')
-    ..addSeparator("find:last:class:body:line:number")
-    ..addOption('path', abbr: 'p', help: 'source file full path');
+    ..addSeparator("Find the last line number of a class body")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    );
 
   parser.addCommand("class:name:get")
-    ..addSeparator("getClassName")
-    ..addOption('path', abbr: 'p', help: 'source file full path');
+    ..addSeparator("Get the primary class name from a file")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    );
 
   parser.addCommand("class:name:list")
-    ..addSeparator("get class list from path")
-    ..addOption('path', abbr: 'p', help: 'source file full path');
+    ..addSeparator("List all class names in a file")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    );
 
   parser.addCommand("method:params", parser.addCommand("method:params2"))
-    ..addSeparator("extract params from method")
-    ..addOption('path', abbr: 'p', help: 'source file full path')
-    ..addOption('method', abbr: 'm', help: 'method name (optional)');
+    ..addSeparator("Extract parameters from a method")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
+    ..addOption('method', abbr: 'm', help: 'Method name (optional)');
 
   parser.addCommand("method:response:type")
-    ..addSeparator("extract response type from method")
-    ..addOption('path', abbr: 'p', help: 'source file full path')
-    ..addOption('method', abbr: 'm', help: 'method name');
+    ..addSeparator("Extract the response type from a method")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
+    ..addOption(
+      'method',
+      abbr: 'm',
+      help: 'Method name (required)',
+      mandatory: true,
+    );
 
   parser.addCommand("method:response:inner:data:type")
     ..addSeparator(
-      "extract response type `data` or `body` field type from method",
+      "Extract inner 'data' or 'body' field type from a method's response",
     )
-    ..addOption('path', abbr: 'p', help: 'source file full path')
-    ..addOption('method', abbr: 'm', help: 'method name');
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
+    ..addOption(
+      'method',
+      abbr: 'm',
+      help: 'Method name (required)',
+      mandatory: true,
+    );
 
   parser.addCommand("method:response:inner:field:type")
-    ..addSeparator("extract response type with custom field type from method")
-    ..addOption('path', abbr: 'p', help: 'source file full path')
-    ..addOption('method', abbr: 'm', help: 'method name')
+    ..addSeparator("Extract a specific field type from a method's response")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
+    ..addOption(
+      'method',
+      abbr: 'm',
+      help: 'Method name (required)',
+      mandatory: true,
+    )
     ..addOption(
       'fieldName',
       abbr: 'f',
-      help: 'field name, canbe a string seperated by comma(,)',
+      help: 'Field names (can be comma-separated) (optional)',
     );
 
   parser.addCommand("method:list")
-    ..addSeparator("extract method list from class")
-    ..addOption('path', abbr: 'p', help: 'source file full path')
-    ..addOption('class', abbr: 'c', help: 'class name (optional)');
+    ..addSeparator("List all methods in a class")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
+    ..addOption('class', abbr: 'c', help: 'Class name (optional)');
 
   parser.addCommand("method:list2")
-    ..addSeparator("extract method list from class")
-    ..addOption('path', abbr: 'p', help: 'source file full path')
+    ..addSeparator("List all methods in a class or file")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
     ..addOption(
       'identifier',
       abbr: 'i',
-      help: 'identifier to find, eg: `OrderBloc`',
+      help: 'Identifier to find (e.g., PetBloc) (optional)',
     );
 
   parser.addCommand('constructor:list')
-    ..addSeparator("extract contructor list from class")
-    ..addOption('path', abbr: 'p', help: 'source file full path')
-    ..addOption('class', abbr: 'c', help: 'class name (optional)');
+    ..addSeparator("List all constructors in a class")
+    ..addOption(
+      'path',
+      abbr: 'p',
+      help: 'Source file full path (required)',
+      mandatory: true,
+    )
+    ..addOption('class', abbr: 'c', help: 'Class name (optional)');
 
   final commandList = parser.commands;
   // printInfo(commandList);
-  if (arguments.isNotEmpty) {
-    if (commandList[arguments[0]] == null) {
-      printError("Command '${arguments[0]}' not found.");
-      return;
-    }
+  if (arguments.isNotEmpty &&
+      !arguments[0].startsWith('-') &&
+      commandList[arguments[0]] == null) {
+    printError("Command '${arguments[0]}' not found.");
+    return;
   }
   try {
     final parserResult = parser.parse(arguments);
 
     if (parserResult['help'] as bool || parserResult.command == null) {
       print('Available commands:');
+
+      final commandGroups = <ArgParser, List<String>>{};
+      final groupOrder = <ArgParser>[];
+
       parser.commands.forEach((name, command) {
-        print("$green$name$reset: ${command.usage}\n");
+        if (!commandGroups.containsKey(command)) {
+          groupOrder.add(command);
+          commandGroups[command] = [];
+        }
+        commandGroups[command]!.add(name);
       });
+
+      for (final command in groupOrder) {
+        final names = commandGroups[command]!;
+        final displayNames = names.join(' | ');
+        print("$green$displayNames$reset: ${command.usage}\n");
+      }
+
       print('\n${parser.usage}');
       exit(0);
     }
@@ -204,7 +338,8 @@ Future<void> main(List<String> arguments) async {
         if (apiPath != null && apiPath.isNotEmpty) {
           apiPath = toAbsPath(apiPath);
         }
-        await makeBloc(domain, name, apiPath);
+        final writeDir = command['writeDir'] as String?;
+        await makeBloc(domain, name, apiPath, writeDir: writeDir);
         break;
       case 'add:event':
       case 'add':
@@ -216,7 +351,15 @@ Future<void> main(List<String> arguments) async {
           apiPath = toAbsPath(apiPath);
         }
         final method = command['method'] as String?;
-        await addEvent(domain, name, event, apiPath, method);
+        final writeDir = command['writeDir'] as String?;
+        await addEvent(
+          domain,
+          name,
+          event,
+          apiPath,
+          method,
+          writeDir: writeDir,
+        );
         break;
       case 'pr':
       case 'project:root':
@@ -350,8 +493,9 @@ Future<void> main(List<String> arguments) async {
   } on FormatException catch (e) {
     printError('ArgParser FormatException: ${e.message}');
     exit(1);
-  } catch (e) {
+  } catch (e, stackTrace) {
     printError("General error: ${e.toString()}");
+    print(stackTrace);
     exit(2);
   }
 }

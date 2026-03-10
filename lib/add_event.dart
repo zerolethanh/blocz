@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:blocz/_internal/colors.dart';
+import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/extractMethodListFromClass.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
@@ -10,7 +11,7 @@ import 'package:blocz/findLastClassbodyLineNumber.dart';
 import 'package:blocz/findLastConstFactory.dart';
 import 'package:blocz/findLast_On_LineNumber.dart';
 import 'package:blocz/getClassName.dart';
-import 'package:blocz/onDoneUtils.dart';
+import 'package:blocz/makeUtils.dart';
 import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
 
@@ -19,8 +20,9 @@ Future<void> addEvent(
   String? name,
   String? event,
   String? apiPath,
-  String? method,
-) async {
+  String? method, {
+  String? writeDir,
+}) async {
   // multiple event generate
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
     final methods = extractMethodListFromClass(apiPath);
@@ -41,7 +43,14 @@ Future<void> addEvent(
           continue;
         }
         results.add(
-          await _addSingleEvent(domain, name, methodName, apiPath, methodName),
+          await _addSingleEvent(
+            domain,
+            name,
+            methodName,
+            apiPath,
+            methodName,
+            writeDir: writeDir,
+          ),
         );
       }
 
@@ -58,8 +67,8 @@ Future<void> addEvent(
           printWarning("No events generated.");
           return;
         }
-        runDartFormat(dir);
         runBuildRunner(dir);
+        runDartFormat(dir);
       }
       printSuccess(' ✅ Finished generating events from $apiPath.');
     } else {
@@ -82,14 +91,19 @@ Future<void> addEvent(
     event,
     apiPath,
     method ?? event,
+    writeDir: writeDir,
   );
   if (result.$1.isEmpty) {
     printWarning("No events generated.");
     return;
   }
-  runDartFormat(result.$1);
   runBuildRunner(result.$1);
-  printSuccess(' ✅ Finished generating events from $apiPath.');
+  runDartFormat(result.$1);
+  if (apiPath != null && apiPath.trim().isNotEmpty) {
+    printSuccess(' ✅ Finished generating events from $apiPath.');
+  } else {
+    printSuccess(' ✅ Finished generating events.');
+  }
 }
 
 Future<(String, String, String, String)> _addSingleEvent(
@@ -97,8 +111,9 @@ Future<(String, String, String, String)> _addSingleEvent(
   String? name,
   String event,
   String? apiPath,
-  String? method,
-) async {
+  String? method, {
+  String? writeDir,
+}) async {
   final bool isEmptyName = name == null || name.trim().isEmpty;
   name = isEmptyName ? domain : name;
 
@@ -110,16 +125,37 @@ Future<(String, String, String, String)> _addSingleEvent(
   final String commonClassName =
       '${domain.pascalCase}${isEmptyName ? '' : name.pascalCase}';
 
-  final writeDir = p.join('lib', 'features', domain, 'presentation', 'bloc');
-  final blocPath = p.join(writeDir, '${commonFileName}_bloc.dart');
-  final eventPath = p.join(writeDir, '${commonFileName}_event.dart');
-  final statePath = p.join(writeDir, '${commonFileName}_state.dart');
+  String effectiveWriteDir =
+      writeDir ?? p.join('lib', 'features', domain, 'presentation', 'bloc');
+  // Support template variables in custom writeDir
+  if (writeDir != null) {
+    effectiveWriteDir = replaceDomainKey(writeDir, domain);
+  }
+  Directory(effectiveWriteDir).createSync(recursive: true);
 
+  final blocPath = p.join(effectiveWriteDir, '${commonFileName}_bloc.dart');
+  final eventPath = p.join(effectiveWriteDir, '${commonFileName}_event.dart');
+  final statePath = p.join(effectiveWriteDir, '${commonFileName}_state.dart');
+
+  bool shouldMakeFirst = false;
   for (var f in [eventPath, statePath, blocPath]) {
     if (!File(f).existsSync()) {
-      print('File not found: $f');
-      return ("", "", "", "");
+      // print('File not found: $f');
+      // create file
+      // File(f).createSync(recursive: true);
+      // return ("", "", "", "");
+      shouldMakeFirst = true;
     }
+  }
+  if (shouldMakeFirst) {
+    await Process.run("blocz", [
+      "make",
+      "--domain",
+      domain,
+      if (!isEmptyName) ...["--name", name],
+      "--writeDir",
+      effectiveWriteDir,
+    ]);
   }
 
   final eventName = event.camelCase;
@@ -136,13 +172,21 @@ Future<(String, String, String, String)> _addSingleEvent(
           jsonDecode(extractMethodParams(apiPath, method) ?? "{}")?["data"] ??
           "(dynamic params)";
     }
-    final newEvent =
-        '  const factory $eventClassName.${eventName}$params = _${EventName}Requested;';
-    if (!eventContent.contains(newEvent)) {
-      final eventLines = eventContent.split('\n');
-      eventLines.insert(eventInsertionPoint, newEvent);
-      File(eventPath).writeAsStringSync(eventLines.join('\n'));
-      print('Updated: $eventPath');
+    String constructorName = '$eventClassName.$eventName';
+    var hasFactoryConstructor = ConstructorManager(
+      filePath: eventPath,
+      identifier: constructorName,
+    ).hasFactoryConstructor();
+
+    if (!hasFactoryConstructor) {
+      final newEvent =
+          '  const factory $constructorName$params = _${EventName}Requested;';
+      if (!eventContent.contains(newEvent)) {
+        final eventLines = eventContent.split('\n');
+        eventLines.insert(eventInsertionPoint, newEvent);
+        File(eventPath).writeAsStringSync(eventLines.join('\n'));
+        print('Updated: $eventPath');
+      }
     }
   }
 
@@ -167,13 +211,20 @@ Future<(String, String, String, String)> _addSingleEvent(
       }
     }
 
-    final newState =
-        '  const factory $stateClassName.${eventName}Result$stateParams = _${EventName}Result;';
-    if (!stateContent.contains(newState)) {
-      final stateLines = stateContent.split('\n');
-      stateLines.insert(stateInsertionPoint, newState);
-      File(statePath).writeAsStringSync(stateLines.join('\n'));
-      print('Updated: $statePath');
+    String constructorName = '$stateClassName.${eventName}Result';
+    var hasFactoryConstructor = ConstructorManager(
+      filePath: statePath,
+      identifier: constructorName,
+    ).hasFactoryConstructor();
+    if (!hasFactoryConstructor) {
+      final newState =
+          '  const factory $constructorName$stateParams = _${EventName}Result;';
+      if (!stateContent.contains(newState)) {
+        final stateLines = stateContent.split('\n');
+        stateLines.insert(stateInsertionPoint, newState);
+        File(statePath).writeAsStringSync(stateLines.join('\n'));
+        print('Updated: $statePath');
+      }
     }
   }
 
@@ -212,12 +263,13 @@ Future<(String, String, String, String)> _addSingleEvent(
           ? getFirstClassNameInFile(apiPath)
           : null;
 
+      final apiClassNameCamelCase = apiClassName?.camelCase;
       final apiCodeBlock =
           apiPath != null && method != null && apiClassName != null
           ? '''
         try {
-          final injectedApi = GetIt.instance<$apiClassName>();
-          final response = await injectedApi.$method(${_getEventCallParams(apiPath, method)});
+          final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
+          final response = await $apiClassNameCamelCase.$method(${_getEventCallParams(apiPath, method)});
           ${resHitField != '' ? '''
           if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));
@@ -266,7 +318,7 @@ Future<(String, String, String, String)> _addSingleEvent(
     File(blocPath).writeAsStringSync(blocLines.join('\n'));
     print('Updated: $blocPath');
   }
-  return (writeDir, blocPath, eventPath, statePath);
+  return (effectiveWriteDir, blocPath, eventPath, statePath);
 }
 
 String _getEventCallParams(String? fpath, String? method) {

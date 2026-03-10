@@ -5,8 +5,10 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
-List<String> extractConstructorListFromClass(String filePath,
-    [String? className]) {
+List<String> extractConstructorListFromClass(
+  String filePath, [
+  String? className,
+]) {
   final file = File(filePath);
   if (!file.existsSync()) {
     throw Exception('File not found: $filePath');

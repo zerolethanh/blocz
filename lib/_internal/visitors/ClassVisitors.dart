@@ -120,8 +120,7 @@ class LastConstFactoryVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitConstructorDeclaration(ConstructorDeclaration node) {
-    if (node.constKeyword != null &&
-        node.factoryKeyword != null) {
+    if (node.constKeyword != null && node.factoryKeyword != null) {
       if (result == null || node.offset > result!.offset) {
         result = node;
       }

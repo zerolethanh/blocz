@@ -14,7 +14,6 @@ class MethodsListVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
-    // TODO: implement visitClassDeclaration
     if (className != null) {
       if (node.namePart.typeName.toString() == className) {
         _currentClassName = className;
