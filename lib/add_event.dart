@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/_internal/managers/ConstructorManager.dart';
-import 'package:blocz/_internal/managers/MethodManager.dart';
 import 'package:blocz/extractMethodInvocationArgs.dart';
 import 'package:blocz/extractMethodListFromClass.dart';
+import 'package:blocz/replaceMethodInvocationArgs.dart';
 import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
 import 'package:blocz/findClassNameByMethodName.dart';
 import 'package:blocz/findLastClassbodyLineNumber.dart';
@@ -89,7 +89,9 @@ Future<void> addEvent(
   }
 
   if (event == null || event.trim().isEmpty) {
-    printError(' ❗️ Event name is required (or apiPath must be provided).');
+    printError(
+      ' ❗️ Domain (or event) name is required (or apiPath must be provided).',
+    );
     return;
   }
 
@@ -271,12 +273,13 @@ Future<(String, String, String, String)> _addSingleEvent(
       printWarning(
         "event handler registration `$onRegistration` already exists. skip...",
       );
-      printWarning("use `--update` to force update");
+
+      // printWarning("use `--update` to force update");
       return ("", "", "", ""); // Already up-to-date for this event, do nothing.
     }
     if (_hasOnMethod) {
       printWarning("method `$onMethodName` already exists. skip...");
-      printWarning("use `--update` to force update");
+      // printWarning("use `--update` to force update");
       return ("", "", "", "");
     }
   }
@@ -354,16 +357,6 @@ Future<(String, String, String, String)> _addSingleEvent(
     print('Updated: $blocPath');
   } else if (update && _hasOnMethod) {
     // try update method body
-    final responseType = (apiPath != null && method != null)
-        ? await extractMethodResponseInnerDataType(apiPath, method)
-        : null;
-
-    final resHitField = responseType?['hitField'] ?? '';
-    final apiClassName = (apiPath != null && method != null)
-        ? findClassNameByMethodName(apiPath, method)
-        : null;
-    final apiClassNameCamelCase = apiClassName?.camelCase;
-
     final newCallArgs = getEventCallArgs(apiPath, method);
     final newCallArgsWithParentheses = "($newCallArgs)";
     final currentCallArgsWithParentheses =
@@ -377,58 +370,21 @@ Future<(String, String, String, String)> _addSingleEvent(
     //   isSame: ${newCallArgsWithParentheses == currentCallArgsWithParentheses}
     // ''');
 
-    final apiCodeBlock =
-        (apiPath != null && method != null && apiClassName != null)
-        ? '''
-        try {
-          final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
-          final response = await $apiClassNameCamelCase.$method$newCallArgsWithParentheses;
-          ${resHitField != '' ? '''
-          if (response == null) {
-            emit(const ${commonClassName}State.failure('No data'));
-            return;
-          }
-          emit(${commonClassName}State.${eventName}Result(response.$resHitField));
-''' : '''
-          ${newStateParams == "()" ? '''
-          emit(${commonClassName}State.${eventName}Result());
-          ''' : '''
-          emit(${commonClassName}State.${eventName}Result(response));
-          '''}
-'''}
-        } catch (e) {
-          emit(${commonClassName}State.failure(e.toString()));
-        }
-'''
-        : '';
-
-    final newMethodBody =
-        '''async {
-    $apiCodeBlock
-  }''';
-
-    final onMethodManager = MethodManager(
-      filePath: blocPath,
-      identifier: ".$onMethodName",
-    );
-    final result = onMethodManager.ON_invocationFindByMethodName(
-      replacementHandlerBody: newMethodBody,
-    );
-    final taskResult =
-        result.otherProps["ON_invocationFindByMethodName_result"]
-            as Map<String, dynamic>?;
-    final onMethodChangedFullSource =
-        taskResult?["fullNewSourceCode"] as String?;
-    if (onMethodChangedFullSource != null) {
-      // print('''
-      //   "onchanges :"
-      //   ${onMethodChangedFullSource.contains("$apiClassNameCamelCase.$method")}
-      //   ''');
-      File(blocPath).writeAsStringSync(onMethodChangedFullSource);
-      print('Updated (refresh): $blocPath');
+    if (newCallArgsWithParentheses != currentCallArgsWithParentheses) {
+      final updatedSource = replaceMethodInvocationArgs(
+        blocPath,
+        method!,
+        newCallArgsWithParentheses,
+      );
+      if (updatedSource != null) {
+        File(blocPath).writeAsStringSync(updatedSource);
+        print('Updated (refresh args): $blocPath');
+      } else {
+        printWarning(
+          "Could not find method call to `.$method` in $blocPath for surgical update.",
+        );
+      }
     }
-  } else {
-    printWarning("no bloc content to write");
   }
   return (effectiveWriteDir, blocPath, eventPath, statePath);
 }
