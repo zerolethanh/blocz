@@ -16,6 +16,36 @@ Một công cụ dòng lệnh (CLI) giúp tăng tốc độ phát triển ứng 
 - Hỗ trợ thêm nhanh các event vào BLoC.
 - Tự động nhập (import) các event và trình xử lý từ tệp tin service API.
 
+## Cách thức hoạt động
+
+Sơ đồ dưới đây minh họa luồng xử lý khi thêm một event mới (hoặc nhiều event từ một API) bằng lệnh `blocz add:event`:
+
+```mermaid
+graph TD
+    Start([Lệnh add:event]) --> Input[Nhận domain, name, event, apiPath, method]
+    Input --> Mode{Có apiPath?}
+    
+    Mode -- Có --> ExtractMethods[Trích xuất các phương thức từ file API]
+    ExtractMethods --> Loop[Với mỗi phương thức...]
+    Loop --> SingleEvent
+    
+    Mode -- Không --> SingleEvent[Xử lý từng Event đơn lẻ]
+    
+    subgraph SingleEventFlow [Luồng xử lý Event đơn lẻ]
+        CheckFiles[Đảm bảo các file BLoC tồn tại - tạo mới nếu thiếu]
+        CheckFiles --> Event[Cập nhật _event.dart: Thêm factory constructor]
+        Event --> State[Cập nhật _state.dart: Thêm factory constructor]
+        State --> Bloc[Cập nhật _bloc.dart]
+        
+        Bloc --> UpdateCheck{Có cờ update?}
+        UpdateCheck -- Không --> Registration[Chèn đăng ký 'on' và phương thức handler]
+        UpdateCheck -- Có --> Surgical[Cập nhật chính xác đối số gọi hàm bằng AST]
+    end
+    
+    SingleEvent --> Finish[Chạy build_runner & dart format]
+    Finish --> End([Hoàn tất])
+```
+
 ## Điều kiện tiên quyết
 
 Chạy các lệnh sau trong thư mục dự án Flutter của bạn để thêm các dependency cần thiết:

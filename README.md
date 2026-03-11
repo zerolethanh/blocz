@@ -16,6 +16,36 @@ A command-line interface (CLI) tool to speed up Flutter app development by scaff
 - Supports quickly adding new events to a BLoC.
 - Automatically import events and handlers from an API service file.
 
+## How it Works
+
+The following diagram illustrates the flow of adding a new event (or multiple events from an API) using `blocz add:event`:
+
+```mermaid
+graph TD
+    Start([add:event command]) --> Input[Receive domain, name, event, apiPath, method]
+    Input --> Mode{apiPath provided?}
+    
+    Mode -- Yes --> ExtractMethods[Extract methods from API file]
+    ExtractMethods --> Loop[For each method...]
+    Loop --> SingleEvent
+    
+    Mode -- No --> SingleEvent[Process Single Event]
+    
+    subgraph SingleEventFlow [Single Event Generation]
+        CheckFiles[Ensure BLoC files exist - make if missing]
+        CheckFiles --> Event[Update _event.dart: Add factory constructor]
+        Event --> State[Update _state.dart: Add factory constructor]
+        State --> Bloc[Update _bloc.dart]
+        
+        Bloc --> UpdateCheck{update flag?}
+        UpdateCheck -- No --> Registration[Insert 'on' registration and handler method]
+        UpdateCheck -- Yes --> Surgical[Surgically update method call arguments using AST]
+    end
+    
+    SingleEvent --> Finish[Run build_runner & dart format]
+    Finish --> End([Done])
+```
+
 ## Prerequisites
 
 Run these commands in your Flutter project directory to add the required dependencies:
