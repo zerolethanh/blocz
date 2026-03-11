@@ -64,6 +64,7 @@ Future<void> addEvent(
         );
       }
 
+      // run build runner and format
       sleep(const Duration(milliseconds: 100));
       if (results.isNotEmpty) {
         String dir = "";
@@ -156,7 +157,7 @@ Future<(String, String, String, String)> _addSingleEvent(
 
   bool shouldMakeFirst = false;
   for (var f in [eventPath, statePath, blocPath]) {
-    if (!File(f).existsSync()) {
+    if (File(f).existsSync() == false) {
       shouldMakeFirst = true;
       break;
     }
@@ -209,10 +210,7 @@ Future<(String, String, String, String)> _addSingleEvent(
       // printInfo("newEventParam: $newEventParam");
       // printInfo("currentEventParam: $currentEventParam");
       // update if changed
-      final result = eventManager.findOrReplace(replacementText: newEvent);
-      final taskResult =
-          result.otherProps["findOrReplace_result"] as Map<String, dynamic>?;
-      final newSource = taskResult?["newSourceCode"] as String?;
+      final newSource = newSourCode(eventManager, newEvent);
       if (newSource != null) {
         File(eventPath).writeAsStringSync(newSource);
         printWarning(
@@ -239,12 +237,6 @@ Future<(String, String, String, String)> _addSingleEvent(
     // state params
     newStateParams = await _stateParam(apiPath, method, true);
     currentStateParams = await _stateParam(statePath, constructorName, false);
-    //     printInfo("""
-
-    // newStateParams: $newStateParams,
-    // currentStateParams: $currentStateParams,
-    // """);
-
     final newFactory =
         '  const factory $constructorName$newStateParams = _${EventName}Result;';
 
@@ -255,10 +247,7 @@ Future<(String, String, String, String)> _addSingleEvent(
       printSuccess('Created: $constructorName');
     }
     if (update && (newStateParams != currentStateParams)) {
-      final result = stateManager.findOrReplace(replacementText: newFactory);
-      final taskResult =
-          result.otherProps["findOrReplace_result"] as Map<String, dynamic>?;
-      final newSource = taskResult?["newSourceCode"] as String?;
+      final newSource = newSourCode(stateManager, newFactory);
       if (newSource != null) {
         File(statePath).writeAsStringSync(newSource);
         printWarning(
@@ -555,4 +544,12 @@ String _eventParam(String? fp, String method, bool? isApiPath) {
     // printInfo("fp: $fp, method:$method ,\neResult $params");
     return params;
   }
+}
+
+String? newSourCode(ConstructorManager stateManager, String newFactory) {
+  final result = stateManager.findOrReplace(replacementText: newFactory);
+  final taskResult =
+      result.otherProps["findOrReplace_result"] as Map<String, dynamic>?;
+  final newSource = taskResult?["newSourceCode"] as String?;
+  return newSource;
 }

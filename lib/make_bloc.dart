@@ -80,7 +80,7 @@ Future<void> makeBloc(
       writeDir: effectiveWriteDir,
     );
 
-    printSuccess('Finished adding events from apiPath: $apiPath .');
+    // printSuccess('Finished adding events from apiPath: $apiPath .');
   } else {
     if (hasGenerated) {
       runBuildRunner(effectiveWriteDir);
