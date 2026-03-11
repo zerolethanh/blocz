@@ -15,6 +15,7 @@ Một công cụ dòng lệnh (CLI) giúp tăng tốc độ phát triển ứng 
 - Mã nguồn được tạo ra tương thích với các package phổ biến như `flutter_bloc`, `freezed`, và `injectable`.
 - Hỗ trợ thêm nhanh các event vào BLoC.
 - Tự động nhập (import) các event và trình xử lý từ tệp tin service API.
+- **Cập nhật Thông minh & Chính xác**: Sử dụng Dart AST (Abstract Syntax Tree) để phân tích và cập nhật mã nguồn một cách chính xác, bảo toàn các thay đổi thủ công của bạn.
 
 ## Cách thức hoạt động
 

@@ -15,6 +15,7 @@ A command-line interface (CLI) tool to speed up Flutter app development by scaff
 - The generated code is compatible with popular packages like `flutter_bloc`, `freezed`, and `injectable`.
 - Supports quickly adding new events to a BLoC.
 - Automatically import events and handlers from an API service file.
+- **Robust & Surgical Updates**: Uses Dart AST (Abstract Syntax Tree) to accurately identify and update method calls, preserving your manual changes.
 
 ## How it Works
 
@@ -66,6 +67,9 @@ graph TD
         Upd -- Yes --> Surgical[Surgically update call args using AST]
         Upd -- No --> Skip[Skip update]
     end
+
+> [!NOTE]
+> `blocz` uses the Dart `analyzer` package to parse your code into an **Abstract Syntax Tree (AST)**. This allows it to perform "surgical" updates—replacing only the necessary bits (like method arguments) while leaving the rest of your custom logic untouched.
     
     Single --> Finish[Run build_runner & format]
     Reg --> Finish
