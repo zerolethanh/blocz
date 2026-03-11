@@ -1,7 +1,5 @@
 import 'package:blocz/_internal/typedef.dart';
 
-import '../../colors.dart';
-
 const taskResultSuffix = "_result";
 
 class ManagersResultData with JSONStringMixin {
