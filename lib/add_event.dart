@@ -1,14 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/_internal/managers/MethodManager.dart';
-import 'package:blocz/extractConstructorParams.dart';
 import 'package:blocz/extractMethodListFromClass.dart';
-import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
-import 'package:blocz/extractMethodResponseTypeWithField.dart';
 import 'package:blocz/findClassNameByMethodName.dart';
 import 'package:blocz/findLastClassbodyLineNumber.dart';
 import 'package:blocz/findLastConstFactory.dart';
@@ -191,9 +187,9 @@ Future<(String, String, String, String)> _addSingleEvent(
     String newEventParam = "(dynamic params)";
     String currentEventParam = "()";
     if (apiPath != null && method != null) {
-      newEventParam = _eventParam(apiPath, method, true);
+      newEventParam = eventParam(apiPath, method, true);
     }
-    currentEventParam = _eventParam(eventPath, constructorName, false);
+    currentEventParam = eventParam(eventPath, constructorName, false);
 
     final newEvent =
         '  const factory $constructorName$newEventParam = _${EventName}Requested;';
@@ -235,8 +231,8 @@ Future<(String, String, String, String)> _addSingleEvent(
     );
 
     // state params
-    newStateParams = await _stateParam(apiPath, method, true);
-    currentStateParams = await _stateParam(statePath, constructorName, false);
+    newStateParams = await stateParam(apiPath, method, true);
+    currentStateParams = await stateParam(statePath, constructorName, false);
     final newFactory =
         '  const factory $constructorName$newStateParams = _${EventName}Result;';
 
@@ -264,7 +260,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   final newOn = '    on<_${EventName}Requested>(_on${EventName}Requested);';
   final newMethodName = '_on${EventName}Requested';
 
-  final bool hasOn = blocContent.contains(newOn);
+  final bool hasOn = blocContent.contains(newOn.replaceAll(RegExp(r'\s+'), ""));
   // ignore: no_leading_underscores_for_local_identifiers
   final bool _hasMethod = hasMethod(blocPath, newMethodName);
 
@@ -299,7 +295,7 @@ Future<(String, String, String, String)> _addSingleEvent(
           ? '''
         try {
           final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
-          final response = await $apiClassNameCamelCase.$method(${_getEventCallParams(apiPath, method)});
+          final response = await $apiClassNameCamelCase.$method(${getEventCallParams(apiPath, method)});
           ${resHitField != '' ? '''
           if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));
@@ -364,7 +360,7 @@ Future<(String, String, String, String)> _addSingleEvent(
         ? '''
         try {
           final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
-          final response = await $apiClassNameCamelCase.$method(${_getEventCallParams(apiPath, method)});
+          final response = await $apiClassNameCamelCase.$method(${getEventCallParams(apiPath, method)});
           ${resHitField != '' ? '''
           if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));
@@ -404,152 +400,8 @@ Future<(String, String, String, String)> _addSingleEvent(
       File(blocPath).writeAsStringSync(newSource);
       print('Updated (refresh): $blocPath');
     }
+  } else {
+    printWarning("no bloc content to write");
   }
   return (effectiveWriteDir, blocPath, eventPath, statePath);
-}
-
-/// Extracts and formats the parameters for calling an API method within a BLoC event handler.
-///
-/// It parses the method's parameters and returns a string of formatted arguments
-/// (e.g., `id, name: event.name`) to be used in the generated code.
-String _getEventCallParams(String? fpath, String? method) {
-  if (fpath == null || method == null) return '';
-
-  final paramsJson = extractMethodParams(fpath, method);
-  if (paramsJson == null) return '';
-
-  final paramsString = jsonDecode(paramsJson)?["data"] as String?;
-  if (paramsString == null || paramsString == '()') return '';
-
-  // remove parentheses `()` to get the content, e.g.:
-  // "String id, { OrderDomainApplyCouponDTO? applyCouponDTO, }"
-  var innerParams = paramsString.substring(1, paramsString.length - 1).trim();
-  if (innerParams.isEmpty) return '';
-
-  List<String> positionalParams = [];
-  List<String> namedParams = [];
-
-  final namedParamsStartIndex = innerParams.indexOf('{');
-  String positionalPartStr;
-  String namedPartStr = '';
-
-  if (namedParamsStartIndex != -1) {
-    // Case with mixed or only named parameters
-    positionalPartStr = innerParams.substring(0, namedParamsStartIndex).trim();
-    final namedParamsEndIndex = innerParams.lastIndexOf('}');
-    if (namedParamsEndIndex != -1) {
-      namedPartStr = innerParams
-          .substring(namedParamsStartIndex + 1, namedParamsEndIndex)
-          .trim();
-    }
-  } else {
-    // Case with only positional (required or optional) parameters
-    positionalPartStr = innerParams.replaceAll(RegExp(r'[\[\]]'), '').trim();
-  }
-
-  // Process positional parameters
-  if (positionalPartStr.endsWith(',')) {
-    positionalPartStr = positionalPartStr.substring(
-      0,
-      positionalPartStr.length - 1,
-    );
-  }
-  if (positionalPartStr.isNotEmpty) {
-    positionalParams = positionalPartStr
-        .split(',')
-        .where((s) => s.trim().isNotEmpty)
-        .map((p) {
-          final namePart = p.trim().split('=').first.trim();
-          final name = namePart.split(' ').last;
-          return 'event.$name';
-        })
-        .toList();
-  }
-
-  // Process named parameters
-  if (namedPartStr.endsWith(',')) {
-    namedPartStr = namedPartStr.substring(0, namedPartStr.length - 1);
-  }
-  if (namedPartStr.isNotEmpty) {
-    namedParams = namedPartStr.split(',').where((s) => s.trim().isNotEmpty).map(
-      (p) {
-        final namePart = p.trim().split('=').first.trim();
-        final name = namePart.split(' ').last;
-        return '$name: event.$name';
-      },
-    ).toList();
-  }
-
-  // Combine and return
-  final allParams = [...positionalParams, ...namedParams];
-  return allParams.join(', ');
-}
-
-Future<String> _stateParam(String? fp, String? method, bool? isApiPath) async {
-  if (fp == null || method == null) {
-    return "()";
-  }
-  if (isApiPath != null && isApiPath) {
-    Map<String, dynamic>? responseType;
-    try {
-      responseType = await extractMethodResponseTypeWithField(
-        fp,
-        method,
-        "data,body",
-      );
-      String responseDataType = "dynamic";
-      String result = "()";
-      responseDataType = responseType['responseDataType'];
-      result = "($responseDataType data)";
-      if (result == "(void data)") {
-        result = "()";
-      }
-      return result;
-    } catch (e) {
-      print("Error: $e");
-    }
-    return "()";
-  } else {
-    // current statePath;
-    Map<String, dynamic>? eResult = jsonDecode(
-      extractConstructorParams(fp, method),
-    );
-    // printInfo("currentstateparam eResult $eResult");
-    final params = eResult?["data"]?["constructorParams"] ?? "()";
-    // printInfo("fp: $fp, method:$method ,\neResult $params");
-    return params;
-  }
-}
-
-String _eventParam(String? fp, String method, bool? isApiPath) {
-  if (fp == null) return "(dynamic params)";
-  if (isApiPath != null && isApiPath) {
-    // fp = apiPath
-    try {
-      Map<String, dynamic>? eResult = jsonDecode(
-        extractMethodParams(fp, method) ?? "{}",
-      );
-      final params = eResult?["data"] ?? "(dynamic params)";
-      // printInfo("fp: $fp, method:$method ,\neResult $params");
-      return params;
-    } catch (e) {
-      return "()";
-    }
-  } else {
-    // fp = eventPath
-    Map<String, dynamic>? eResult = jsonDecode(
-      extractConstructorParams(fp, method),
-    );
-    final params = eResult?["data"]?["constructorParams"] ?? "()";
-    // printInfo("fp: $fp, method:$method ,\neResult $params");
-    return params;
-  }
-}
-
-String? newSourCode(ConstructorManager stateManager, String newFactory) {
-  final result = stateManager.findOrReplace(replacementText: newFactory);
-  final taskResult =
-      result.otherProps["findOrReplace_result"] as Map<String, dynamic>?;
-  final newSource = taskResult?["newSourceCode"] as String?;
-  return newSource;
 }

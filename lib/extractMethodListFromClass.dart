@@ -36,7 +36,7 @@ class _MethodVisitor extends GeneralizingAstVisitor<void> {
 
   @override
   void visitClassDeclaration(ClassDeclaration cls) {
-    _currentClassName = cls.name.toString();
+    _currentClassName = cls.namePart.toString();
     if (_className == null || _currentClassName == _className) {
       super.visitClassDeclaration(cls);
     }
