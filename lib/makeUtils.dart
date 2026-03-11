@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/extractConstructorParams.dart';
+import 'package:blocz/extractMethodInvocationArgs.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithField.dart';
 import 'package:recase/recase.dart';
@@ -40,10 +41,18 @@ String replaceDomainKey(String? writeDir, String domain) {
 ///
 /// It parses the method's parameters and returns a string of formatted arguments
 /// (e.g., `id, name: event.name`) to be used in the generated code.
-String getEventCallParams(String? fpath, String? method) {
+String getEventCallArgs(String? fpath, String? method) {
   if (fpath == null || method == null) return '';
 
-  final paramsJson = extractMethodParams(fpath, method);
+  String? paramsJson;
+  try {
+    paramsJson = extractMethodParams(fpath, method);
+    // printInfo(paramsJson);
+  } catch (e) {
+    // printWarning(e);
+    // paramsJson = extractMethodInvocationArgs(fpath, method);
+    // printInfo(paramsJson);
+  }
   if (paramsJson == null) return '';
 
   final paramsString = jsonDecode(paramsJson)?["data"] as String?;

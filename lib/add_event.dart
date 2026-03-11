@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/_internal/managers/MethodManager.dart';
+import 'package:blocz/extractMethodInvocationArgs.dart';
 import 'package:blocz/extractMethodListFromClass.dart';
 import 'package:blocz/extractMethodResponseTypeWithDataField.dart';
 import 'package:blocz/findClassNameByMethodName.dart';
@@ -169,11 +171,10 @@ Future<(String, String, String, String)> _addSingleEvent(
     ]);
   }
 
+  // Event
   final eventName = event.camelCase;
   // ignore: non_constant_identifier_names
   final EventName = eventName.pascalCase;
-
-  // Event
   final eventClassName = getFirstClassNameInFile(eventPath);
   var eventContent = File(eventPath).readAsStringSync();
   final eventInsertionPoint = findLastConstFactory(eventPath);
@@ -257,27 +258,34 @@ Future<(String, String, String, String)> _addSingleEvent(
   // Bloc
   var blocContent = File(blocPath).readAsStringSync();
 
-  final newOn = '    on<_${EventName}Requested>(_on${EventName}Requested);';
-  final newMethodName = '_on${EventName}Requested';
+  final onRegistration =
+      'on<_${EventName}Requested>(_on${EventName}Requested);';
+  final onMethodName = '_on${EventName}Requested';
 
-  final bool hasOn = blocContent.contains(newOn.replaceAll(RegExp(r'\s+'), ""));
   // ignore: no_leading_underscores_for_local_identifiers
-  final bool _hasMethod = hasMethod(blocPath, newMethodName);
-
-  if (_hasMethod && !update) {
-    print("$yellow method $newMethodName already exists. skip...");
-    return ("", "", "", "");
-  }
-  if (hasOn && !update) {
-    print("$yellow `on` $newOn already exists. skip...");
-    return ("", "", "", ""); // Already up-to-date for this event, do nothing.
+  final bool _hasOnRegistration = blocContent.contains(onRegistration);
+  // ignore: no_leading_underscores_for_local_identifiers
+  final bool _hasOnMethod = hasMethod(blocPath, onMethodName);
+  if (!update) {
+    if (_hasOnRegistration) {
+      printWarning(
+        "event handler registration `$onRegistration` already exists. skip...",
+      );
+      printWarning("use `--update` to force update");
+      return ("", "", "", ""); // Already up-to-date for this event, do nothing.
+    }
+    if (_hasOnMethod) {
+      printWarning("method `$onMethodName` already exists. skip...");
+      printWarning("use `--update` to force update");
+      return ("", "", "", "");
+    }
   }
 
   final blocLines = blocContent.split('\n');
   bool isDirty = false;
 
   // Insert method if it's missing. This is inserted near the end of the file.
-  if (!_hasMethod) {
+  if (!_hasOnMethod) {
     final lastLine = findLastClassbodyLineNumber(blocPath);
     if (lastLine != null) {
       final responseType = (apiPath != null && method != null)
@@ -295,7 +303,7 @@ Future<(String, String, String, String)> _addSingleEvent(
           ? '''
         try {
           final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
-          final response = await $apiClassNameCamelCase.$method(${getEventCallParams(apiPath, method)});
+          final response = await $apiClassNameCamelCase.$method(${getEventCallArgs(apiPath, method)});
           ${resHitField != '' ? '''
           if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));
@@ -305,7 +313,7 @@ Future<(String, String, String, String)> _addSingleEvent(
 ''' : '''
           ${newStateParams == "()" ? '''
           emit(${commonClassName}State.${eventName}Result());
-          ''' : '''
+''' : '''
           emit(${commonClassName}State.${eventName}Result(response));
           '''}
 '''}
@@ -318,7 +326,7 @@ Future<(String, String, String, String)> _addSingleEvent(
       final newMethod =
           '''
 
-  Future<void> $newMethodName(
+  Future<void> $onMethodName(
     _${EventName}Requested event,
     Emitter<${commonClassName}State> emit,
   ) async {
@@ -332,35 +340,49 @@ Future<(String, String, String, String)> _addSingleEvent(
 
   // Insert the 'on' call if it's missing. This is inserted earlier in the file.
   // By doing insertions in reverse order, we don't invalidate earlier indices.
-  if (!hasOn) {
+  if (!_hasOnRegistration) {
     final onInsertionPoint = findLast_On_LineNumber(blocPath);
     if (onInsertionPoint != null) {
-      blocLines.insert(onInsertionPoint, newOn);
+      blocLines.insert(onInsertionPoint, onRegistration);
       isDirty = true;
     }
   }
 
+  // start writing to bloc file
   if (isDirty) {
     File(blocPath).writeAsStringSync(blocLines.join('\n'));
     print('Updated: $blocPath');
-  } else if (update && _hasMethod) {
+  } else if (update && _hasOnMethod) {
     // try update method body
     final responseType = (apiPath != null && method != null)
         ? await extractMethodResponseInnerDataType(apiPath, method)
         : null;
 
     final resHitField = responseType?['hitField'] ?? '';
-    final apiClassName = apiPath != null && method != null
+    final apiClassName = (apiPath != null && method != null)
         ? findClassNameByMethodName(apiPath, method)
         : null;
     final apiClassNameCamelCase = apiClassName?.camelCase;
 
+    final newCallArgs = getEventCallArgs(apiPath, method);
+    final newCallArgsWithParentheses = "($newCallArgs)";
+    final currentCallArgsWithParentheses =
+        jsonDecode(
+              extractMethodInvocationArgs(blocPath, method) ?? "{}",
+            )['data']
+            as String?;
+    //     print('''
+    //   newCallArgsWithParentheses: $newCallArgsWithParentheses
+    //   currentCallArgsWithParentheses: $currentCallArgsWithParentheses
+    //   isSame: ${newCallArgsWithParentheses == currentCallArgsWithParentheses}
+    // ''');
+
     final apiCodeBlock =
-        apiPath != null && method != null && apiClassName != null
+        (apiPath != null && method != null && apiClassName != null)
         ? '''
         try {
           final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
-          final response = await $apiClassNameCamelCase.$method(${getEventCallParams(apiPath, method)});
+          final response = await $apiClassNameCamelCase.$method$newCallArgsWithParentheses;
           ${resHitField != '' ? '''
           if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));
@@ -385,19 +407,24 @@ Future<(String, String, String, String)> _addSingleEvent(
     $apiCodeBlock
   }''';
 
-    final manager = MethodManager(
+    final onMethodManager = MethodManager(
       filePath: blocPath,
-      identifier: ".$newMethodName",
+      identifier: ".$onMethodName",
     );
-    final result = manager.ON_invocationFindByMethodName(
+    final result = onMethodManager.ON_invocationFindByMethodName(
       replacementHandlerBody: newMethodBody,
     );
     final taskResult =
         result.otherProps["ON_invocationFindByMethodName_result"]
             as Map<String, dynamic>?;
-    final newSource = taskResult?["fullNewSourceCode"] as String?;
-    if (newSource != null) {
-      File(blocPath).writeAsStringSync(newSource);
+    final onMethodChangedFullSource =
+        taskResult?["fullNewSourceCode"] as String?;
+    if (onMethodChangedFullSource != null) {
+      // print('''
+      //   "onchanges :"
+      //   ${onMethodChangedFullSource.contains("$apiClassNameCamelCase.$method")}
+      //   ''');
+      File(blocPath).writeAsStringSync(onMethodChangedFullSource);
       print('Updated (refresh): $blocPath');
     }
   } else {
