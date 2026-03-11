@@ -23,57 +23,13 @@ Một công cụ dòng lệnh (CLI) giúp tăng tốc độ phát triển ứng 
 
 Lệnh `make` tạo cấu trúc BLoC ban đầu.
 
-```mermaid
-graph TD
-    Start([Lệnh make]) --> Params[Xác định tên & đường dẫn]
-    Params --> Exist{File đã tồn tại?}
-    Exist -- Chưa --> Templates[Render template Mustache]
-    Templates --> Write[Ghi các file _bloc, _event, _state]
-    Exist -- Rồi --> Skip[Bỏ qua việc tạo file]
-    
-    Write --> API{Có apiPath?}
-    Skip --> API
-    
-    API -- Có --> AddEvent[Gọi logic add:event]
-    API -- Không --> Build[Chạy build_runner & format]
-    
-    AddEvent --> Build
-    Build --> End([Hoàn tất])
-```
+![make](resources/diagrams/make.mmd.svg)
 
 ### 2. Thêm Event (`add:event`)
 
 Lệnh `add:event` thêm hoặc cập nhật các event trong BLoC hiện có.
 
-```mermaid
-graph TD
-    Start([Lệnh add:event]) --> Input[Nhận domain, event, apiPath, method]
-    Input --> Mode{Có apiPath?}
-    
-    Mode -- Có --> Bulk[Vòng lặp: Xử lý từng phương thức API]
-    Mode -- Không --> Single[Xử lý một event duy nhất]
-    
-    Bulk --> Single
-    
-    subgraph SingleEventProc [Quy trình xử lý Event]
-        Ensure[Đảm bảo file tồn tại - chạy 'make' nếu thiếu]
-        Ensure --> Ev[Cập nhật _event.dart: Thêm/Cập nhật factory]
-        Ev --> St[Cập nhật _state.dart: Thêm/Cập nhật factory]
-        St --> Bl{Đã đăng ký?}
-        
-        Bl -- Chưa --> Reg[Chèn đăng ký 'on' & phương thức handler]
-        Bl -- Rồi --> Upd{Có cờ update?}
-        
-        Upd -- Có --> Surgical[Cập nhật chính xác đối số gọi hàm bằng AST]
-        Upd -- Không --> Skip[Bỏ qua cập nhật]
-    end
-    
-    Single --> Finish[Chạy build_runner & format]
-    Reg --> Finish
-    Surgical --> Finish
-    Skip --> Finish
-    Finish --> End([Hoàn tất])
-```
+![add_event](resources/diagrams/add_event.mmd.svg)
 
 > [!NOTE]
 > `blocz` sử dụng package `analyzer` của Dart để chuyển đổi code của bạn thành một **Cây Cú pháp Trừu tượng (AST - Abstract Syntax Tree)**. Điều này cho phép công cụ thực hiện các cập nhật cực kỳ chính xác—chỉ thay thế những phần cần thiết (như các đối số của phương thức) trong khi vẫn giữ nguyên logic tùy chỉnh khác của bạn.

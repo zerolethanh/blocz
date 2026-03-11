@@ -1,0 +1,27 @@
+graph TD
+    Start([add:event command]) --> Input[Receive domain, event, apiPath, method]
+    Input --> Mode{apiPath provided?}
+    
+    Mode -- Yes --> Bulk[Loop: Process each API method]
+    Mode -- No --> Single[Process single event]
+    
+    Bulk --> Single
+    
+    subgraph SingleEventProc [Single Event Process]
+        Ensure[Ensure files exist - run 'make' if missing]
+        Ensure --> Ev[Update _event.dart: Add/Update factory]
+        Ev --> St[Update _state.dart: Add/Update factory]
+        St --> Bl{Already registered?}
+        
+        Bl -- No --> Reg[Insert 'on' registration & handler method]
+        Bl -- Yes --> Upd{update flag?}
+        
+        Upd -- Yes --> Surgical[Surgically update call args using AST]
+        Upd -- No --> Skip[Skip update]
+    end
+    
+    Single --> Finish[Run build_runner & format]
+    Reg --> Finish
+    Surgical --> Finish
+    Skip --> Finish
+    Finish --> End([Done])

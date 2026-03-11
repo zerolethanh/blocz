@@ -23,57 +23,13 @@ A command-line interface (CLI) tool to speed up Flutter app development by scaff
 
 The `make` command creates the initial BLoC structure.
 
-```mermaid
-graph TD
-    Start([make command]) --> Params[Determine names & paths]
-    Params --> Exist{Files exist?}
-    Exist -- No --> Templates[Render Mustache templates]
-    Templates --> Write[Write _bloc, _event, _state files]
-    Exist -- Yes --> Skip[Skip file generation]
-    
-    Write --> API{apiPath provided?}
-    Skip --> API
-    
-    API -- Yes --> AddEvent[Call add:event logic]
-    API -- No --> Build[Run build_runner & format]
-    
-    AddEvent --> Build
-    Build --> End([Done])
-```
+![make](resources/diagrams/make.mmd.svg)
 
 ### 2. Adding Events (`add:event`)
 
 The `add:event` command adds or updates events in an existing BLoC.
 
-```mermaid
-graph TD
-    Start([add:event command]) --> Input[Receive domain, event, apiPath, method]
-    Input --> Mode{apiPath provided?}
-    
-    Mode -- Yes --> Bulk[Loop: Process each API method]
-    Mode -- No --> Single[Process single event]
-    
-    Bulk --> Single
-    
-    subgraph SingleEventProc [Single Event Process]
-        Ensure[Ensure files exist - run 'make' if missing]
-        Ensure --> Ev[Update _event.dart: Add/Update factory]
-        Ev --> St[Update _state.dart: Add/Update factory]
-        St --> Bl{Already registered?}
-        
-        Bl -- No --> Reg[Insert 'on' registration & handler method]
-        Bl -- Yes --> Upd{update flag?}
-        
-        Upd -- Yes --> Surgical[Surgically update call args using AST]
-        Upd -- No --> Skip[Skip update]
-    end
-    
-    Single --> Finish[Run build_runner & format]
-    Reg --> Finish
-    Surgical --> Finish
-    Skip --> Finish
-    Finish --> End([Done])
-```
+![add_event](resources/diagrams/add_event.mmd.svg)
 
 > [!NOTE]
 > `blocz` uses the Dart `analyzer` package to parse your code into an **Abstract Syntax Tree (AST)**. This allows it to perform "surgical" updates—replacing only the necessary bits (like method arguments) while leaving the rest of your custom logic untouched.

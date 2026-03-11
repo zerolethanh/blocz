@@ -1,0 +1,16 @@
+
+graph TD
+    Start([make command]) --> Params[Determine names & paths]
+    Params --> Exist{Files exist?}
+    Exist -- No --> Templates[Render Mustache templates]
+    Templates --> Write[Write _bloc, _event, _state files]
+    Exist -- Yes --> Skip[Skip file generation]
+    
+    Write --> API{apiPath provided?}
+    Skip --> API
+    
+    API -- Yes --> AddEvent[Call add:event logic]
+    API -- No --> Build[Run build_runner & format]
+    
+    AddEvent --> Build
+    Build --> End([Done])
