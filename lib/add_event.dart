@@ -194,13 +194,13 @@ Future<(String, String, String, String)> _addSingleEvent(
     }
     currentEventParam = eventParam(eventPath, constructorName, false);
 
-    final newEvent =
+    final newEventFactory =
         '  const factory $constructorName$newEventParam = _${EventName}Requested;';
 
     if (!eventManager.hasFactoryConstructor()) {
       // write new event
       final eventLines = eventContent.split('\n');
-      eventLines.insert(eventInsertionPoint, newEvent);
+      eventLines.insert(eventInsertionPoint, newEventFactory);
       File(eventPath).writeAsStringSync(eventLines.join('\n'));
       printSuccess('Created: $constructorName');
     }
@@ -209,7 +209,7 @@ Future<(String, String, String, String)> _addSingleEvent(
       // printInfo("newEventParam: $newEventParam");
       // printInfo("currentEventParam: $currentEventParam");
       // update if changed
-      final newSource = newSourCode(eventManager, newEvent);
+      final newSource = newSourCode(eventManager, newEventFactory);
       if (newSource != null) {
         File(eventPath).writeAsStringSync(newSource);
         printWarning(
@@ -236,17 +236,17 @@ Future<(String, String, String, String)> _addSingleEvent(
     // state params
     newStateParams = await stateParam(apiPath, method, true);
     currentStateParams = await stateParam(statePath, constructorName, false);
-    final newFactory =
+    final newStateFactory =
         '  const factory $constructorName$newStateParams = _${EventName}Result;';
 
     if (!stateManager.hasFactoryConstructor()) {
       final stateLines = stateContent.split('\n');
-      stateLines.insert(stateInsertionPoint, newFactory);
+      stateLines.insert(stateInsertionPoint, newStateFactory);
       File(statePath).writeAsStringSync(stateLines.join('\n'));
       printSuccess('Created: $constructorName');
     }
     if (update && (newStateParams != currentStateParams)) {
-      final newSource = newSourCode(stateManager, newFactory);
+      final newSource = newSourCode(stateManager, newStateFactory);
       if (newSource != null) {
         File(statePath).writeAsStringSync(newSource);
         printWarning(
@@ -260,9 +260,8 @@ Future<(String, String, String, String)> _addSingleEvent(
   // Bloc
   var blocContent = File(blocPath).readAsStringSync();
 
-  final onRegistration =
-      'on<_${EventName}Requested>(_on${EventName}Requested);';
   final onMethodName = '_on${EventName}Requested';
+  final onRegistration = 'on<_${EventName}Requested>($onMethodName);';
 
   // ignore: no_leading_underscores_for_local_identifiers
   final bool _hasOnRegistration = blocContent.contains(onRegistration);

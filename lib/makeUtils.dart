@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/extractConstructorParams.dart';
-import 'package:blocz/extractMethodInvocationArgs.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithField.dart';
 import 'package:recase/recase.dart';
