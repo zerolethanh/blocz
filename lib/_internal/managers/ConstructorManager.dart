@@ -1,26 +1,9 @@
-import 'package:blocz/_internal/colors.dart';
 import 'package:blocz/_internal/managers/mixins/ParseStringResultMixin.dart';
 import 'package:blocz/getClassName.dart';
 
 import '../visitors/ClassVisitors.dart';
 import 'data/ManagersResultData.dart';
 import 'interfaces/IConstructorManager.dart';
-
-void main() {
-  ConstructorManager(
-      filePath:
-          "/Users/lethanh/StudioProjects/ddd/lib/features/order/presentation/bloc/order_event.dart",
-      identifier: ".test",
-    )
-    ..listAllConstructors()
-        // ..listAllConstructorsIgnoreIdentifier()
-        // ..findOrReplace(
-        // //   replacementText: '''
-        // //     ___THIS ___ THIS ___TEST
-        // //     ''',
-        // )
-        .expose();
-}
 
 class ConstructorManager
     with ParseStringResultMixin
@@ -102,7 +85,7 @@ class ConstructorManager
       return dataSingleton;
     }
     // node not found
-    printWarning('[findOrReplace] constructor "$fullIdentifier" not found.');
+    // printWarning('[findOrReplace] constructor "$fullIdentifier" not found.');
     // dataInstance.update(foundNode: null, foundOffset: 0, foundEnd: 0);
     dataSingleton.addTaskResultValue({
       "foundNode": null,

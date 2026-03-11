@@ -20,11 +20,23 @@ class ExampleApi {
     ];
   }
 
-  Future<void> createUser(User user) async {
+  Future<User> createUser(User user) async {
     // Simulated API call
+    return User(id: user.id, name: user.name, email: user.email);
   }
 
-  Future<void> deleteUser(int id) async {
+  Future<int> deleteUser(int id) async {
     // Simulated API call
+    return id;
+  }
+
+  Future<User> getUserByIdWithApiKey(int id, String apiKey) async {
+    // Simulated API call
+    return User(id: id, name: 'John Doe', email: 'john@example.com');
+  }
+
+  Future<bool> updateUser(User user) async {
+    // Simulated API call
+    return true;
   }
 }

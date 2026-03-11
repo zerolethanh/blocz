@@ -16,6 +16,7 @@ mixin ParseStringResultMixin {
     final parsed = parseFile(
       path: filePath,
       featureSet: FeatureSet.latestLanguageVersion(),
+      throwIfDiagnostics: false,
     );
     _parsedFile = parsed;
     return _parsedFile!;

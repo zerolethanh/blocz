@@ -90,6 +90,12 @@ Future<void> main(List<String> arguments) async {
       'writeDir',
       abbr: 'w',
       help: 'Custom directory to find BLoC files (optional)',
+    )
+    ..addFlag(
+      'update',
+      abbr: 'u',
+      help: 'Update existing event and BLoC method if parameters have changed',
+      defaultsTo: false,
     );
 
   parser.addCommand('pr', parser.addCommand("project:root"))
@@ -352,6 +358,7 @@ Future<void> main(List<String> arguments) async {
         }
         final method = command['method'] as String?;
         final writeDir = command['writeDir'] as String?;
+        final update = command['update'] as bool;
         await addEvent(
           domain,
           name,
@@ -359,6 +366,7 @@ Future<void> main(List<String> arguments) async {
           apiPath,
           method,
           writeDir: writeDir,
+          update: update,
         );
         break;
       case 'pr':

@@ -7,19 +7,6 @@ import '../visitors/ClassVisitors.dart';
 import 'data/ManagersResultData.dart';
 import 'interfaces/IClassManager.dart';
 
-void main() {
-  ClassManager(
-    filePath:
-    "/Users/lethanh/StudioProjects/ddd/lib/features/order/presentation/bloc/order_event.dart",
-    identifier: "",
-  )
-    ..lastLineNumberGet()
-    ..lastConstFactoryLineNumber()
-    ..listAllMethods()
-    ..listAllConstructors()
-    ..listAllGetters().expose();
-}
-
 class ClassManager with ParseStringResultMixin implements IClassManager {
   @override
   final String filePath;
@@ -96,7 +83,8 @@ class ClassManager with ParseStringResultMixin implements IClassManager {
     // print(methodList);
 
     dataSingleton.addTaskResultValue(
-        methodList["listAllMethods$taskResultSuffix"]);
+      methodList["listAllMethods$taskResultSuffix"],
+    );
     return dataSingleton;
   }
 
@@ -136,7 +124,7 @@ class ClassManagerResultData extends ManagersResultData {
 
   // Singleton instance
   static final ClassManagerResultData singleton =
-  ClassManagerResultData._singleton();
+      ClassManagerResultData._singleton();
 
   // Factory constructor
   factory ClassManagerResultData() {

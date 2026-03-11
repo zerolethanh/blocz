@@ -1,7 +1,8 @@
-import 'package:blocz_example/api/example_api.dart';
 import 'package:bloc/bloc.dart';
+import 'package:blocz_example/api/example_api.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:injectable/injectable.dart';
 
 part 'user_event.dart';
@@ -22,6 +23,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<_GetUsersRequested>(_onGetUsersRequested);
     on<_CreateUserRequested>(_onCreateUserRequested);
     on<_DeleteUserRequested>(_onDeleteUserRequested);
+    on<_GetUserByIdWithApiKeyRequested>(_onGetUserByIdWithApiKeyRequested);
+    on<_UpdateUserRequested>(_onUpdateUserRequested);
   }
 
   Future<void> _onUserEventLoading(
@@ -36,8 +39,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) async {
     try {
-      final api = GetIt.instance<ExampleApi>();
-      final response = await api.getUserById(event.id);
+      final exampleApi = GetIt.instance<ExampleApi>();
+      final response = await exampleApi.getUserById(event.id);
       emit(UserState.getUserByIdResult(response));
     } catch (e) {
       emit(UserState.failure(e.toString()));
@@ -49,8 +52,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) async {
     try {
-      final api = GetIt.instance<ExampleApi>();
-      final response = await api.getUsers();
+      final exampleApi = GetIt.instance<ExampleApi>();
+      final response = await exampleApi.getUsers();
       emit(UserState.getUsersResult(response));
     } catch (e) {
       emit(UserState.failure(e.toString()));
@@ -62,9 +65,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) async {
     try {
-      final api = GetIt.instance<ExampleApi>();
-      await api.createUser(event.user);
-      emit(UserState.createUserResult());
+      final exampleApi = GetIt.instance<ExampleApi>();
+      final response = await exampleApi.createUser(event.user);
+      emit(UserState.createUserResult(response));
     } catch (e) {
       emit(UserState.failure(e.toString()));
     }
@@ -75,9 +78,38 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) async {
     try {
-      final api = GetIt.instance<ExampleApi>();
-      await api.deleteUser(event.id);
-      emit(UserState.deleteUserResult());
+      final exampleApi = GetIt.instance<ExampleApi>();
+      final response = await exampleApi.deleteUser(event.id);
+      emit(UserState.deleteUserResult(response));
+    } catch (e) {
+      emit(UserState.failure(e.toString()));
+    }
+  }
+
+  Future<void> _onGetUserByIdWithApiKeyRequested(
+    _GetUserByIdWithApiKeyRequested event,
+    Emitter<UserState> emit,
+  ) async {
+    try {
+      final exampleApi = GetIt.instance<ExampleApi>();
+      final response = await exampleApi.getUserByIdWithApiKey(
+        event.id,
+        event.apiKey,
+      );
+      emit(UserState.getUserByIdWithApiKeyResult(response));
+    } catch (e) {
+      emit(UserState.failure(e.toString()));
+    }
+  }
+
+  Future<void> _onUpdateUserRequested(
+    _UpdateUserRequested event,
+    Emitter<UserState> emit,
+  ) async {
+    try {
+      final exampleApi = GetIt.instance<ExampleApi>();
+      final response = await exampleApi.updateUser(event.user);
+      emit(UserState.updateUserResult(response));
     } catch (e) {
       emit(UserState.failure(e.toString()));
     }

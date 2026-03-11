@@ -1,7 +1,5 @@
 import 'package:blocz/_internal/typedef.dart';
 
-import '../../colors.dart';
-
 const taskResultSuffix = "_result";
 
 class ManagersResultData with JSONStringMixin {
@@ -68,19 +66,27 @@ class ManagersResultData with JSONStringMixin {
 
   String fullTaskNameAtFrame([List<String>? subTasks]) {
     subTasks?.removeWhere((val) => val.isEmpty);
-    String currentTaskMethodName = "";
+    String currentTaskMethodName = "unknown";
 
     // Capture the stack trace
-    final stackString = StackTrace.current.toString();
     final frames = StackTrace.current.toString().split('\n');
-    final mainLine = getLineNumberOfMain(stackString);
-    if (mainLine == null) {
-      throw Exception("main line not found");
+
+    // Find the first frame that is not part of this manager infrastructure
+    for (var frame in frames) {
+      if (frame.contains('ManagersResultData') ||
+          frame.contains('StackTrace') ||
+          frame.isEmpty ||
+          frame.startsWith('<')) {
+        continue;
+      }
+
+      final currentTaskInfo = getClassAndMethodName(frame);
+      if (currentTaskInfo != null) {
+        currentTaskMethodName = currentTaskInfo.split(".").last;
+        break;
+      }
     }
-    final currentTaskLine = frames[mainLine - 1];
-    final currentTaskInfo = getClassAndMethodName(currentTaskLine);
-    currentTaskMethodName = currentTaskInfo!.split(".").last;
-    printWarning("-- adding task: $currentTaskInfo");
+
     final taskFullName =
         currentTaskMethodName +
         ((subTasks == null || subTasks.isEmpty)
