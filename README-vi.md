@@ -75,6 +75,9 @@ graph TD
     Finish --> End([Hoàn tất])
 ```
 
+> [!NOTE]
+> `blocz` sử dụng package `analyzer` của Dart để chuyển đổi code của bạn thành một **Cây Cú pháp Trừu tượng (AST - Abstract Syntax Tree)**. Điều này cho phép công cụ thực hiện các cập nhật cực kỳ chính xác—chỉ thay thế những phần cần thiết (như các đối số của phương thức) trong khi vẫn giữ nguyên logic tùy chỉnh khác của bạn.
+
 ## Điều kiện tiên quyết
 
 Chạy các lệnh sau trong thư mục dự án Flutter của bạn để thêm các dependency cần thiết:

@@ -67,9 +67,6 @@ graph TD
         Upd -- Yes --> Surgical[Surgically update call args using AST]
         Upd -- No --> Skip[Skip update]
     end
-
-> [!NOTE]
-> `blocz` uses the Dart `analyzer` package to parse your code into an **Abstract Syntax Tree (AST)**. This allows it to perform "surgical" updates—replacing only the necessary bits (like method arguments) while leaving the rest of your custom logic untouched.
     
     Single --> Finish[Run build_runner & format]
     Reg --> Finish
@@ -77,6 +74,9 @@ graph TD
     Skip --> Finish
     Finish --> End([Done])
 ```
+
+> [!NOTE]
+> `blocz` uses the Dart `analyzer` package to parse your code into an **Abstract Syntax Tree (AST)**. This allows it to perform "surgical" updates—replacing only the necessary bits (like method arguments) while leaving the rest of your custom logic untouched.
 
 ## Prerequisites
 
