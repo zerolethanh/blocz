@@ -18,31 +18,59 @@ Một công cụ dòng lệnh (CLI) giúp tăng tốc độ phát triển ứng 
 
 ## Cách thức hoạt động
 
-Sơ đồ dưới đây minh họa luồng xử lý khi thêm một event mới (hoặc nhiều event từ một API) bằng lệnh `blocz add:event`:
+### 1. Khởi tạo BLoC (`make`)
+
+Lệnh `make` tạo cấu trúc BLoC ban đầu.
 
 ```mermaid
 graph TD
-    Start([Lệnh add:event]) --> Input[Nhận domain, name, event, apiPath, method]
+    Start([Lệnh make]) --> Params[Xác định tên & đường dẫn]
+    Params --> Exist{File đã tồn tại?}
+    Exist -- Chưa --> Templates[Render template Mustache]
+    Templates --> Write[Ghi các file _bloc, _event, _state]
+    Exist -- Rồi --> Skip[Bỏ qua việc tạo file]
+    
+    Write --> API{Có apiPath?}
+    Skip --> API
+    
+    API -- Có --> AddEvent[Gọi logic add:event]
+    API -- Không --> Build[Chạy build_runner & format]
+    
+    AddEvent --> Build
+    Build --> End([Hoàn tất])
+```
+
+### 2. Thêm Event (`add:event`)
+
+Lệnh `add:event` thêm hoặc cập nhật các event trong BLoC hiện có.
+
+```mermaid
+graph TD
+    Start([Lệnh add:event]) --> Input[Nhận domain, event, apiPath, method]
     Input --> Mode{Có apiPath?}
     
-    Mode -- Có --> ExtractMethods[Trích xuất các phương thức từ file API]
-    ExtractMethods --> Loop[Với mỗi phương thức...]
-    Loop --> SingleEvent
+    Mode -- Có --> Bulk[Vòng lặp: Xử lý từng phương thức API]
+    Mode -- Không --> Single[Xử lý một event duy nhất]
     
-    Mode -- Không --> SingleEvent[Xử lý từng Event đơn lẻ]
+    Bulk --> Single
     
-    subgraph SingleEventFlow [Luồng xử lý Event đơn lẻ]
-        CheckFiles[Đảm bảo các file BLoC tồn tại - tạo mới nếu thiếu]
-        CheckFiles --> Event[Cập nhật _event.dart: Thêm factory constructor]
-        Event --> State[Cập nhật _state.dart: Thêm factory constructor]
-        State --> Bloc[Cập nhật _bloc.dart]
+    subgraph SingleEventProc [Quy trình xử lý Event]
+        Ensure[Đảm bảo file tồn tại - chạy 'make' nếu thiếu]
+        Ensure --> Ev[Cập nhật _event.dart: Thêm/Cập nhật factory]
+        Ev --> St[Cập nhật _state.dart: Thêm/Cập nhật factory]
+        St --> Bl{Đã đăng ký?}
         
-        Bloc --> UpdateCheck{Có cờ update?}
-        UpdateCheck -- Không --> Registration[Chèn đăng ký 'on' và phương thức handler]
-        UpdateCheck -- Có --> Surgical[Cập nhật chính xác đối số gọi hàm bằng AST]
+        Bl -- Chưa --> Reg[Chèn đăng ký 'on' & phương thức handler]
+        Bl -- Rồi --> Upd{Có cờ update?}
+        
+        Upd -- Có --> Surgical[Cập nhật chính xác đối số gọi hàm bằng AST]
+        Upd -- Không --> Skip[Bỏ qua cập nhật]
     end
     
-    SingleEvent --> Finish[Chạy build_runner & dart format]
+    Single --> Finish[Chạy build_runner & format]
+    Reg --> Finish
+    Surgical --> Finish
+    Skip --> Finish
     Finish --> End([Hoàn tất])
 ```
 

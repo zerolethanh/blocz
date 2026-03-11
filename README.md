@@ -18,31 +18,59 @@ A command-line interface (CLI) tool to speed up Flutter app development by scaff
 
 ## How it Works
 
-The following diagram illustrates the flow of adding a new event (or multiple events from an API) using `blocz add:event`:
+### 1. BLoC Scaffolding (`make`)
+
+The `make` command creates the initial BLoC structure.
 
 ```mermaid
 graph TD
-    Start([add:event command]) --> Input[Receive domain, name, event, apiPath, method]
+    Start([make command]) --> Params[Determine names & paths]
+    Params --> Exist{Files exist?}
+    Exist -- No --> Templates[Render Mustache templates]
+    Templates --> Write[Write _bloc, _event, _state files]
+    Exist -- Yes --> Skip[Skip file generation]
+    
+    Write --> API{apiPath provided?}
+    Skip --> API
+    
+    API -- Yes --> AddEvent[Call add:event logic]
+    API -- No --> Build[Run build_runner & format]
+    
+    AddEvent --> Build
+    Build --> End([Done])
+```
+
+### 2. Adding Events (`add:event`)
+
+The `add:event` command adds or updates events in an existing BLoC.
+
+```mermaid
+graph TD
+    Start([add:event command]) --> Input[Receive domain, event, apiPath, method]
     Input --> Mode{apiPath provided?}
     
-    Mode -- Yes --> ExtractMethods[Extract methods from API file]
-    ExtractMethods --> Loop[For each method...]
-    Loop --> SingleEvent
+    Mode -- Yes --> Bulk[Loop: Process each API method]
+    Mode -- No --> Single[Process single event]
     
-    Mode -- No --> SingleEvent[Process Single Event]
+    Bulk --> Single
     
-    subgraph SingleEventFlow [Single Event Generation]
-        CheckFiles[Ensure BLoC files exist - make if missing]
-        CheckFiles --> Event[Update _event.dart: Add factory constructor]
-        Event --> State[Update _state.dart: Add factory constructor]
-        State --> Bloc[Update _bloc.dart]
+    subgraph SingleEventProc [Single Event Process]
+        Ensure[Ensure files exist - run 'make' if missing]
+        Ensure --> Ev[Update _event.dart: Add/Update factory]
+        Ev --> St[Update _state.dart: Add/Update factory]
+        St --> Bl{Already registered?}
         
-        Bloc --> UpdateCheck{update flag?}
-        UpdateCheck -- No --> Registration[Insert 'on' registration and handler method]
-        UpdateCheck -- Yes --> Surgical[Surgically update method call arguments using AST]
+        Bl -- No --> Reg[Insert 'on' registration & handler method]
+        Bl -- Yes --> Upd{update flag?}
+        
+        Upd -- Yes --> Surgical[Surgically update call args using AST]
+        Upd -- No --> Skip[Skip update]
     end
     
-    SingleEvent --> Finish[Run build_runner & dart format]
+    Single --> Finish[Run build_runner & format]
+    Reg --> Finish
+    Surgical --> Finish
+    Skip --> Finish
     Finish --> End([Done])
 ```
 

@@ -28,29 +28,39 @@ This will create:
 
 With events and handlers automatically generated for `getUserById`, `getUsers`, `createUser`, and `deleteUser`.
 
-## BLoC Generation Flow
+## Generation Flow
+
+### 1. BLoC Scaffolding (`make`)
 
 ```mermaid
 graph TD
-    Start([add:event command]) --> Input[Receive domain, name, event, apiPath, method]
-    Input --> Mode{apiPath provided?}
+    Start([make]) --> Exist{Files exist?}
+    Exist -- No --> Gen[Generate from templates]
+    Exist -- Yes --> API{apiPath?}
+    Gen --> API
+    API -- Yes --> Add[Add Events]
+    API -- No --> End[Build & Format]
+    Add --> End
+```
 
-    Mode -- Yes --> ExtractMethods[Extract methods from API file]
-    ExtractMethods --> Loop[For each method...]
-    Loop --> SingleEventFlow
+### 2. Adding Events (`add:event`)
 
-    Mode -- No --> SingleEventFlow[Process Single Event]
-
-    subgraph Flow [Single Event Generation]
-        Check[Ensure BLoC files exist]
-        Event[Update Event factory]
-        State[Update State factory]
-        Bloc[Update BLoC handler]
-
-        Check --> Event --> State --> Bloc
+```mermaid
+graph TD
+    Start([add:event]) --> Mode{apiPath?}
+    Mode -- Yes --> Bulk[Bulk process]
+    Mode -- No --> Single[Single event]
+    Bulk --> Single
+    
+    subgraph Flow [Event Update]
+        Files[Ensure files exist]
+        Files --> Ev[Update Event]
+        Ev --> St[Update State]
+        St --> Bl[Update BLoC Handler]
     end
-
-    SingleEventFlow --> Finish[Build Runner & Format]
+    
+    Single --> Flow
+    Flow --> End[Build & Format]
 ```
 
 ## Testing
