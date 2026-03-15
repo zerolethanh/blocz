@@ -1,0 +1,17 @@
+graph TD
+    API["API File\n(e.g., pet_api.dart)"] --> Parse["Parse using dart:analyzer (AST)"]
+    Parse --> Extract["Extract Public Methods & Parameters\n(e.g., addPet(Pet body))"]
+    
+    Extract --> MakeEvent["Generate Event Classes\n(e.g., PetEvent.addPet(Pet body))"]
+    Extract --> MakeState["Generate State Classes\n(e.g., PetState.addPetResult)"]
+    Extract --> MakeHandler["Generate Event Handlers\n(e.g., on&lt;AddPetRequested&gt;)"]
+    
+    MakeEvent --> EventFile["Write to *_event.dart\n(using freezed)"]
+    MakeState --> StateFile["Write to *_state.dart\n(using freezed)"]
+    
+    MakeHandler --> ApiCall["Generate API Call Logic\n(e.g., api.addPet(event.body))"]
+    ApiCall --> BlocFile["Write to *_bloc.dart"]
+    
+    EventFile -.-> BuildRunner["Run build_runner\n(Generates .freezed.dart)"]
+    StateFile -.-> BuildRunner
+    BlocFile -.-> BuildRunner

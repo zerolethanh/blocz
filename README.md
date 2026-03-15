@@ -31,6 +31,12 @@ The `add:event` command adds or updates events in an existing BLoC.
 
 ![add_event](resources/diagrams/add_event.mmd.svg)
 
+### 3. API to BLoC Generation (`--apiPath`)
+
+When `--apiPath` is provided, `blocz` parses the Dart API file to scaffold comprehensive Event and State classes based on the API's public methods.
+
+![api_to_bloc](resources/diagrams/api_to_bloc.mmd.svg)
+
 > [!NOTE]
 > `blocz` uses the Dart `analyzer` package to parse your code into an **Abstract Syntax Tree (AST)**. This allows it to perform "surgical" updates—replacing only the necessary bits (like method arguments) while leaving the rest of your custom logic untouched.
 

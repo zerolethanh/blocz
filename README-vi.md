@@ -31,6 +31,12 @@ Lệnh `add:event` thêm hoặc cập nhật các event trong BLoC hiện có.
 
 ![add_event](resources/diagrams/add_event.mmd.svg)
 
+### 3. Tự động tạo BLoC từ API (`--apiPath`)
+
+Khi `--apiPath` được cung cấp, `blocz` phân tích tệp API Dart để tự động tạo ra các lớp Event và State một cách toàn diện dựa trên các phương thức public của API.
+
+![api_to_bloc](resources/diagrams/api_to_bloc.mmd.svg)
+
 > [!NOTE]
 > `blocz` sử dụng package `analyzer` của Dart để chuyển đổi code của bạn thành một **Cây Cú pháp Trừu tượng (AST - Abstract Syntax Tree)**. Điều này cho phép công cụ thực hiện các cập nhật cực kỳ chính xác—chỉ thay thế những phần cần thiết (như các đối số của phương thức) trong khi vẫn giữ nguyên logic tùy chỉnh khác của bạn.
 
