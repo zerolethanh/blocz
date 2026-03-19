@@ -287,12 +287,12 @@ Future<(String, String, String, String)> _addSingleEvent(
     }
   }
 
-  final blocLines = blocContent.split('\n');
+  List<String> blocLines = blocContent.split('\n');
   bool isDirty = false;
 
   // Insert method if it's missing. This is inserted near the end of the file.
   if (!_hasOnMethod) {
-    final lastLine = findLastClassbodyLineNumber(blocPath);
+    int? lastLine = findLastClassbodyLineNumber(blocPath);
     if (lastLine != null) {
       final responseType = (apiPath != null && method != null)
           ? await extractMethodResponseInnerDataType(apiPath, method)
@@ -306,13 +306,15 @@ Future<(String, String, String, String)> _addSingleEvent(
       final clientInstanceName = apiClassName?.camelCase;
       final bool isProto = apiPath?.endsWith('.proto') ?? false;
 
+      // print(blocContent);
       if (isProto &&
           clientInstanceName != null &&
           !blocContent.contains('$apiClassName get $clientInstanceName')) {
-        final String getter = '''
-import 'package:connectrpc/http2.dart';
-import 'package:connectrpc/protobuf.dart';
-import 'package:connectrpc/protocol/connect.dart';
+        final String getter =
+            '''
+// import 'package:connectrpc/http2.dart';
+// import 'package:connectrpc/protobuf.dart';
+// import 'package:connectrpc/protocol/connect.dart';
 
 $apiClassName get $clientInstanceName => $apiClassName(
   Transport(
@@ -332,6 +334,8 @@ $apiClassName get $clientInstanceName => $apiClassName(
         }
         lines.insert(insertIndex, '\n$getter');
         blocContent = lines.join('\n');
+        blocLines = lines;
+        lastLine = lines.length - 1;
         isDirty = true;
       }
       final apiCodeBlock =
@@ -373,7 +377,7 @@ $apiClassName get $clientInstanceName => $apiClassName(
     $apiCodeBlock
   }
 ''';
-      blocLines.insert(lastLine - 1, newMethod);
+      blocLines.insert(lastLine! - 1, newMethod);
       isDirty = true;
     }
   }
