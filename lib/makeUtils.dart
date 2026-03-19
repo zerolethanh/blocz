@@ -45,37 +45,7 @@ String getEventCallArgs(String? fpath, String? method) {
   if (fpath == null || method == null) return '';
 
   if (fpath.endsWith('.proto')) {
-    final content = File(fpath).readAsStringSync();
-    final services = parseProtoServices(content);
-    final messages = parseProtoMessages(content);
-
-    for (final service in services) {
-      for (final protoMethod in service.methods) {
-        if (protoMethod.name == method) {
-          final requestType = protoMethod.requestType;
-          if (requestType == 'void' || requestType == 'google.protobuf.Empty') {
-            return '';
-          }
-
-          final message = messages.firstWhere(
-            (m) => m.name == requestType,
-            orElse: () => ProtoMessage(name: requestType, fields: []),
-          );
-
-          if (message.fields.isEmpty) {
-            return 'event.request';
-          }
-
-          final args = message.fields.map((f) {
-            final fieldName = f.name.camelCase;
-            return '$fieldName: event.$fieldName';
-          }).join(', ');
-
-          return '$requestType($args)';
-        }
-      }
-    }
-    return '';
+    return 'event.request';
   }
 
   String? paramsJson;

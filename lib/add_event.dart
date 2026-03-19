@@ -303,13 +303,47 @@ Future<(String, String, String, String)> _addSingleEvent(
           ? findClassNameByMethodName(apiPath, method)
           : null;
 
-      final apiClassNameCamelCase = apiClassName?.camelCase;
+      final clientInstanceName = apiClassName?.camelCase;
+      final bool isProto = apiPath?.endsWith('.proto') ?? false;
+
+      if (isProto &&
+          clientInstanceName != null &&
+          !blocContent.contains('$apiClassName get $clientInstanceName')) {
+        final String getter = '''
+import 'package:connectrpc/http2.dart';
+import 'package:connectrpc/protobuf.dart';
+import 'package:connectrpc/protocol/connect.dart';
+
+$apiClassName get $clientInstanceName => $apiClassName(
+  Transport(
+    baseUrl: "https://[IP_ADDRESS]",
+    codec: const ProtoCodec(), // Or JsonCodec()
+    httpClient: createHttpClient(), // h2 transporter
+  ),
+);
+''';
+        // Insert after part of or imports
+        final lines = blocContent.split('\n');
+        int insertIndex = 0;
+        for (int i = 0; i < lines.length; i++) {
+          if (lines[i].startsWith('import ') || lines[i].startsWith('part ')) {
+            insertIndex = i + 1;
+          }
+        }
+        lines.insert(insertIndex, '\n$getter');
+        blocContent = lines.join('\n');
+        isDirty = true;
+      }
       final apiCodeBlock =
           apiPath != null && method != null && apiClassName != null
           ? '''
         try {
-          final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
-          final response = await $apiClassNameCamelCase.${apiPath.endsWith('.proto') ? eventName : method}(${getEventCallArgs(apiPath, method)});
+          ${isProto ? '' : 'final $clientInstanceName = GetIt.instance<$apiClassName>();'}
+          ${(isProto && (responseType?['responseDataType']?.startsWith('Stream<') ?? false)) ? '''
+          final response = $clientInstanceName.${apiPath.endsWith('.proto') ? eventName : method}(${getEventCallArgs(apiPath, method)});
+''' : '''
+          final response = await $clientInstanceName.${apiPath.endsWith('.proto') ? eventName : method}(${getEventCallArgs(apiPath, method)});
+'''}
           ${resHitField != '' ? '''
           if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));

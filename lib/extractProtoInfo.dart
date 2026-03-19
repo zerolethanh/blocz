@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:recase/recase.dart';
 
 class ProtoMethod {
   final String name;
@@ -140,7 +139,6 @@ List<String> extractMethodListFromProto(String filePath) {
 String extractProtoMethodParams(String filePath, String methodName) {
   final content = File(filePath).readAsStringSync();
   final services = parseProtoServices(content);
-  final messages = parseProtoMessages(content);
 
   for (final service in services) {
     for (final method in service.methods) {
@@ -150,25 +148,10 @@ String extractProtoMethodParams(String filePath, String methodName) {
           return '()';
         }
 
-        final message = messages.firstWhere(
-          (m) => m.name == requestType,
-          orElse: () => ProtoMessage(name: requestType, fields: []),
-        );
-
-        if (message.fields.isEmpty) {
-          return '($requestType request)';
-        }
-
-        final params = message.fields.map((f) {
-          final dartType = mapProtoTypeToDart(f.type);
-          final fieldName = f.name.camelCase;
-          if (f.isRepeated) {
-            return 'List<$dartType> $fieldName';
-          }
-          return '$dartType $fieldName';
-        }).join(', ');
-
-        return '({$params})';
+        final type = method.isClientStreaming
+            ? 'Stream<$requestType>'
+            : requestType;
+        return '($type request)';
       }
     }
   }
@@ -186,11 +169,27 @@ String extractProtoMethodResponseType(String filePath, String methodName) {
         if (responseType == 'void' || responseType == 'google.protobuf.Empty') {
           return 'void';
         }
-        return responseType;
+        return method.isServerStreaming
+            ? 'Stream<$responseType>'
+            : responseType;
       }
     }
   }
   return 'dynamic';
+}
+
+String getProtoServiceName(String filePath, String methodName) {
+  final content = File(filePath).readAsStringSync();
+  final services = parseProtoServices(content);
+
+  for (final service in services) {
+    for (final method in service.methods) {
+      if (method.name == methodName) {
+        return service.name;
+      }
+    }
+  }
+  return 'Service';
 }
 
 String getProtoClassName(String filePath, String methodName) {
