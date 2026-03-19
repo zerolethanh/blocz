@@ -306,11 +306,15 @@ Future<(String, String, String, String)> _addSingleEvent(
       final clientInstanceName = apiClassName?.camelCase;
       final bool isProto = apiPath?.endsWith('.proto') ?? false;
 
-      // print(blocContent);
+      //
+      // INSTANCE GENERATOR CODE
+      //
+
+      String instanceCode = '';
       if (isProto &&
           clientInstanceName != null &&
           !blocContent.contains('$apiClassName get $clientInstanceName')) {
-        final String getter =
+        instanceCode =
             '''
 // import 'package:connectrpc/http2.dart';
 // import 'package:connectrpc/protobuf.dart';
@@ -324,29 +328,44 @@ $apiClassName get $clientInstanceName => $apiClassName(
   ),
 );
 ''';
-        // Insert after part of or imports
-        final lines = blocContent.split('\n');
-        int insertIndex = 0;
-        for (int i = 0; i < lines.length; i++) {
-          if (lines[i].startsWith('import ') || lines[i].startsWith('part ')) {
-            insertIndex = i + 1;
-          }
+      } else {
+        instanceCode =
+            'final $clientInstanceName = GetIt.instance<$apiClassName>();';
+        if (blocContent.contains(instanceCode)) {
+          instanceCode = '';
         }
-        lines.insert(insertIndex, '\n$getter');
-        blocContent = lines.join('\n');
-        blocLines = lines;
-        lastLine = lines.length - 1;
-        isDirty = true;
       }
+
+      // Insert after part of or imports
+      final lines = blocContent.split('\n');
+      int insertIndex = 0;
+      for (int i = 0; i < lines.length; i++) {
+        if (lines[i].startsWith('import ') || lines[i].startsWith('part ')) {
+          insertIndex = i + 1;
+        }
+      }
+      lines.insert(insertIndex, '\n$instanceCode');
+      blocContent = lines.join('\n');
+      // update blocLines & lastLine
+      blocLines = lines;
+      lastLine = lines.length - 1;
+      isDirty = true;
+      //
+      // END INSTANCE GENERATOR CODE
+      //
+
+      //
+      // API CODE BLOCK
+      //
       final apiCodeBlock =
           apiPath != null && method != null && apiClassName != null
           ? '''
         try {
-          ${isProto ? '' : 'final $clientInstanceName = GetIt.instance<$apiClassName>();'}
+          // ${isProto ? '' : 'final $clientInstanceName = GetIt.instance<$apiClassName>();'}
           ${(isProto && (responseType?['responseDataType']?.startsWith('Stream<') ?? false)) ? '''
-          final response = $clientInstanceName.${apiPath.endsWith('.proto') ? eventName : method}(${getEventCallArgs(apiPath, method)});
+          final response = $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
 ''' : '''
-          final response = await $clientInstanceName.${apiPath.endsWith('.proto') ? eventName : method}(${getEventCallArgs(apiPath, method)});
+          final response = await $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
 '''}
           ${resHitField != '' ? '''
           if (response == null) {
