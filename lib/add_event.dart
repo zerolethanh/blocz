@@ -14,6 +14,7 @@ import 'package:blocz/findLast_On_LineNumber.dart';
 import 'package:blocz/getClassName.dart';
 import 'package:blocz/makeUtils.dart';
 import 'package:path/path.dart' as p;
+import 'package:blocz/extractProtoInfo.dart';
 import 'package:recase/recase.dart';
 
 /// Adds one or more events to a BLoC.
@@ -32,7 +33,10 @@ Future<void> addEvent(
 }) async {
   // multiple event generate
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
-    final methods = extractMethodListFromClass(apiPath);
+    final bool isProto = apiPath.endsWith('.proto');
+    final methods = isProto
+        ? extractMethodListFromProto(apiPath)
+        : extractMethodListFromClass(apiPath);
     if (methods.isNotEmpty) {
       print(
         'Found ${methods.length} methods in $apiPath. Generating events...',
@@ -305,7 +309,7 @@ Future<(String, String, String, String)> _addSingleEvent(
           ? '''
         try {
           final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
-          final response = await $apiClassNameCamelCase.$method(${getEventCallArgs(apiPath, method)});
+          final response = await $apiClassNameCamelCase.${apiPath.endsWith('.proto') ? eventName : method}(${getEventCallArgs(apiPath, method)});
           ${resHitField != '' ? '''
           if (response == null) {
             emit(const ${commonClassName}State.failure('No data'));

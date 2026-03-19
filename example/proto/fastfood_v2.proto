@@ -1,0 +1,81 @@
+syntax = "proto3"; // Phiên bản mới nhất của Protobuf
+
+// Tên package để quản lý code
+package fastfood_v2;
+
+import "google/type/money.proto";
+
+option go_package = "github.com/zerolethanh/iQUIC/grpc/gen/go/fastfood/v2";
+
+// 1. Dữ liệu Khách hàng gửi đi (Chỉ cần mã Combo)
+message OrderRequest {
+  string combo_id = 1;
+  uint32 quantity = 2;
+  // Lưu ý: Số '1' ở đây là số thứ tự (tag) để mã hóa nhị phân cho nhanh,
+  // không phải là giá trị của combo.
+}
+
+// 2. Dữ liệu Nhà hàng trả về (Chi tiết món ăn và giá tiền)
+message OrderResponse {
+  string items = 1;
+  google.type.Money total_price = 2;
+  uint32 ordered_quantity = 3;
+}
+
+message StreamOrderRequest {
+  string combo_id = 1;
+  uint32 quantity = 2;
+  uint32 start_time = 3;
+  // Lưu ý: Số '1' ở đây là số thứ tự (tag) để mã hóa nhị phân cho nhanh,
+  // không phải là giá trị của combo.
+}
+
+// 2. Dữ liệu Nhà hàng trả về (Chi tiết món ăn và giá tiền)
+message StreamOrderResponse {
+  oneof response_type {
+    OrderResponse success_response = 1;
+    string error_message = 2;
+  }
+  int64 startTime = 4;
+  int64 endTime = 5;
+}
+
+message MenuReq {}
+message MenuRes {
+  repeated string items = 1;
+}
+
+// combo
+message ComboListReq{
+  
+}
+message FoodItem { 
+  string id = 1;
+  string name=2;
+  google.type.Money price =3;
+  string note = 4;
+}
+
+message ComboItem{
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated FoodItem foodItems = 4;
+  google.type.Money comboPrice = 5;
+}
+
+message ComboListRes{
+  repeated ComboItem comboItems = 1;
+
+}
+// END combo region
+
+service FastFoodService {
+  // Hàm 'OrderMeal': Nhận vào OrderRequest và trả về OrderResponse
+  rpc OrderMeal(OrderRequest) returns (OrderResponse);
+  rpc Menus(MenuReq) returns (MenuRes);
+
+  rpc StreamOrder(stream StreamOrderRequest) returns (stream StreamOrderResponse);
+  rpc ComboList(ComboListReq) returns (ComboListRes);
+  rpc ComboOrder( ComboItem) returns ();
+}

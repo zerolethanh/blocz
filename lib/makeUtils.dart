@@ -6,6 +6,7 @@ import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/extractConstructorParams.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithField.dart';
+import 'package:blocz/extractProtoInfo.dart';
 import 'package:recase/recase.dart';
 
 void runDartFormat(String dir) {
@@ -42,6 +43,40 @@ String replaceDomainKey(String? writeDir, String domain) {
 /// (e.g., `id, name: event.name`) to be used in the generated code.
 String getEventCallArgs(String? fpath, String? method) {
   if (fpath == null || method == null) return '';
+
+  if (fpath.endsWith('.proto')) {
+    final content = File(fpath).readAsStringSync();
+    final services = parseProtoServices(content);
+    final messages = parseProtoMessages(content);
+
+    for (final service in services) {
+      for (final protoMethod in service.methods) {
+        if (protoMethod.name == method) {
+          final requestType = protoMethod.requestType;
+          if (requestType == 'void' || requestType == 'google.protobuf.Empty') {
+            return '';
+          }
+
+          final message = messages.firstWhere(
+            (m) => m.name == requestType,
+            orElse: () => ProtoMessage(name: requestType, fields: []),
+          );
+
+          if (message.fields.isEmpty) {
+            return 'event.request';
+          }
+
+          final args = message.fields.map((f) {
+            final fieldName = f.name.camelCase;
+            return '$fieldName: event.$fieldName';
+          }).join(', ');
+
+          return '$requestType($args)';
+        }
+      }
+    }
+    return '';
+  }
 
   String? paramsJson;
   try {
@@ -126,17 +161,21 @@ Future<String> stateParam(String? fp, String? method, bool? isApiPath) async {
     return "()";
   }
   if (isApiPath != null && isApiPath) {
-    Map<String, dynamic>? responseType;
+    if (fp.endsWith('.proto')) {
+      final responseType = extractProtoMethodResponseType(fp, method);
+      if (responseType == 'void' || responseType == 'dynamic') {
+        return "()";
+      }
+      return "($responseType data)";
+    }
     try {
-      responseType = await extractMethodResponseTypeWithField(
+      final responseTypeMap = await extractMethodResponseTypeWithField(
         fp,
         method,
         "data,body",
       );
-      String responseDataType = "dynamic";
-      String result = "()";
-      responseDataType = responseType['responseDataType'];
-      result = "($responseDataType data)";
+      String responseDataType = responseTypeMap['responseDataType'] ?? "dynamic";
+      String result = "($responseDataType data)";
       if (result == "(void data)") {
         result = "()";
       }
@@ -162,6 +201,9 @@ String eventParam(String? fp, String method, bool? isApiPath) {
   if (isApiPath != null && isApiPath) {
     // fp = apiPath
     try {
+      if (fp.endsWith('.proto')) {
+        return extractProtoMethodParams(fp, method);
+      }
       Map<String, dynamic>? eResult = jsonDecode(
         extractMethodParams(fp, method) ?? "{}",
       );

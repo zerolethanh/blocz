@@ -5,9 +5,13 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import 'package:blocz/extractProtoInfo.dart';
 import '_internal/typedef.dart';
 
 JSONString findClassNameByMethodName(String filePath, String methodName) {
+  if (filePath.endsWith('.proto')) {
+    return getProtoClassName(filePath, methodName);
+  }
   final file = File(filePath);
   if (!file.existsSync()) {
     throw Exception('File not found: $filePath');
