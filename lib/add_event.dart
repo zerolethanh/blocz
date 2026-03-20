@@ -376,7 +376,6 @@ Transport(
         ? '''
       try {
         emit(const ${commonClassName}State.loading());
-        // ${isProto ? '' : 'final $clientInstanceName = GetIt.instance<$apiClassName>();'}
         ${(isProto && (responseType?['responseDataType']?.startsWith('Stream<') ?? false)) ? '''
         final response = $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
 ''' : '''
