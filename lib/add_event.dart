@@ -273,10 +273,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   final bool _hasOnMethod = hasMethod(blocPath, onMethodName);
   if (!update) {
     if (_hasOnRegistration) {
-      printWarning(
-        "event handler registration `$onRegistration` already exists. skip...",
-      );
-
+      printWarning(" `$onRegistration` already exists. skip...");
       // printWarning("use `--update` to force update");
       return ("", "", "", ""); // Already up-to-date for this event, do nothing.
     }
@@ -291,117 +288,131 @@ Future<(String, String, String, String)> _addSingleEvent(
   bool isDirty = false;
 
   // Insert method if it's missing. This is inserted near the end of the file.
-  if (!_hasOnMethod) {
-    int? lastLine = findLastClassbodyLineNumber(blocPath);
-    if (lastLine != null) {
-      final responseType = (apiPath != null && method != null)
-          ? await extractMethodResponseInnerDataType(apiPath, method)
-          : null;
+  int? lastLine = findLastClassbodyLineNumber(blocPath);
+  if (!_hasOnMethod && lastLine != null) {
+    final responseType = (apiPath != null && method != null)
+        ? await extractMethodResponseInnerDataType(apiPath, method)
+        : null;
 
-      final resHitField = responseType?['hitField'] ?? '';
-      final apiClassName = apiPath != null && method != null
-          ? findClassNameByMethodName(apiPath, method)
-          : null;
+    final resHitField = responseType?['hitField'] ?? '';
+    final apiClassName = apiPath != null && method != null
+        ? findClassNameByMethodName(apiPath, method)
+        : null;
 
-      final clientInstanceName = apiClassName?.camelCase;
-      final bool isProto = apiPath?.endsWith('.proto') ?? false;
+    final clientInstanceName = apiClassName?.camelCase;
+    final bool isProto = apiPath?.endsWith('.proto') ?? false;
 
-      //
-      // INSTANCE GENERATOR CODE
-      //
+    ////////////////////////////////
+    // INSTANCE GENERATOR CODE
+    ////////////////////////////////
 
-      String instanceCode = '';
-      if (isProto &&
-          clientInstanceName != null &&
-          !blocContent.contains('final $clientInstanceName = $apiClassName(')) {
-        instanceCode =
-            '''
-// import 'package:connectrpc/http2.dart';
-// import 'package:connectrpc/protobuf.dart';
-// import 'package:connectrpc/protocol/connect.dart';
+    String instanceCode = '';
+    if (isProto &&
+        clientInstanceName != null &&
+        !blocContent.contains('final $clientInstanceName = $apiClassName(')) {
+      ////////////////////////////////
+      // START wirte proto imports
+      ////////////////////////////////
+      const protoImports = '''
+import 'package:connectrpc/http2.dart';
+import 'package:connectrpc/protobuf.dart';
+import 'package:connectrpc/protocol/connect.dart';
+''';
+      blocLines.insert(0, protoImports);
+      File(blocPath).writeAsStringSync(blocLines.join('\n'));
+      blocContent = File(blocPath).readAsStringSync();
+      blocLines = blocContent.split('\n');
+      ////////////////////////////////
+      // END wirte proto imports
+      ////////////////////////////////
 
+      ////////////////////////////////
+      // START write instance code
+      ////////////////////////////////
+      instanceCode =
+          '''
 final $clientInstanceName = $apiClassName(
-  Transport(
-    baseUrl: "https://[IP_ADDRESS]",
-    codec: const ProtoCodec(), // Or JsonCodec()
-    httpClient: createHttpClient(), // h2 transporter
-  ),
+Transport(
+  baseUrl: "https://[IP_ADDRESS]",
+  codec: const ProtoCodec(), // Or JsonCodec()
+  httpClient: createHttpClient(), // h2 transporter
+),
 );
 ''';
-      } else if (!isProto) {
-        instanceCode =
-            'final $clientInstanceName = GetIt.instance<$apiClassName>();';
-        if (blocContent.contains(instanceCode)) {
-          instanceCode = '';
-        }
+    } else if (!isProto) {
+      instanceCode =
+          'final $clientInstanceName = GetIt.instance<$apiClassName>();';
+      if (blocContent.contains(instanceCode)) {
+        instanceCode = '';
       }
-
-      // Insert after part of or imports
-      final lines = blocContent.split('\n');
-      int insertIndex = 0;
-      for (int i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith('import ') || lines[i].startsWith('part ')) {
-          insertIndex = i + 1;
-        }
-      }
-      if (instanceCode.isNotEmpty) {
-        lines.insert(insertIndex, '\n$instanceCode');
-      }
-      blocContent = lines.join('\n');
-      // update blocLines & lastLine
-      blocLines = lines;
-      lastLine = lines.length - 1;
-      isDirty = true;
-      //
-      // END INSTANCE GENERATOR CODE
-      //
-
-      //
-      // API CODE BLOCK
-      //
-      final apiCodeBlock =
-          apiPath != null && method != null && apiClassName != null
-          ? '''
-        try {
-          emit(const ${commonClassName}State.loading());
-          // ${isProto ? '' : 'final $clientInstanceName = GetIt.instance<$apiClassName>();'}
-          ${(isProto && (responseType?['responseDataType']?.startsWith('Stream<') ?? false)) ? '''
-          final response = $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
-''' : '''
-          final response = await $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
-'''}
-          ${resHitField != '' ? '''
-          if (response == null) {
-            emit(const ${commonClassName}State.failure('No data'));
-            return;
-          }
-          emit(${commonClassName}State.${eventName}Result(response.$resHitField));
-''' : '''
-          ${newStateParams == "()" ? '''
-          emit(${commonClassName}State.${eventName}Result());
-''' : '''
-          emit(${commonClassName}State.${eventName}Result(response));
-          '''}
-'''}
-        } catch (e) {
-          emit(${commonClassName}State.failure(e.toString()));
-        }
-'''
-          : '';
-
-      final newMethod =
-          '''
-
-  Future<void> $onMethodName(
-    _${EventName}Requested event,
-    Emitter<${commonClassName}State> emit,
-  ) async {
-    $apiCodeBlock
-  }
-''';
-      blocLines.insert(lastLine! - 1, newMethod);
-      isDirty = true;
     }
+
+    // Insert after part of or imports
+    final lines = blocContent.split('\n');
+    int insertIndex = 0;
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].startsWith('import ') || lines[i].startsWith('part ')) {
+        insertIndex = i + 1;
+      }
+    }
+    if (instanceCode.isNotEmpty) {
+      lines.insert(insertIndex, '\n$instanceCode');
+    }
+    blocContent = lines.join('\n');
+    // update blocLines & lastLine
+    blocLines = lines;
+    lastLine = lines.length - 1;
+    isDirty = true;
+
+    ////////////////////////////////
+    // END INSTANCE GENERATOR CODE
+    ////////////////////////////////
+
+    //
+    // API CODE BLOCK
+    //
+    final apiCodeBlock =
+        apiPath != null && method != null && apiClassName != null
+        ? '''
+      try {
+        emit(const ${commonClassName}State.loading());
+        // ${isProto ? '' : 'final $clientInstanceName = GetIt.instance<$apiClassName>();'}
+        ${(isProto && (responseType?['responseDataType']?.startsWith('Stream<') ?? false)) ? '''
+        final response = $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
+''' : '''
+        final response = await $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
+'''}
+        ${resHitField != '' ? '''
+        if (response == null) {
+          emit(const ${commonClassName}State.failure('No data'));
+          return;
+        }
+        emit(${commonClassName}State.${eventName}Result(response.$resHitField));
+''' : '''
+        ${newStateParams == "()" ? '''
+        emit(${commonClassName}State.${eventName}Result());
+''' : '''
+        emit(${commonClassName}State.${eventName}Result(response));
+        '''}
+'''}
+      } catch (e) {
+        emit(${commonClassName}State.failure(e.toString()));
+      }
+'''
+        : '';
+
+    final newMethod =
+        '''
+
+Future<void> $onMethodName(
+  _${EventName}Requested event,
+  Emitter<${commonClassName}State> emit,
+) async {
+  $apiCodeBlock
+}
+''';
+    blocLines.insert(lastLine! - 1, newMethod);
+    isDirty = true;
   }
 
   // Insert the 'on' call if it's missing. This is inserted earlier in the file.
