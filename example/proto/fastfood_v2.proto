@@ -3,6 +3,9 @@ syntax = "proto3";
 package fastfood_v2;
 
 import "google/type/money.proto";
+
+option go_package = "github.com/zerolethanh/iQUIC/grpc/gen/go/fastfood/v2";
+
 message OrderRequest {
   string combo_id = 1;
   uint32 quantity = 2;
@@ -62,5 +65,5 @@ service FastFoodService {
   rpc OrderMeal(OrderRequest) returns (OrderResponse);
   rpc Menus(MenuReq) returns (MenuRes);
   rpc StreamOrder(stream StreamOrderRequest) returns (stream StreamOrderResponse);
-  rpc ComboList(ComboListReq) returns (stream ComboListRes);
+  rpc ComboList(ComboListReq) returns (ComboListRes);
 }

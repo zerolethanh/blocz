@@ -318,7 +318,7 @@ import 'package:connectrpc/http2.dart';
 import 'package:connectrpc/protobuf.dart';
 import 'package:connectrpc/protocol/connect.dart';
 ''';
-      blocLines.insert(0, protoImports);
+      blocLines.insert(1, protoImports);
       File(blocPath).writeAsStringSync(blocLines.join('\n'));
       blocContent = File(blocPath).readAsStringSync();
       blocLines = blocContent.split('\n');
@@ -375,7 +375,7 @@ Transport(
         apiPath != null && method != null && apiClassName != null
         ? '''
       try {
-        emit(const ${commonClassName}State.loading());
+        // emit(const ${commonClassName}State.loading());
         ${(isProto && (responseType?['responseDataType']?.startsWith('Stream<') ?? false)) ? '''
         final response = $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
 ''' : '''
