@@ -313,14 +313,14 @@ Future<(String, String, String, String)> _addSingleEvent(
       String instanceCode = '';
       if (isProto &&
           clientInstanceName != null &&
-          !blocContent.contains('$apiClassName get $clientInstanceName')) {
+          !blocContent.contains('final $clientInstanceName = $apiClassName(')) {
         instanceCode =
             '''
 // import 'package:connectrpc/http2.dart';
 // import 'package:connectrpc/protobuf.dart';
 // import 'package:connectrpc/protocol/connect.dart';
 
-$apiClassName get $clientInstanceName => $apiClassName(
+final $clientInstanceName = $apiClassName(
   Transport(
     baseUrl: "https://[IP_ADDRESS]",
     codec: const ProtoCodec(), // Or JsonCodec()
@@ -328,7 +328,7 @@ $apiClassName get $clientInstanceName => $apiClassName(
   ),
 );
 ''';
-      } else {
+      } else if (!isProto) {
         instanceCode =
             'final $clientInstanceName = GetIt.instance<$apiClassName>();';
         if (blocContent.contains(instanceCode)) {
@@ -344,7 +344,9 @@ $apiClassName get $clientInstanceName => $apiClassName(
           insertIndex = i + 1;
         }
       }
-      lines.insert(insertIndex, '\n$instanceCode');
+      if (instanceCode.isNotEmpty) {
+        lines.insert(insertIndex, '\n$instanceCode');
+      }
       blocContent = lines.join('\n');
       // update blocLines & lastLine
       blocLines = lines;
@@ -361,6 +363,7 @@ $apiClassName get $clientInstanceName => $apiClassName(
           apiPath != null && method != null && apiClassName != null
           ? '''
         try {
+          emit(const ${commonClassName}State.loading());
           // ${isProto ? '' : 'final $clientInstanceName = GetIt.instance<$apiClassName>();'}
           ${(isProto && (responseType?['responseDataType']?.startsWith('Stream<') ?? false)) ? '''
           final response = $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
