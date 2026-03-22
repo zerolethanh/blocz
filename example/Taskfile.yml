@@ -8,3 +8,13 @@ tasks:
     cmds:
       - buf dep update
       - buf generate
+
+  make:user:
+    cmds:
+      - task buf
+      - blocz add:event -d user_proto -a proto/user.proto --update
+
+  brun:
+    aliases: ["b"]
+    cmds:
+      - dart run build_runner build --delete-conflicting-outputs

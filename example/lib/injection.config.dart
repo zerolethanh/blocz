@@ -12,6 +12,8 @@
 import 'package:blocz_example/api/example_api.dart' as _i919;
 import 'package:blocz_example/features/user/presentation/bloc/user_bloc.dart'
     as _i624;
+import 'package:blocz_example/features/user_proto/presentation/bloc/user_proto_bloc.dart'
+    as _i116;
 import 'package:blocz_example/injection.dart' as _i400;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -25,6 +27,7 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
     gh.singleton<_i919.ExampleApi>(() => registerModule.exampleApi);
+    gh.lazySingleton<_i116.UserProtoBloc>(() => _i116.UserProtoBloc());
     gh.lazySingleton<_i624.UserBloc>(() => _i624.UserBloc());
     return this;
   }
