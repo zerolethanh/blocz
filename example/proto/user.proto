@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package user;
+
+message User {
+  string id = 1;
+  string email = 2;
+  string display_name = 3;
+  string photo_url = 4;
+  int64 last_login_at = 5;
+}
