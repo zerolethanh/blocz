@@ -44,55 +44,87 @@ class ProtoMessage {
 
 List<ProtoService> parseProtoServices(String content) {
   final services = <ProtoService>[];
-  final serviceRegex = RegExp(r'service\s+(\w+)\s*\{([\s\S]*?)\}');
+  final serviceStartRegex = RegExp(r'service\s+(\w+)\s*\{');
   final rpcRegex = RegExp(
-    r'rpc\s+(\w+)\s*\(\s*(stream\s+)?(\w+)?\s*\)\s*returns\s*\(\s*(stream\s+)?(\w+)?\s*\)\s*;',
+    r'rpc\s+(\w+)\s*\(\s*(stream\s+)?([\w\.]+)?\s*\)\s*returns\s*\(\s*(stream\s+)?([\w\.]+)?\s*\)\s*(?:;|\{[\s\S]*?\})',
   );
 
-  for (final serviceMatch in serviceRegex.allMatches(content)) {
+  for (final serviceMatch in serviceStartRegex.allMatches(content)) {
     final serviceName = serviceMatch.group(1)!;
-    final serviceBody = serviceMatch.group(2)!;
-    final methods = <ProtoMethod>[];
+    final bodyStartIndex = serviceMatch.end;
 
-    for (final rpcMatch in rpcRegex.allMatches(serviceBody)) {
-      methods.add(
-        ProtoMethod(
-          name: rpcMatch.group(1)!,
-          isClientStreaming: rpcMatch.group(2) != null,
-          requestType: rpcMatch.group(3) ?? 'void',
-          isServerStreaming: rpcMatch.group(4) != null,
-          responseType: rpcMatch.group(5) ?? 'void',
-        ),
-      );
+    // Find matching brace manually to handle nested braces
+    int braceCount = 1;
+    int bodyEndIndex = -1;
+    for (int i = bodyStartIndex; i < content.length; i++) {
+      if (content[i] == '{') braceCount++;
+      if (content[i] == '}') braceCount--;
+      if (braceCount == 0) {
+        bodyEndIndex = i;
+        break;
+      }
     }
-    services.add(ProtoService(name: serviceName, methods: methods));
+
+    if (bodyEndIndex != -1) {
+      final serviceBody = content.substring(bodyStartIndex, bodyEndIndex);
+      final methods = <ProtoMethod>[];
+
+      for (final rpcMatch in rpcRegex.allMatches(serviceBody)) {
+        methods.add(
+          ProtoMethod(
+            name: rpcMatch.group(1)!,
+            isClientStreaming: rpcMatch.group(2) != null,
+            requestType: rpcMatch.group(3) ?? 'void',
+            isServerStreaming: rpcMatch.group(4) != null,
+            responseType: rpcMatch.group(5) ?? 'void',
+          ),
+        );
+      }
+      services.add(ProtoService(name: serviceName, methods: methods));
+    }
   }
   return services;
 }
 
 List<ProtoMessage> parseProtoMessages(String content) {
   final messages = <ProtoMessage>[];
-  final messageRegex = RegExp(r'message\s+(\w+)\s*\{([\s\S]*?)\}');
+  final messageStartRegex = RegExp(r'message\s+(\w+)\s*\{');
   final fieldRegex = RegExp(
     r'^\s*(repeated\s+)?([\w\.]+)\s+(\w+)\s*=\s*\d+\s*;',
     multiLine: true,
   );
 
-  for (final messageMatch in messageRegex.allMatches(content)) {
+  for (final messageMatch in messageStartRegex.allMatches(content)) {
     final messageName = messageMatch.group(1)!;
-    final messageBody = messageMatch.group(2)!;
-    final fields = <ProtoMessageField>[];
+    final bodyStartIndex = messageMatch.end;
 
-    for (final fieldMatch in fieldRegex.allMatches(messageBody)) {
-      fields.add(
-        ProtoMessageField(
-          isRepeated: fieldMatch.group(1) != null,
-          type: fieldMatch.group(2)!,
-          name: fieldMatch.group(3)!,
-        ),
-      );
+    // Find matching brace manually to handle nested blocks like enums or options
+    int braceCount = 1;
+    int bodyEndIndex = -1;
+    for (int i = bodyStartIndex; i < content.length; i++) {
+      if (content[i] == '{') braceCount++;
+      if (content[i] == '}') braceCount--;
+      if (braceCount == 0) {
+        bodyEndIndex = i;
+        break;
+      }
     }
-    messages.add(ProtoMessage(name: messageName, fields: fields));
+
+    if (bodyEndIndex != -1) {
+      final messageBody = content.substring(bodyStartIndex, bodyEndIndex);
+      final fields = <ProtoMessageField>[];
+
+      for (final fieldMatch in fieldRegex.allMatches(messageBody)) {
+        fields.add(
+          ProtoMessageField(
+            isRepeated: fieldMatch.group(1) != null,
+            type: fieldMatch.group(2)!,
+            name: fieldMatch.group(3)!,
+          ),
+        );
+      }
+      messages.add(ProtoMessage(name: messageName, fields: fields));
+    }
   }
   return messages;
 }
