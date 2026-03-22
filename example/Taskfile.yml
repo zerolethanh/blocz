@@ -12,6 +12,10 @@ tasks:
   make:user:
     cmds:
       - task buf
+      - blocz add:event -d user -a lib/api/example_api.dart --update
+  make:user:proto:
+    cmds:
+      - task buf
       - blocz add:event -d user_proto -a proto/user.proto --update
 
   brun:
