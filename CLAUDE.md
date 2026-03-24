@@ -1,6 +1,3 @@
-- using dart AST to write supports extract functions
-- lib/_internal directory include reuse-able functions
-
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
