@@ -96,6 +96,12 @@ Future<void> main(List<String> arguments) async {
       abbr: 'u',
       help: 'Update existing event and BLoC method if parameters have changed',
       defaultsTo: false,
+    )
+    ..addFlag(
+      'repository',
+      abbr: 'r',
+      help: 'Create repository & repository_impl',
+      defaultsTo: false,
     );
 
   parser.addCommand('pr', parser.addCommand("project:root"))
@@ -359,6 +365,7 @@ Future<void> main(List<String> arguments) async {
         final method = command['method'] as String?;
         final writeDir = command['writeDir'] as String?;
         final update = command['update'] as bool;
+        final makeRepository = command['repository'] as bool;
         await addEvent(
           domain,
           name,
@@ -367,6 +374,7 @@ Future<void> main(List<String> arguments) async {
           method,
           writeDir: writeDir,
           update: update,
+          makeRepository: makeRepository,
         );
         break;
       case 'pr':

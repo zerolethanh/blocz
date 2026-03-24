@@ -30,6 +30,7 @@ Future<void> addEvent(
   String? method, {
   String? writeDir,
   bool update = false,
+  bool makeRepository = false,
 }) async {
   // multiple event generate
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
@@ -62,6 +63,7 @@ Future<void> addEvent(
             methodName,
             writeDir: writeDir,
             update: update,
+            makeRepository: makeRepository,
           ),
         );
       }
@@ -108,6 +110,7 @@ Future<void> addEvent(
     method ?? event,
     writeDir: writeDir,
     update: update,
+    makeRepository: makeRepository,
   );
   if (result.$1.isEmpty) {
     printWarning("No events generated.");
@@ -135,6 +138,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   String? method, {
   String? writeDir,
   bool update = false,
+  bool makeRepository = false,
 }) async {
   final bool isEmptyName = name == null || name.trim().isEmpty;
   name = isEmptyName ? domain : name;
@@ -453,11 +457,105 @@ Future<void> $onMethodName(
         File(blocPath).writeAsStringSync(updatedSource);
         print('Updated (refresh args): $blocPath');
       } else {
-        printWarning(
-          "Could not find method call to `.$method` in $blocPath for surgical update.",
-        );
+        // printWarning(
+        //   "Could not find method call to `.$method` in $blocPath for surgical update.",
+        // );
       }
     }
   }
+  if (makeRepository) {
+    final repoDir = p.join(p.dirname(effectiveWriteDir), 'repository');
+    Directory(repoDir).createSync(recursive: true);
+
+    final repoPath = p.join(repoDir, '${commonFileName}_repository.dart');
+    final repoImplPath = p.join(
+      repoDir,
+      '${commonFileName}_repository_impl.dart',
+    );
+
+    if (!File(repoPath).existsSync()) {
+      final repoContent =
+          '''
+abstract class ${commonClassName}Repository {
+}
+''';
+      File(repoPath).writeAsStringSync(repoContent);
+      printSuccess('Generated: $repoPath');
+    }
+
+    if (!File(repoImplPath).existsSync()) {
+      final repoImplContent =
+          '''
+import '${commonFileName}_repository.dart';
+
+@LazySingleton(as: ${commonClassName}Repository)
+class ${commonClassName}RepositoryImpl implements ${commonClassName}Repository {
+}
+''';
+      File(repoImplPath).writeAsStringSync(repoImplContent);
+      printSuccess('Generated: $repoImplPath');
+    }
+
+    // append new methods if api is specified
+    if (apiPath != null && method != null) {
+      final repoStateParams = await stateParam(apiPath, method, true);
+      final repoEventParam = eventParam(apiPath, method, true);
+      String repoReturnType = 'Future<void>';
+
+      if (repoStateParams != '()') {
+        String inner = repoStateParams
+            .substring(1, repoStateParams.length - 1)
+            .trim();
+        int lastSpace = inner.lastIndexOf(' ');
+        if (lastSpace != -1) {
+          String type = inner.substring(0, lastSpace).trim();
+          repoReturnType = type.startsWith('Stream<') ? type : 'Future<$type>';
+        } else {
+          String type = inner;
+          repoReturnType = type.startsWith('Stream<') ? type : 'Future<$type>';
+        }
+      }
+
+      final interfaceMethod = '  $repoReturnType $eventName$repoEventParam;';
+      final implMethod =
+          '''
+  @override
+  $repoReturnType $eventName$repoEventParam async {
+    // TODO: implement $eventName
+    throw UnimplementedError();
+  }''';
+
+      // Update interface
+      String repoContent = File(repoPath).readAsStringSync();
+      if (!repoContent.contains(' $eventName(')) {
+        int lastBrace = repoContent.lastIndexOf('}');
+        if (lastBrace != -1) {
+          repoContent =
+              repoContent.substring(0, lastBrace) +
+              interfaceMethod +
+              '\n' +
+              repoContent.substring(lastBrace);
+          File(repoPath).writeAsStringSync(repoContent);
+          printSuccess('Updated: $repoPath with $eventName');
+        }
+      }
+
+      // Update impl
+      String repoImplContent = File(repoImplPath).readAsStringSync();
+      if (!repoImplContent.contains(' $eventName(')) {
+        int lastBraceImpl = repoImplContent.lastIndexOf('}');
+        if (lastBraceImpl != -1) {
+          repoImplContent =
+              repoImplContent.substring(0, lastBraceImpl) +
+              implMethod +
+              '\n' +
+              repoImplContent.substring(lastBraceImpl);
+          File(repoImplPath).writeAsStringSync(repoImplContent);
+          printSuccess('Updated: $repoImplPath with $eventName');
+        }
+      }
+    }
+  }
+
   return (effectiveWriteDir, blocPath, eventPath, statePath);
 }
