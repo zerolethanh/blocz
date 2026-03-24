@@ -36,7 +36,7 @@ tasks:
       - dart run bin/blocz.dart {{.CLI_ARGS}}
 
   release:local:
-    desc: Release local (compiles and copies binary to pub-cache bin)
+    desc: Release local (compiles and copies binary to /usr/local/bin)
     aliases:
       - rl
     cmds:
@@ -56,14 +56,12 @@ tasks:
   _copy:bin:darwin:
     internal: true
     cmds:
-      - mkdir -p "$HOME/.pub-cache/bin"
-      - cp bin/blocz "$HOME/.pub-cache/bin/blocz"
+      - cp bin/blocz /usr/local/bin/blocz
 
   _copy:bin:linux:
     internal: true
     cmds:
-      - mkdir -p "$HOME/.pub-cache/bin"
-      - cp bin/blocz "$HOME/.pub-cache/bin/blocz"
+      - cp bin/blocz /usr/local/bin/blocz
 
   _copy:bin:windows:
     internal: true
@@ -79,26 +77,12 @@ tasks:
   _setup:path:darwin:
     internal: true
     cmds:
-      - |
-        if [[ ":$PATH:" != *":$HOME/.pub-cache/bin:"* ]]; then
-          echo "Adding $HOME/.pub-cache/bin to PATH in ~/.zshrc"
-          echo 'export PATH="$PATH:$HOME/.pub-cache/bin"' >> ~/.zshrc
-          echo "Added to ~/.zshrc. Please run 'source ~/.zshrc' or restart terminal."
-        else
-          echo "PATH already contains pub-cache/bin"
-        fi
+      - echo "/usr/local/bin is usually in PATH. If not, please add it."
 
   _setup:path:linux:
     internal: true
     cmds:
-      - |
-        if [[ ":$PATH:" != *":$HOME/.pub-cache/bin:"* ]]; then
-          echo "Adding $HOME/.pub-cache/bin to PATH in ~/.bashrc"
-          echo 'export PATH="$PATH:$HOME/.pub-cache/bin"' >> ~/.bashrc
-          echo "Added to ~/.bashrc. Please run 'source ~/.bashrc' or restart terminal."
-        else
-          echo "PATH already contains pub-cache/bin"
-        fi
+      - echo "/usr/local/bin is usually in PATH. If not, please add it."
 
   _setup:path:windows:
     internal: true
