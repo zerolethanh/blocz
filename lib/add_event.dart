@@ -486,6 +486,7 @@ abstract class ${commonClassName}Repository {
     if (!File(repoImplPath).existsSync()) {
       final repoImplContent =
           '''
+import 'package:injectable/injectable.dart';
 import '${commonFileName}_repository.dart';
 
 @LazySingleton(as: ${commonClassName}Repository)
