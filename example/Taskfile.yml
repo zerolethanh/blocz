@@ -12,11 +12,12 @@ tasks:
   make:user:
     cmds:
       - task buf
-      - blocz add:event -d user -a lib/api/example_api.dart --update
+      - blocz add:event -d user -a lib/api/example_api.dart --update {{.CLI_ARGS}} # example: task make:user -- --repository
+
   make:user:proto:
     cmds:
       - task buf
-      - blocz add:event -d user_proto -a proto/user.proto --update
+      - blocz add:event -d user_proto -a proto/user.proto --update {{.CLI_ARGS}} # example: task make:user:proto -- --repository
 
   brun:
     aliases: ["b"]
