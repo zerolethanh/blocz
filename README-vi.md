@@ -14,7 +14,8 @@ Một công cụ dòng lệnh (CLI) giúp tăng tốc độ phát triển ứng 
 - Tự động tạo cấu trúc thư mục theo domain.
 - Mã nguồn được tạo ra tương thích với các package phổ biến như `flutter_bloc`, `freezed`, và `injectable`.
 - Hỗ trợ thêm nhanh các event vào BLoC.
-- Tự động nhập (import) các event và trình xử lý từ tệp tin service API.
+- Tự động nhập (import) các event và trình xử lý từ tệp tin service API hoặc tệp **Protobuf (`.proto`)**.
+- **Khởi tạo Repository (Scaffolding)**: Tự động tạo interface và implementation cho repository, đồng bộ với các phương thức trong tệp API/Proto.
 - **Cập nhật Thông minh & Chính xác**: Sử dụng Dart AST (Abstract Syntax Tree) để phân tích và cập nhật mã nguồn một cách chính xác, bảo toàn các thay đổi thủ công của bạn.
 
 ## Cách thức hoạt động
@@ -219,6 +220,28 @@ Thêm một event từ một phương thức API cụ thể:
 ```bash
 blocz add:event --domain pet --name profile --event UpdateAvatar --apiPath lib/features/pet/data/api/pet_api.dart --method uploadAvatar
 ```
+
+#### Hỗ trợ Protobuf
+
+Bạn có thể tạo BLoC events và states trực tiếp từ một tệp `.proto`:
+
+```bash
+blocz add:event -d user_proto -a proto/user.proto --update
+```
+
+#### Khởi tạo Repository
+
+Tự động tạo interface và implementation cho repository:
+
+```bash
+blocz add:event -d user -a lib/api/example_api.dart --update --repository
+```
+
+Lệnh này sẽ tạo ra:
+- `lib/features/user/presentation/repository/user_repository.dart` (Interface)
+- `lib/features/user/presentation/repository/user_repository_impl.dart` (Implementation)
+
+Repository sẽ tự động được điền các phương thức tương ứng với định nghĩa API/Proto của bạn.
 
 Lệnh này sẽ cập nhật các tệp BLoC tương ứng để thêm (các) event mới.
 

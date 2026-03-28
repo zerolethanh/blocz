@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package user;
+
+// UserService handles user-related operations such as retrieving and updating user profiles.
+service UserService {
+  // GetUser retrieves a user by their ID.
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  // UpdateUser updates an existing user profile.
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+  // SaveUser saves or updates a user profile.
+  rpc SaveUser(SaveUserRequest) returns (SaveUserResponse) {}
+  // UploadAvatar uploads a new profile photo for a user.
+  rpc UploadAvatar(UploadAvatarRequest) returns (UploadAvatarResponse) {}
+  // UpdatePhotoUrl updates the profile photo URL for a user.
+  rpc UpdatePhotoUrl(UpdatePhotoUrlRequest) returns (UpdatePhotoUrlResponse) {}
+}
+
+// User represents a user profile in the system.
+message User {
+  // The unique identifier for the user.
+  string id = 1;
+  // The user's email address.
+  string email = 2;
+  // The user's display name.
+  string display_name = 3;
+  // The URL of the user's profile photo.
+  string photo_url = 4;
+  // The timestamp of the user's last login (Unix epoch in milliseconds).
+  int64 last_login_at = 5;
+}
+
+// GetUserRequest is the request type for GetUser.
+message GetUserRequest {
+  // The ID of the user to retrieve.
+  string id = 1;
+}
+
+// GetUserResponse is the response type for GetUser.
+message GetUserResponse {
+  // The retrieved user profile.
+  User user = 1;
+}
+
+// UpdateUserRequest is the request type for UpdateUser.
+message UpdateUserRequest {
+  // The user profile to update.
+  User user = 1;
+}
+
+// UpdateUserResponse is the response type for UpdateUser.
+message UpdateUserResponse {
+  // The updated user profile.
+  User user = 1;
+}
+
+// SaveUserRequest is the request type for SaveUser.
+message SaveUserRequest {
+  // The user profile to save.
+  User user = 1;
+}
+
+// SaveUserResponse is the response type for SaveUser.
+message SaveUserResponse {
+  // The saved user profile.
+  User user = 1;
+}
+
+// UploadAvatarRequest is the request type for UploadAvatar.
+message UploadAvatarRequest {
+  // The ID of the user whose avatar is being uploaded.
+  string user_id = 1;
+  // The avatar data in bytes.
+  bytes data = 2;
+  // The filename or extension of the avatar (optional).
+  string filename = 3;
+}
+
+// UploadAvatarResponse is the response type for UploadAvatar.
+message UploadAvatarResponse {
+  // The URL of the uploaded avatar photo.
+  string photo_url = 1;
+}
+
+// UpdatePhotoUrlRequest is the request type for UpdatePhotoUrl.
+message UpdatePhotoUrlRequest {
+  // The ID of the user to update.
+  string user_id = 1;
+  // The new photo URL.
+  string photo_url = 2;
+}
+
+// UpdatePhotoUrlResponse is the response type for UpdatePhotoUrl.
+message UpdatePhotoUrlResponse {
+  // The updated user ID.
+  string user_id = 1;
+  // The updated photo URL.
+  string photo_url = 2;
+}

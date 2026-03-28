@@ -14,7 +14,8 @@ A command-line interface (CLI) tool to speed up Flutter app development by scaff
 - Automatically create a domain-based directory structure.
 - The generated code is compatible with popular packages like `flutter_bloc`, `freezed`, and `injectable`.
 - Supports quickly adding new events to a BLoC.
-- Automatically import events and handlers from an API service file.
+- Automatically import events and handlers from an API service file or **Protobuf (`.proto`)** file.
+- **Repository Scaffolding**: Automatically generate repository interfaces and implementations synced with your API/Proto methods.
 - **Robust & Surgical Updates**: Uses Dart AST (Abstract Syntax Tree) to accurately identify and update method calls, preserving your manual changes.
 
 ## How it Works
@@ -219,6 +220,28 @@ Add a single event from a specific API method:
 ```bash
 blocz add:event --domain pet --name profile --event UpdateAvatar --apiPath ./apis/my_pet_api/lib/api/pet_api.dart --method uploadFile
 ```
+
+#### Protobuf Support
+
+You can generate BLoC events and states directly from a `.proto` file:
+
+```bash
+blocz add:event -d user_proto -a proto/user.proto --update
+```
+
+#### Repository Scaffolding
+
+Generate repository interfaces and implementations automatically:
+
+```bash
+blocz add:event -d user -a lib/api/example_api.dart --update --repository
+```
+
+This command will create:
+- `lib/features/user/presentation/repository/user_repository.dart` (Interface)
+- `lib/features/user/presentation/repository/user_repository_impl.dart` (Implementation)
+
+The repository will be automatically populated with methods matching your API/Proto definitions.
 
 This command will update the corresponding BLoC files to add the new event(s).
 

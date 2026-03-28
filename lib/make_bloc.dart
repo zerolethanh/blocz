@@ -96,7 +96,7 @@ String _renderTemplate(String templateContent, Map<String, String> data) {
   return template.renderString(data);
 }
 
-const _blocTemplate = r'''
+const _blocTemplate = '''
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_it/get_it.dart';
@@ -110,11 +110,10 @@ part '{{common_file_name}}_bloc.freezed.dart';
 @lazySingleton
 class {{CommonFileName}}Bloc extends Bloc<{{CommonFileName}}Event, {{CommonFileName}}State> {
     // dependencies injections
-    // final OtherBloc _otherBloc = GetIt.I<OtherBloc>();
-    // final OtherUseCase _otherUseCase;
+    // final {{CommonFileName}}Repository _repository;
 
     {{CommonFileName}}Bloc(
-        // this._otherUseCase
+        // this._repository
     ) : super(const {{CommonFileName}}State.initial()) {
         on<_{{CommonFileName}}EventLoading>(_on{{CommonFileName}}EventLoading);
     }

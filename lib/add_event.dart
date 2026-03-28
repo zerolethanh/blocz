@@ -14,6 +14,7 @@ import 'package:blocz/findLast_On_LineNumber.dart';
 import 'package:blocz/getClassName.dart';
 import 'package:blocz/makeUtils.dart';
 import 'package:path/path.dart' as p;
+import 'package:blocz/extractProtoInfo.dart';
 import 'package:recase/recase.dart';
 
 /// Adds one or more events to a BLoC.
@@ -29,10 +30,14 @@ Future<void> addEvent(
   String? method, {
   String? writeDir,
   bool update = false,
+  bool makeRepository = false,
 }) async {
   // multiple event generate
   if (apiPath != null && (event == null || event.trim().isEmpty)) {
-    final methods = extractMethodListFromClass(apiPath);
+    final bool isProto = apiPath.endsWith('.proto');
+    final methods = isProto
+        ? extractMethodListFromProto(apiPath)
+        : extractMethodListFromClass(apiPath);
     if (methods.isNotEmpty) {
       print(
         'Found ${methods.length} methods in $apiPath. Generating events...',
@@ -58,6 +63,7 @@ Future<void> addEvent(
             methodName,
             writeDir: writeDir,
             update: update,
+            makeRepository: makeRepository,
           ),
         );
       }
@@ -104,6 +110,7 @@ Future<void> addEvent(
     method ?? event,
     writeDir: writeDir,
     update: update,
+    makeRepository: makeRepository,
   );
   if (result.$1.isEmpty) {
     printWarning("No events generated.");
@@ -131,6 +138,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   String? method, {
   String? writeDir,
   bool update = false,
+  bool makeRepository = false,
 }) async {
   final bool isEmptyName = name == null || name.trim().isEmpty;
   name = isEmptyName ? domain : name;
@@ -269,10 +277,7 @@ Future<(String, String, String, String)> _addSingleEvent(
   final bool _hasOnMethod = hasMethod(blocPath, onMethodName);
   if (!update) {
     if (_hasOnRegistration) {
-      printWarning(
-        "event handler registration `$onRegistration` already exists. skip...",
-      );
-
+      printWarning(" `$onRegistration` already exists. skip...");
       // printWarning("use `--update` to force update");
       return ("", "", "", ""); // Already up-to-date for this event, do nothing.
     }
@@ -283,61 +288,134 @@ Future<(String, String, String, String)> _addSingleEvent(
     }
   }
 
-  final blocLines = blocContent.split('\n');
+  List<String> blocLines = blocContent.split('\n');
   bool isDirty = false;
 
   // Insert method if it's missing. This is inserted near the end of the file.
-  if (!_hasOnMethod) {
-    final lastLine = findLastClassbodyLineNumber(blocPath);
-    if (lastLine != null) {
-      final responseType = (apiPath != null && method != null)
-          ? await extractMethodResponseInnerDataType(apiPath, method)
-          : null;
+  int? lastLine = findLastClassbodyLineNumber(blocPath);
+  if (!_hasOnMethod && lastLine != null) {
+    final responseType = (apiPath != null && method != null)
+        ? await extractMethodResponseInnerDataType(apiPath, method)
+        : null;
 
-      final resHitField = responseType?['hitField'] ?? '';
-      final apiClassName = apiPath != null && method != null
-          ? findClassNameByMethodName(apiPath, method)
-          : null;
+    final resHitField = responseType?['hitField'] ?? '';
+    final apiClassName = apiPath != null && method != null
+        ? findClassNameByMethodName(apiPath, method)
+        : null;
 
-      final apiClassNameCamelCase = apiClassName?.camelCase;
-      final apiCodeBlock =
-          apiPath != null && method != null && apiClassName != null
-          ? '''
-        try {
-          final $apiClassNameCamelCase = GetIt.instance<$apiClassName>();
-          final response = await $apiClassNameCamelCase.$method(${getEventCallArgs(apiPath, method)});
-          ${resHitField != '' ? '''
-          if (response == null) {
-            emit(const ${commonClassName}State.failure('No data'));
-            return;
-          }
-          emit(${commonClassName}State.${eventName}Result(response.$resHitField));
-''' : '''
-          ${newStateParams == "()" ? '''
-          emit(${commonClassName}State.${eventName}Result());
-''' : '''
-          emit(${commonClassName}State.${eventName}Result(response));
-          '''}
-'''}
-        } catch (e) {
-          emit(${commonClassName}State.failure(e.toString()));
-        }
-'''
-          : '';
+    final clientInstanceName = apiClassName?.camelCase;
+    final bool isProto = apiPath?.endsWith('.proto') ?? false;
 
-      final newMethod =
-          '''
+    ////////////////////////////////
+    // INSTANCE GENERATOR CODE
+    ////////////////////////////////
 
-  Future<void> $onMethodName(
-    _${EventName}Requested event,
-    Emitter<${commonClassName}State> emit,
-  ) async {
-    $apiCodeBlock
-  }
+    String instanceCode = '';
+    if (isProto &&
+        clientInstanceName != null &&
+        !blocContent.contains('final $clientInstanceName = $apiClassName(')) {
+      ////////////////////////////////
+      // START wirte proto imports
+      ////////////////////////////////
+      const protoImports = '''
+import 'package:connectrpc/http2.dart';
+import 'package:connectrpc/protobuf.dart';
+import 'package:connectrpc/protocol/connect.dart';
 ''';
-      blocLines.insert(lastLine - 1, newMethod);
-      isDirty = true;
+      blocLines.insert(1, protoImports);
+      File(blocPath).writeAsStringSync(blocLines.join('\n'));
+      blocContent = File(blocPath).readAsStringSync();
+      blocLines = blocContent.split('\n');
+      ////////////////////////////////
+      // END wirte proto imports
+      ////////////////////////////////
+
+      ////////////////////////////////
+      // START write instance code
+      ////////////////////////////////
+      instanceCode =
+          '''
+final $clientInstanceName = $apiClassName(
+Transport(
+  baseUrl: "https://[IP_ADDRESS]",
+  codec: const ProtoCodec(), // Or JsonCodec()
+  httpClient: createHttpClient(), // h2 transporter
+),
+);
+''';
+    } else if (!isProto) {
+      instanceCode =
+          'final $clientInstanceName = GetIt.instance<$apiClassName>();';
+      if (blocContent.contains(instanceCode)) {
+        instanceCode = '';
+      }
     }
+
+    // Insert after part of or imports
+    final lines = blocContent.split('\n');
+    int insertIndex = 0;
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].startsWith('import ') || lines[i].startsWith('part ')) {
+        insertIndex = i + 1;
+      }
+    }
+    if (instanceCode.isNotEmpty) {
+      lines.insert(insertIndex, '\n$instanceCode');
+    }
+    blocContent = lines.join('\n');
+    // update blocLines & lastLine
+    blocLines = lines;
+    lastLine = lines.length - 1;
+    isDirty = true;
+
+    ////////////////////////////////
+    // END INSTANCE GENERATOR CODE
+    ////////////////////////////////
+
+    //
+    // API CODE BLOCK
+    //
+    final apiCodeBlock =
+        apiPath != null && method != null && apiClassName != null
+        ? '''
+      try {
+        // emit(const ${commonClassName}State.loading());
+        ${(isProto && (responseType?['responseDataType']?.startsWith('Stream<') ?? false)) ? '''
+        final response = $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
+''' : '''
+        final response = await $clientInstanceName.${isProto ? eventName : method}(${getEventCallArgs(apiPath, method)});
+'''}
+        ${resHitField != '' ? '''
+        if (response == null) {
+          emit(const ${commonClassName}State.failure('No data'));
+          return;
+        }
+        emit(${commonClassName}State.${eventName}Result(response.$resHitField));
+''' : '''
+        ${newStateParams == "()" ? '''
+        emit(${commonClassName}State.${eventName}Result());
+''' : '''
+        emit(${commonClassName}State.${eventName}Result(response));
+        '''}
+'''}
+      } catch (e) {
+        emit(${commonClassName}State.failure(e.toString()));
+      }
+'''
+        : '';
+
+    final newMethod =
+        '''
+
+Future<void> $onMethodName(
+  _${EventName}Requested event,
+  Emitter<${commonClassName}State> emit,
+) async {
+  $apiCodeBlock
+}
+''';
+    blocLines.insert(lastLine! - 1, newMethod);
+    isDirty = true;
   }
 
   // Insert the 'on' call if it's missing. This is inserted earlier in the file.
@@ -379,11 +457,106 @@ Future<(String, String, String, String)> _addSingleEvent(
         File(blocPath).writeAsStringSync(updatedSource);
         print('Updated (refresh args): $blocPath');
       } else {
-        printWarning(
-          "Could not find method call to `.$method` in $blocPath for surgical update.",
-        );
+        // printWarning(
+        //   "Could not find method call to `.$method` in $blocPath for surgical update.",
+        // );
       }
     }
   }
+  if (makeRepository) {
+    final repoDir = p.join(p.dirname(effectiveWriteDir), 'repository');
+    Directory(repoDir).createSync(recursive: true);
+
+    final repoPath = p.join(repoDir, '${commonFileName}_repository.dart');
+    final repoImplPath = p.join(
+      repoDir,
+      '${commonFileName}_repository_impl.dart',
+    );
+
+    if (!File(repoPath).existsSync()) {
+      final repoContent =
+          '''
+abstract class ${commonClassName}Repository {
+}
+''';
+      File(repoPath).writeAsStringSync(repoContent);
+      printSuccess('Generated: $repoPath');
+    }
+
+    if (!File(repoImplPath).existsSync()) {
+      final repoImplContent =
+          '''
+import 'package:injectable/injectable.dart';
+import '${commonFileName}_repository.dart';
+
+@LazySingleton(as: ${commonClassName}Repository)
+class ${commonClassName}RepositoryImpl implements ${commonClassName}Repository {
+}
+''';
+      File(repoImplPath).writeAsStringSync(repoImplContent);
+      printSuccess('Generated: $repoImplPath');
+    }
+
+    // append new methods if api is specified
+    if (apiPath != null && method != null) {
+      final repoStateParams = await stateParam(apiPath, method, true);
+      final repoEventParam = eventParam(apiPath, method, true);
+      String repoReturnType = 'Future<void>';
+
+      if (repoStateParams != '()') {
+        String inner = repoStateParams
+            .substring(1, repoStateParams.length - 1)
+            .trim();
+        int lastSpace = inner.lastIndexOf(' ');
+        if (lastSpace != -1) {
+          String type = inner.substring(0, lastSpace).trim();
+          repoReturnType = type.startsWith('Stream<') ? type : 'Future<$type>';
+        } else {
+          String type = inner;
+          repoReturnType = type.startsWith('Stream<') ? type : 'Future<$type>';
+        }
+      }
+
+      final interfaceMethod = '  $repoReturnType $eventName$repoEventParam;';
+      final implMethod =
+          '''
+  @override
+  $repoReturnType $eventName$repoEventParam async {
+    // TODO: implement $eventName
+    throw UnimplementedError();
+  }''';
+
+      // Update interface
+      String repoContent = File(repoPath).readAsStringSync();
+      if (!repoContent.contains(' $eventName(')) {
+        int lastBrace = repoContent.lastIndexOf('}');
+        if (lastBrace != -1) {
+          repoContent =
+              repoContent.substring(0, lastBrace) +
+              interfaceMethod +
+              '\n' +
+              repoContent.substring(lastBrace);
+          File(repoPath).writeAsStringSync(repoContent);
+          printSuccess('Updated: $repoPath with $eventName');
+        }
+      }
+
+      // Update impl
+      String repoImplContent = File(repoImplPath).readAsStringSync();
+      if (!repoImplContent.contains(' $eventName(')) {
+        int lastBraceImpl = repoImplContent.lastIndexOf('}');
+        if (lastBraceImpl != -1) {
+          repoImplContent =
+              repoImplContent.substring(0, lastBraceImpl) +
+              implMethod +
+              '\n' +
+              repoImplContent.substring(lastBraceImpl);
+          File(repoImplPath).writeAsStringSync(repoImplContent);
+          printSuccess('Updated: $repoImplPath with $eventName');
+        }
+      }
+    }
+  }
+
   return (effectiveWriteDir, blocPath, eventPath, statePath);
 }

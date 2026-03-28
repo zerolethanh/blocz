@@ -9,6 +9,7 @@ sealed class UserState with _$UserState {
   const factory UserState.getUsersResult(List<User> data) = _GetUsersResult;
   const factory UserState.createUserResult(User data) = _CreateUserResult;
   const factory UserState.deleteUserResult(int data) = _DeleteUserResult;
-  const factory UserState.getUserByIdWithApiKeyResult(User data) = _GetUserByIdWithApiKeyResult;
+  const factory UserState.getUserByIdWithApiKeyResult(User data) =
+      _GetUserByIdWithApiKeyResult;
   const factory UserState.updateUserResult(bool data) = _UpdateUserResult;
 }

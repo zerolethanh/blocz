@@ -6,6 +6,7 @@ import 'package:blocz/_internal/managers/ConstructorManager.dart';
 import 'package:blocz/extractConstructorParams.dart';
 import 'package:blocz/extractMethodParams.dart';
 import 'package:blocz/extractMethodResponseTypeWithField.dart';
+import 'package:blocz/extractProtoInfo.dart';
 import 'package:recase/recase.dart';
 
 void runDartFormat(String dir) {
@@ -42,6 +43,10 @@ String replaceDomainKey(String? writeDir, String domain) {
 /// (e.g., `id, name: event.name`) to be used in the generated code.
 String getEventCallArgs(String? fpath, String? method) {
   if (fpath == null || method == null) return '';
+
+  if (fpath.endsWith('.proto')) {
+    return 'event.request';
+  }
 
   String? paramsJson;
   try {
@@ -126,17 +131,21 @@ Future<String> stateParam(String? fp, String? method, bool? isApiPath) async {
     return "()";
   }
   if (isApiPath != null && isApiPath) {
-    Map<String, dynamic>? responseType;
+    if (fp.endsWith('.proto')) {
+      final responseType = extractProtoMethodResponseType(fp, method);
+      if (responseType == 'void' || responseType == 'dynamic') {
+        return "()";
+      }
+      return "($responseType data)";
+    }
     try {
-      responseType = await extractMethodResponseTypeWithField(
+      final responseTypeMap = await extractMethodResponseTypeWithField(
         fp,
         method,
         "data,body",
       );
-      String responseDataType = "dynamic";
-      String result = "()";
-      responseDataType = responseType['responseDataType'];
-      result = "($responseDataType data)";
+      String responseDataType = responseTypeMap['responseDataType'] ?? "dynamic";
+      String result = "($responseDataType data)";
       if (result == "(void data)") {
         result = "()";
       }
@@ -162,6 +171,9 @@ String eventParam(String? fp, String method, bool? isApiPath) {
   if (isApiPath != null && isApiPath) {
     // fp = apiPath
     try {
+      if (fp.endsWith('.proto')) {
+        return extractProtoMethodParams(fp, method);
+      }
       Map<String, dynamic>? eResult = jsonDecode(
         extractMethodParams(fp, method) ?? "{}",
       );
