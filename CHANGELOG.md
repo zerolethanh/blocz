@@ -1,3 +1,9 @@
+## 1.5.0
+
+- **Protobuf Support**: You can now generate BLoC events and states directly from `.proto` files. Use `blocz add:event -d <domain> -a <proto_file> --update` to automatically extract RPC methods and generate the corresponding BLoC logic.
+- **Repository Scaffolding**: Added support for generating repository interfaces and implementations. Use the `--repository` (or `-r`) flag with `add:event` to create a clean repository layer skeleton synced with your API/Proto methods.
+- **Enhanced Code Generation**: Improved support for ConnectRPC and Protobuf through automatic import injection and client instance generation.
+
 ## 1.4.0
 
 - **New `--update` flag**: Added support for updating existing events. When used, `blocz` will synchronize parameters between your API methods and existing Event/State factory constructors, and surgically update BLoC method call arguments.

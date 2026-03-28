@@ -6,8 +6,6 @@ import 'package:connectrpc/protobuf.dart';
 import 'package:connectrpc/protocol/connect.dart';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
 import 'package:injectable/injectable.dart';
 
 part 'user_proto_event.dart';
